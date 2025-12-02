@@ -155,6 +155,96 @@ body{
   color:#fff;
 }
 
+  /* Calendario y selector de horas */
+.calendar-time-wrapper{
+  display:grid;
+  grid-template-columns:1.2fr 0.8fr;
+  gap:16px;
+  align-items:start;
+}
+.calendar-wrapper,.time-selector{
+  background:#1a2332;
+  border:2px solid #2d3e50;
+  border-radius:8px;
+  padding:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+.calendar-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+.calendar-month{
+  font-weight:700;
+  text-transform:capitalize;
+}
+.calendar-nav{
+  background:#457b9d;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  width:32px;
+  height:32px;
+  cursor:pointer;
+  font-size:18px;
+}
+.calendar-weekdays,.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+.calendar-weekdays span{
+  text-align:center;
+  font-size:.85em;
+  color:#a8dadc;
+  font-weight:600;
+}
+.calendar-day{
+  width:100%;
+  padding:10px 0;
+  border:none;
+  border-radius:6px;
+  background:#1f2d3d;
+  color:#e0e0e0;
+  cursor:pointer;
+  transition:all .2s;
+}
+.calendar-day:hover{filter:brightness(1.05)}
+.available-day{
+  border:1px solid #2ecc71;
+  background:rgba(46,204,113,.12);
+}
+.unavailable-day{
+  border:1px solid #e63946;
+  background:rgba(230,57,70,.15);
+  color:#e63946;
+  cursor:not-allowed;
+}
+.selected-day{
+  box-shadow:0 0 0 2px #ff6b35 inset;
+}
+.time-selector label{color:#a8dadc;font-weight:600;margin-bottom:8px;display:block}
+#requestedTime{
+  width:100%;
+  padding:12px;
+  border:2px solid #2d3e50;
+  border-radius:6px;
+  background:#1a2332;
+  color:#e0e0e0;
+  font-size:1em;
+}
+#requestedTime option.time-available{color:#2ecc71;}
+#requestedTime option.time-disabled{color:#e63946;}
+.time-helper{
+  margin-top:10px;
+  font-size:.85em;
+  color:#cfd8dc;
+}
+@media(max-width:900px){
+  .calendar-time-wrapper{grid-template-columns:1fr;}
+}
+
 /* Soluciones */
 .solutions-section{margin-top:5px}
 .solution-item{
@@ -424,8 +514,25 @@ body{
     </div>
 
     <div class="form-group">
-      <label for="requestedDate">Fecha solicitada *</label>
-      <input type="datetime-local" id="requestedDate" required>
+      <label for="calendar">Fecha solicitada *</label>
+      <div class="calendar-time-wrapper" id="calendar">
+        <div class="calendar-wrapper">
+          <div class="calendar-header">
+            <button type="button" class="calendar-nav" onclick="changeMonth(-1)">&#8249;</button>
+            <div id="calendarMonthLabel" class="calendar-month"></div>
+            <button type="button" class="calendar-nav" onclick="changeMonth(1)">&#8250;</button>
+          </div>
+          <div class="calendar-weekdays">
+            <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+        <div class="time-selector">
+          <label for="requestedTime">Horario *</label>
+          <select id="requestedTime"></select>
+          <p class="time-helper">Los horarios válidos son de 10:00 a 16:00. Las horas adyacentes a una reserva se bloquean automáticamente.</p>
+        </div>
+      </div>
     </div>
 
     <div class="form-group">
@@ -597,7 +704,7 @@ body{
   <!-- BOTÓN ENVIAR + FALLBACK -->
   <div class="footer-actions">
     <div class="footer-actions-inner">
-      <button type="button" class="btn btn-primary" onclick="openOutlook()">Enviar</button>
+      <button type="button" class="btn btn-primary" onclick="handleSubmit()">Enviar</button>
 
       <div id="fallback" style="display:none" class="fallback-section">
         <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
@@ -615,6 +722,218 @@ body{
 
 <script>
 const mailtoRecipient = 'showroom-itot@ejemplo.com';
+
+// --- NUEVO: lógica de calendario y horarios con SharePoint ---
+const LIST_NAME = 'ReservasShowroom'; // Nombre de la lista de SharePoint (ajustable)
+const DISPLAY_HOURS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+const RESERVABLE_HOURS = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
+let selectedDate = null;      // 'YYYY-MM-DD'
+let selectedTime = null;      // 'HH:MM'
+let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
+let availabilityByDate = {};
+let currentMonthDate = new Date();
+
+function normalizeTimeSlot(timeStr){
+  if(!timeStr) return null;
+  const parts = timeStr.toString().trim().split(':');
+  const hour = parts[0];
+  if(hour === undefined) return null;
+  const hourNum = Number(hour);
+  if(Number.isNaN(hourNum)) return null;
+  return `${String(hourNum).padStart(2,'0')}:00`;
+}
+
+function addBlockedSlot(blockedSet,timeStr){
+  const normalized = normalizeTimeSlot(timeStr);
+  if(!normalized) return;
+  const hour = parseInt(normalized.split(':')[0],10);
+  if(Number.isNaN(hour)) return;
+  [hour-1,hour,hour+1].forEach(h=>{
+    const slot = `${String(h).padStart(2,'0')}:00`;
+    if(DISPLAY_HOURS.includes(slot)){
+      blockedSet.add(slot);
+    }
+  });
+}
+
+function buildAvailabilityMap(){
+  availabilityByDate = {};
+  Object.keys(reservationsByDate).forEach(dateStr=>{
+    const blocked = new Set();
+    (reservationsByDate[dateStr] || []).forEach(time=>addBlockedSlot(blocked,time));
+    const hasAvailableSlots = RESERVABLE_HOURS.some(h=>!blocked.has(h));
+    availabilityByDate[dateStr] = {blockedTimes:blocked, hasAvailableSlots};
+  });
+}
+
+async function loadReservationsFromSharePoint(){
+  try{
+    const response = await fetch(`/_api/web/lists/getbytitle('${LIST_NAME}')/items?$select=FechaReserva,HoraReserva`,{
+      headers:{'Accept':'application/json;odata=nometadata'}
+    });
+    if(!response.ok) throw new Error('Error al obtener reservas');
+    const data = await response.json();
+    reservationsByDate = {};
+    if(Array.isArray(data.value)){
+      data.value.forEach(item=>{
+        const dateStr = item.FechaReserva ? item.FechaReserva.split('T')[0] : null;
+        const timeStr = normalizeTimeSlot(item.HoraReserva);
+        if(dateStr && timeStr){
+          if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
+          reservationsByDate[dateStr].push(timeStr);
+        }
+      });
+    }
+    buildAvailabilityMap();
+    renderCalendar(currentMonthDate);
+    if(selectedDate){
+      renderTimeOptionsForSelectedDay();
+    }
+  }catch(err){
+    console.error('No se pudieron cargar las reservas desde SharePoint',err);
+  }
+}
+
+function formatDateString(year,monthIndex,day){
+  const m = String(monthIndex+1).padStart(2,'0');
+  const d = String(day).padStart(2,'0');
+  return `${year}-${m}-${d}`;
+}
+
+function isDayAvailable(dateStr){
+  const info = availabilityByDate[dateStr];
+  if(!info) return true;
+  return info.hasAvailableSlots;
+}
+
+function renderCalendar(monthDate = currentMonthDate){
+  currentMonthDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+  const monthLabel = document.getElementById('calendarMonthLabel');
+  const grid = document.getElementById('calendarGrid');
+  if(!monthLabel || !grid) return;
+
+  monthLabel.textContent = currentMonthDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+  grid.innerHTML = '';
+
+  const startOfMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth(),1);
+  const startDay = (startOfMonth.getDay()+6)%7; // Empezar en lunes
+  for(let i=0;i<startDay;i++){
+    const empty = document.createElement('div');
+    grid.appendChild(empty);
+  }
+
+  const daysInMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+1,0).getDate();
+  for(let day=1; day<=daysInMonth; day++){
+    const dateStr = formatDateString(currentMonthDate.getFullYear(), currentMonthDate.getMonth(), day);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.classList.add('calendar-day');
+    btn.textContent = day;
+
+    if(isDayAvailable(dateStr)){
+      btn.classList.add('available-day');
+      btn.addEventListener('click',()=>onDayClick(dateStr));
+    }else{
+      btn.classList.add('unavailable-day');
+      btn.disabled = true;
+    }
+
+    if(selectedDate === dateStr){
+      btn.classList.add('selected-day');
+    }
+    grid.appendChild(btn);
+  }
+}
+
+function onDayClick(dateString){
+  if(!isDayAvailable(dateString)) return;
+  selectedDate = dateString;
+  renderCalendar(currentMonthDate);
+  renderTimeOptionsForSelectedDay();
+}
+
+function renderTimeOptionsForSelectedDay(){
+  const select = document.getElementById('requestedTime');
+  if(!select) return;
+  select.innerHTML = '';
+
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  placeholder.textContent = selectedDate ? 'Selecciona un horario' : 'Selecciona una fecha primero';
+  select.appendChild(placeholder);
+
+  const blocked = (selectedDate && availabilityByDate[selectedDate]?.blockedTimes) ? availabilityByDate[selectedDate].blockedTimes : new Set();
+
+  DISPLAY_HOURS.forEach(time=>{
+    const option = document.createElement('option');
+    option.value = time;
+    option.textContent = time;
+    const isReservable = RESERVABLE_HOURS.includes(time);
+    const isBlocked = blocked.has(time);
+    const isAvailable = selectedDate && isReservable && !isBlocked;
+
+    if(isAvailable){
+      option.classList.add('time-available');
+      option.style.color = '#2ecc71';
+    }else{
+      option.classList.add('time-disabled');
+      option.disabled = true;
+      option.style.color = '#e63946';
+    }
+    select.appendChild(option);
+  });
+
+  if(selectedDate){
+    const firstAvailable = RESERVABLE_HOURS.find(h=>!blocked.has(h));
+    if(firstAvailable){
+      const valueToSelect = (selectedTime && !blocked.has(selectedTime)) ? selectedTime : firstAvailable;
+      select.value = valueToSelect;
+      selectedTime = valueToSelect;
+    }else{
+      select.value = '';
+      selectedTime = null;
+    }
+  }else{
+    selectedTime = null;
+  }
+}
+
+function changeMonth(delta){
+  currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+delta, 1);
+  renderCalendar(currentMonthDate);
+}
+
+async function createSharePointReservation(selectedDate, selectedTime, companyName, sector, guestCount, comments, labTeam, guestsArray){
+  const payload = {
+    '__metadata': { 'type': 'SP.Data.ReservasShowroomListItem' }, // Ajustar "type" al nombre interno de la lista
+    'FechaReserva': selectedDate,
+    'HoraReserva': selectedTime,
+    'Empresa': companyName || '',
+    'Sector': sector || '',
+    'NumeroInvitados': guestCount ? Number(guestCount) : 0,
+    'Comentarios': comments || '',
+    'RequiereEquipoLab': labTeam === true,
+    'InvitadosJson': JSON.stringify(guestsArray || [])
+  };
+
+  const response = await fetch(`/_api/web/lists/getbytitle('${LIST_NAME}')/items`,{
+    method:'POST',
+    headers:{
+      'Accept':'application/json;odata=nometadata',
+      'Content-Type':'application/json;odata=verbose',
+      'odata-version':'3.0',
+      'X-RequestDigest': document.getElementById('__REQUESTDIGEST')?.value || ''
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if(!response.ok){
+    throw new Error('Error al crear el ítem en SharePoint');
+  }
+}
+
 
 const LAYER_HEIGHT = 130;
 const purdueLayers = [
@@ -818,8 +1137,8 @@ function renderGuestList(){
 
 /* Validación y armado de correo */
 function validateForm(){
-  const date = document.getElementById('requestedDate').value;
-
+  const hasDate = !!selectedDate;
+  const hasTime = !!selectedTime;
 
   const solIds = [
     {chk:'sol-fw-ot', brandGroup:'fw-ot-brand', label:'FW OT'},
@@ -833,7 +1152,7 @@ function validateForm(){
 
   const anySolutionChecked = solIds.some(s => document.getElementById(s.chk).checked);
 
-  if(!(date && anySolutionChecked)){
+  if(!(hasDate && hasTime && anySolutionChecked)){
     return false;
 }
 
@@ -891,12 +1210,12 @@ function buildMailto(){
   const sector = document.getElementById('sector').value.trim();
   const requiresLabTeam = document.getElementById('labTeamPresent').checked;
   const solutions = getSelectedSolutions();
-
-  const dateObj = new Date(date);
-  const dateStr = dateObj.toLocaleString('es-ES',{
+  const dateStrIso = (selectedDate && selectedTime) ? `${selectedDate}T${selectedTime}:00` : null;
+  const dateObj = dateStrIso ? new Date(dateStrIso) : null;
+  const dateStr = dateObj ? dateObj.toLocaleString('es-ES',{
     year:'numeric',month:'2-digit',day:'2-digit',
     hour:'2-digit',minute:'2-digit'
-  });
+  }) : '';
 
  const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${companyName || "Empresa no indicada"}`;
  let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
@@ -955,6 +1274,39 @@ function openOutlook(){
   }else{
     document.getElementById('fallback').style.display='none';
     window.location.href = mailtoLink;
+  }
+}
+
+ async function handleSubmit(){
+  if(!validateForm()){
+    alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
+    return;
+  }
+
+  openOutlook();
+
+  try{
+    const companyName = document.getElementById('companyName').value.trim();
+    const sector = document.getElementById('sector').value.trim();
+    const guestCount = document.getElementById('guestCount').value.trim();
+    const comments = document.getElementById('comments').value.trim();
+    const requiresLabTeam = document.getElementById('labTeamPresent').checked;
+
+    await createSharePointReservation(
+      selectedDate,
+      selectedTime,
+      companyName,
+      sector,
+      guestCount,
+      comments,
+      requiresLabTeam,
+      guests
+    );
+
+    await loadReservationsFromSharePoint();
+  }catch(err){
+    console.error('No se pudo registrar la reserva en SharePoint', err);
+    alert('El correo fue generado, pero hubo un problema al registrar la reserva en SharePoint.');
   }
 }
 
@@ -2115,6 +2467,15 @@ function toggleBrands(solutionId){
 document.addEventListener('DOMContentLoaded',()=>{
   renderGuestList();
   updateDiagram();
+   renderCalendar(currentMonthDate);
+  renderTimeOptionsForSelectedDay();
+  loadReservationsFromSharePoint();
+  const timeSelect = document.getElementById('requestedTime');
+  if(timeSelect){
+    timeSelect.addEventListener('change',(e)=>{
+      selectedTime = e.target.value || null;
+    });
+  }
   const form = document.getElementById('reservationForm');
   if(form){
     form.addEventListener('change',updateDiagram);
