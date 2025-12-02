@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Showroom IT/OT - Reservas</title>
+
+<!-- Librería para leer Excel (fase de desarrollo con reservas.xlsx en la misma carpeta) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+  color:#e0e0e0;
+  min-height:100vh;
+  padding:20px;
+}
+.container{
+  max-width:1800px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:450px 1fr;
+  gap:30px;
+  align-items:start;
+}
+.header{
+  grid-column:1 / -1;
+  text-align:center;
+  margin-bottom:20px;
+  padding:20px;
+  background:linear-gradient(135deg,#0f3460 0%,#16213e 100%);
+  border-radius:10px;
+  box-shadow:0 4px 15px rgba(0,0,0,.3);
+}
+.header h1{
+  color:#ff6b35;
+  font-size:2.5em;
+  text-shadow:2px 2px 4px rgba(0,0,0,.5);
+}
+.form-panel{
+  background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,.4);
+  border:1px solid #2d3e50;
+}
+.form-panel h2{
+  margin-bottom:15px;
+}
+.form-group{margin-bottom:20px}
+.form-group label{
+  display:block;
+  margin-bottom:8px;
+  color:#a8dadc;
+  font-weight:600;
+  font-size:.95em;
+}
+.form-group input,
+.form-group textarea{
+  width:100%;
+  padding:12px;
+  border:2px solid #2d3e50;
+  border-radius:6px;
+  background:#1a2332;
+  color:#e0e0e0;
+  font-size:1em;
+  transition:all .3s;
+}
+.form-group input:focus,
+.form-group textarea:focus{
+  outline:none;
+  border-color:#ff6b35;
+  box-shadow:0 0 10px rgba(255,107,53,.3);
+}
+.form-group textarea{
+  resize:vertical;
+  min-height:80px;
+}
+.static-field{
+  background:rgba(255,255,255,0.07);
+  padding:10px 12px;
+  border-radius:6px;
+  border:1px solid #2d3e50;
+  font-size:.95em;
+  color:#e0e0e0;
+}
+
+.guest-form{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+  flex-wrap:wrap;
+}
+.guest-form input{
+  flex:1;
+  min-width:140px;
+}
+.btn-guest-add{
+  padding:10px 16px;
+  border:none;
+  border-radius:6px;
+  background:#457b9d;
+  color:#fff;
+  font-size:.85em;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .3s;
+  white-space:nowrap;
+}
+.btn-guest-add:hover{
+  transform:translateY(-1px);
+  box-shadow:0 3px 8px rgba(0,0,0,.3);
+}
+#guestList{
+  margin-top:5px;
+}
+.guest-list-item{
+  font-size:.85em;
+  color:#cfd8dc;
+  margin-bottom:4px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.guest-text{
+  flex:1;
+}
+.guest-actions{
+  display:flex;
+  gap:6px;
+}
+.guest-btn{
+  padding:3px 8px;
+  border:none;
+  border-radius:4px;
+  font-size:.75em;
+  cursor:pointer;
+}
+.guest-btn.edit{
+  background:#457b9d;
+  color:#fff;
+}
+.guest-btn.delete{
+  background:#e63946;
+  color:#fff;
+}
+
+.solutions-section{margin-top:25px}
+.solution-item{
+  margin-bottom:20px;
+  padding:15px;
+  background:#1a2332;
+  border-radius:8px;
+  border-left:4px solid #ff6b35;
+}
+.solution-checkbox{
+  display:flex;
+  align-items:center;
+  margin-bottom:10px;
+}
+.solution-checkbox input[type="checkbox"]{
+  width:20px;
+  height:20px;
+  margin-right:10px;
+  cursor:pointer;
+}
+.solution-checkbox label{
+  cursor:pointer;
+  font-weight:600;
+  color:#ff6b35;
+  font-size:1.05em;
+}
+.brands-group{
+  margin-left:30px;
+  margin-top:10px;
+  display:none;
+}
+.brands-group.active{display:block}
+.brand-option{
+  display:flex;
+  align-items:center;
+  margin-bottom:6px;
+}
+.brand-option input[type="radio"]{
+  width:18px;
+  height:18px;
+  margin-right:8px;
+  cursor:pointer;
+}
+.brand-option label{
+  cursor:pointer;
+  color:#a8dadc;
+  font-size:.9em;
+}
+.buttons-group{
+  margin-top:30px;
+  display:flex;
+  gap:15px;
+}
+.btn{
+  flex:1;
+  padding:15px 25px;
+  border:none;
+  border-radius:8px;
+  font-size:1em;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .3s;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#ff6b35 0%,#e85d2a 100%);
+  color:#fff;
+}
+.btn-primary:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(255,107,53,.4);
+}
+.btn-secondary{
+  background:linear-gradient(135deg,#457b9d 0%,#1d3557 100%);
+  color:#fff;
+}
+.btn-secondary:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(69,123,157,.4);
+}
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+.fallback-section{
+  margin-top:20px;
+  padding:20px;
+  background:#1a2332;
+  border-radius:8px;
+  border:2px solid:#ff6b35;
+}
+.fallback-section h3{
+  color:#ff6b35;
+  margin-bottom:15px;
+}
+.fallback-section textarea{
+  width:100%;
+  min-height:200px;
+  padding:12px;
+  background:#0f1923;
+  color:#e0e0e0;
+  border:1px solid #2d3e50;
+  border-radius:6px;
+  font-family:monospace;
+  font-size:.9em;
+}
+.diagram-panel{
+  background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,.4);
+  border:1px solid #2d3e50;
+  min-height:520px;
+  position:relative;
+}
+.diagram-panel h2{
+  color:#ff6b35;
+  margin-bottom:10px;
+  font-size:1.4em;
+}
+.diagram-panel p{
+  font-size:.85em;
+  color:#a8dadc;
+  margin-bottom:10px;
+}
+#diagram-container{
+  width:100%;
+  height:420px;
+  position:relative;
+  background:#0f1923;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px dashed #2d3e50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#64748b;
+  font-size:.85em;
+  text-align:center;
+}
+
+/* Calendario */
+.calendar{
+  background:#1a2332;
+  padding:15px;
+  border-radius:12px;
+  border:1px solid #2d3e50;
+  color:#e0e0e0;
+  width:100%;
+}
+.calendar-top-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+.calendar-nav-btn{
+  background:#0f172a;
+  border:1px solid #334155;
+  color:#e5e7eb;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:.75em;
+  cursor:pointer;
+}
+.calendar-nav-btn:hover{
+  background:#1f2937;
+}
+.calendar-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+  font-size:.9em;
+}
+.calendar-month-title{
+  font-weight:600;
+  color:#ffb703;
+}
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+  margin-bottom:10px;
+}
+.calendar-day-name{
+  text-align:center;
+  font-size:.7em;
+  color:#94a3b8;
+}
+.calendar-day{
+  text-align:center;
+  padding:6px 0;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:.8em;
+  border:1px solid transparent;
+}
+.calendar-day.disabled{
+  opacity:.25;
+  cursor:not-allowed;
+}
+.calendar-day.available{
+  background:rgba(22,163,74,.15);
+  border-color:rgba(22,163,74,.7);
+}
+.calendar-day.reserved{
+  background:rgba(220,38,38,.35);
+  border-color:rgba(248,113,113,.9);
+}
+.calendar-day.selected{
+  box-shadow:0 0 0 2px #f97316;
+}
+.calendar-legend{
+  display:flex;
+  gap:10px;
+  margin-top:4px;
+  font-size:.7em;
+}
+.calendar-legend span{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.calendar-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+}
+.dot-available{background:#16a34a;}
+.dot-reserved{background:#dc2626;}
+
+.time-selector{
+  margin-top:10px;
+}
+.time-selector select{
+  width:100%;
+  padding:8px;
+  background:#0f1923;
+  border:2px solid #2d3e50;
+  color:#e0e0e0;
+  border-radius:6px;
+}
+
+/* Tooltip (si luego reactivas diagrama interactivo) */
+.tooltip{
+  position:fixed;
+  background:rgba(30,42,58,.95);
+  color:#e0e0e0;
+  padding:10px 14px;
+  border-radius:8px;
+  border:2px solid #ff6b35;
+  pointer-events:none;
+  z-index:1000;
+  box-shadow:0 4px 15px rgba(0,0,0,.5);
+  display:none;
+  max-width:320px;
+  font-size:.85em;
+}
+.tooltip.active{display:block}
+.tooltip strong{
+  color:#ff6b35;
+  display:block;
+  margin-bottom:4px;
+  font-size:1em;
+}
+.tooltip .layer{
+  color:#a8dadc;
+  font-size:.8em;
+  margin-bottom:4px;
+}
+.tooltip .description{
+  color:#c0c0c0;
+  font-size:.8em;
+  line-height:1.3;
+}
+
+@media(max-width:1400px){
+  .container{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- PASO 1 -->
+<div id="step1-wrapper" class="container">
+  <div class="header">
+    <h1>🏭 Showroom IT/OT</h1>
+  </div>
+
+  <div class="form-panel">
+    <h2>Paso 1 – Datos del Ejecutivo y del Cliente</h2>
+
+    <div class="form-group">
+      <label>Nombre del Ejecutivo</label>
+      <div id="executiveName" class="static-field">Obteniendo usuario…</div>
+    </div>
+    <div class="form-group">
+      <label>Correo Corporativo</label>
+      <div id="email" class="static-field">Obteniendo correo…</div>
+    </div>
+    <div class="form-group">
+      <label for="clientName">Nombre del cliente (persona de contacto) *</label>
+      <input type="text" id="clientName" required>
+    </div>
+
+    <!-- Calendario + horario -->
+    <div class="form-group">
+      <label>Fecha solicitada (seleccione en el calendario) *</label>
+      <div id="calendar-container"></div>
+      <input type="hidden" id="requestedDate" required>
+    </div>
+
+    <div class="form-group">
+      <label for="comments">Comentarios (opcional)</label>
+      <textarea id="comments"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="companyName">Nombre de la empresa</label>
+      <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing">
+    </div>
+
+    <div class="form-group">
+      <label for="guestCount">Cantidad de invitados por parte del cliente</label>
+      <input type="number" id="guestCount" min="0" placeholder="Ej: 5">
+    </div>
+
+    <div class="form-group">
+      <label>Invitados del cliente (nombre y puesto)</label>
+      <div class="guest-form">
+        <input type="text" id="guestNameInput" placeholder="Nombre del invitado">
+        <input type="text" id="guestRoleInput" placeholder="Puesto">
+        <button type="button" class="btn-guest-add" onclick="addGuest()">Agregar invitado</button>
+      </div>
+      <div id="guestList"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="sector">Sector de la empresa</label>
+      <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
+    </div>
+
+    <div class="form-group" style="margin-top:10px;">
+      <label>
+        <input type="checkbox" id="labTeamPresent" style="width:16px;height:16px;margin-right:6px;">
+        Requieren que la presentación la dé el equipo de laboratorio
+      </label>
+    </div>
+
+    <div class="buttons-group">
+      <button type="button" class="btn btn-primary" onclick="goToStep2()">Siguiente</button>
+    </div>
+  </div>
+
+  <div class="diagram-panel">
+    <h2>Portal de Reservación – Showroom OT</h2>
+    <p>
+      Este portal está diseñado para que los ejecutivos reserven sesiones en el Showroom IT/OT,
+      capturando los datos del cliente, la fecha y las soluciones que se demostrarán.
+    </p>
+    <p>
+      <strong>Reglamento (versión inicial – se puede mejorar):</strong>
+    </p>
+    <ul style="margin-top:10px;padding-left:20px;font-size:.85em;color:#cbd5f5;">
+      <li>Las reservas solo pueden hacerse en el horario de <strong>09:00 – 18:00</strong>, con slots de demostración entre <strong>10:00 y 17:00</strong>.</li>
+      <li>No se permite reservar a las <strong>09:00</strong> ni iniciar una demostración a las <strong>17:00</strong> para respetar tiempos de preparación.</li>
+      <li>Solo se permiten reservas de <strong>lunes a viernes</strong>.</li>
+      <li>El calendario muestra el mes actual y el siguiente, y permite navegar entre meses.</li>
+      <li>Solo es posible reservar días futuros.</li>
+      <li>Las soluciones seleccionadas deben incluir marca obligatoriamente.</li>
+      <li>Este reglamento es una versión inicial y se podrá ir actualizando conforme madure el uso del Showroom.</li>
+    </ul>
+
+    <div id="diagram-container">
+      Diagrama de la maqueta IT/OT.<br>
+      (Aquí se puede integrar o mantener tu diagrama dinámico actual.)
+    </div>
+  </div>
+</div>
+
+<!-- PASO 2 -->
+<div id="step2-wrapper" class="container" style="display:none">
+  <div class="header">
+    <h1>🏭 Showroom IT/OT</h1>
+  </div>
+
+  <div class="form-panel">
+    <h2>Paso 2 – Selección de Tecnologías y Envío</h2>
+    <form id="reservationForm">
+      <div class="solutions-section">
+        <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a Demostrar *</h3>
+
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-fw-ot" onchange="toggleBrands('fw-ot')">
+            <label for="sol-fw-ot">FW OT (Firewall OT)</label>
+          </div>
+          <div class="brands-group" id="brands-fw-ot">
+            <div class="brand-option">
+              <input type="radio" id="fw-fortinet" name="fw-ot-brand" value="Fortinet">
+              <label for="fw-fortinet">Fortinet</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point">
+              <label for="fw-checkpoint">Check Point</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks">
+              <label for="fw-txone">TXOne Networks</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="fw-paloalto" name="fw-ot-brand" value="Palo Alto Networks">
+              <label for="fw-paloalto">Palo Alto Networks</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-visibility" onchange="toggleBrands('visibility')">
+            <label for="sol-visibility">Visibilidad de Red OT</label>
+          </div>
+          <div class="brands-group" id="brands-visibility">
+            <div class="brand-option">
+              <input type="radio" id="vis-nozomi" name="visibility-brand" value="Nozomi">
+              <label for="vis-nozomi">Nozomi Networks</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vis-tenable" name="visibility-brand" value="Tenable OT">
+              <label for="vis-tenable">Tenable OT</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vis-claroty" name="visibility-brand" value="Claroty">
+              <label for="vis-claroty">Claroty</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-vuln" onchange="toggleBrands('vuln')">
+            <label for="sol-vuln">Gestión de vulnerabilidades OT</label>
+          </div>
+          <div class="brands-group" id="brands-vuln">
+            <div class="brand-option">
+              <input type="radio" id="vuln-nozomi" name="vuln-brand" value="Nozomi">
+              <label for="vuln-nozomi">Nozomi Networks</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vuln-tenable" name="vuln-brand" value="Tenable OT">
+              <label for="vuln-tenable">Tenable OT</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vuln-claroty" name="vuln-brand" value="Claroty">
+              <label for="vuln-claroty">Claroty</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-ips" onchange="toggleBrands('ips')">
+            <label for="sol-ips">IPS (Intrusion Prevention System)</label>
+          </div>
+          <div class="brands-group" id="brands-ips">
+            <div class="brand-option">
+              <input type="radio" id="ips-txone" name="ips-brand" value="TXOne Networks">
+              <label for="ips-txone">TXOne Networks</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-access" onchange="toggleBrands('access')">
+            <label for="sol-access">Acceso Seguro / ZTNA</label>
+          </div>
+          <div class="brands-group" id="brands-access">
+            <div class="brand-option">
+              <input type="radio" id="access-cyolo" name="access-brand" value="Cyolo">
+              <label for="access-cyolo">Cyolo</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="access-claroty" name="access-brand" value="Claroty">
+              <label for="access-claroty">Claroty</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="access-fortinet" name="access-brand" value="Fortinet">
+              <label for="access-fortinet">Fortinet</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-deception" onchange="toggleBrands('deception')">
+            <label for="sol-deception">Deception (Señuelos OT)</label>
+          </div>
+          <div class="brands-group" id="brands-deception">
+            <div class="brand-option">
+              <input type="radio" id="dec-fortinet" name="deception-brand" value="Fortinet">
+              <label for="dec-fortinet">Fortinet</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="dec-zscaler" name="deception-brand" value="Zscaler">
+              <label for="dec-zscaler">Zscaler</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-soc" onchange="toggleBrands('soc')">
+            <label for="sol-soc">SOC (SIEM / Monitoreo)</label>
+          </div>
+          <div class="brands-group" id="brands-soc">
+            <div class="brand-option">
+              <input type="radio" id="soc-splunk" name="soc-brand" value="Splunk">
+              <label for="soc-splunk">Splunk</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="buttons-group">
+        <button type="button" class="btn btn-secondary" onclick="goBackStep1()">Regresar</button>
+        <button type="button" class="btn btn-primary" onclick="openOutlook()">Abrir en Outlook</button>
+      </div>
+
+      <div id="fallback" style="display:none" class="fallback-section">
+        <h3>El enlace mailto es muy largo. Copie el contenido:</h3>
+        <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
+        <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+        <textarea id="fallback-body" readonly></textarea>
+        <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="diagram-panel">
+    <h2>Diagrama de la arquitectura de la maqueta</h2>
+    <p>Pasa al Paso 2 para seleccionar tecnologías. Aquí puedes mantener o integrar tu diagrama dinámico actual de IT/OT.</p>
+    <div id="diagram-container">
+      Área para diagrama IT/OT (SVG, capas Purdue, consolas SOC, etc.).
+    </div>
+  </div>
+</div>
+
+<div id="tooltip" class="tooltip"></div>
+
+<script>
+const mailtoRecipient = 'felipe.tabares@scitum.com.mx';
+
+// -------------------------
+// INVITADOS
+// -------------------------
+let guests = [];
+function addGuest(){
+  const nameInput = document.getElementById('guestNameInput');
+  const roleInput = document.getElementById('guestRoleInput');
+  const name = nameInput.value.trim();
+  const role = roleInput.value.trim();
+  if(!name && !role) return;
+  guests.push({name,role});
+  nameInput.value = '';
+  roleInput.value = '';
+  renderGuestList();
+}
+function editGuest(idx){
+  if(idx<0 || idx>=guests.length) return;
+  const g = guests[idx];
+  const newName = prompt('Nombre del invitado:', g.name || '');
+  if(newName === null) return;
+  const newRole = prompt('Puesto del invitado:', g.role || '');
+  if(newRole === null) return;
+  guests[idx] = {name:newName.trim(), role:newRole.trim()};
+  renderGuestList();
+}
+function removeGuest(idx){
+  if(idx<0 || idx>=guests.length) return;
+  guests.splice(idx,1);
+  renderGuestList();
+}
+function renderGuestList(){
+  const container = document.getElementById('guestList');
+  if(!container) return;
+  if(guests.length === 0){
+    container.innerHTML = '<span style="font-size:0.8em;color:#718096;">Sin invitados capturados aún.</span>';
+    return;
+  }
+  let html = '<ul style="padding-left:0;margin:0;list-style:none;">';
+  guests.forEach((g,idx)=>{
+    const safeName = g.name || 'Sin nombre';
+    const safeRole = g.role || 'Sin puesto';
+    html += `
+      <li class="guest-list-item">
+        <span class="guest-text">${idx+1}. ${safeName} – ${safeRole}</span>
+        <span class="guest-actions">
+          <button type="button" class="guest-btn edit" onclick="editGuest(${idx})">Editar</button>
+          <button type="button" class="guest-btn delete" onclick="removeGuest(${idx})">Eliminar</button>
+        </span>
+      </li>`;
+  });
+  html += '</ul>';
+  container.innerHTML = html;
+}
+
+// -------------------------
+// WIZARD PASO 1 / PASO 2
+// -------------------------
+function validateStep1Basics(){
+  const name = document.getElementById('executiveName').textContent.trim();
+  const email = document.getElementById('email').textContent.trim();
+  const client = document.getElementById('clientName').value.trim();
+  const dateVal = document.getElementById('requestedDate').value;
+  if(!name || !email){
+    alert('No se pudo obtener nombre o correo desde SharePoint.');
+    return false;
+  }
+  if(!client || !dateVal){
+    alert('Por favor complete el nombre del cliente y seleccione una fecha en el calendario.');
+    return false;
+  }
+  return true;
+}
+function goToStep2(){
+  if(!validateStep1Basics()) return;
+  document.getElementById('step1-wrapper').style.display = 'none';
+  document.getElementById('step2-wrapper').style.display = 'grid';
+}
+function goBackStep1(){
+  document.getElementById('step2-wrapper').style.display = 'none';
+  document.getElementById('step1-wrapper').style.display = 'grid';
+}
+
+// -------------------------
+// SELECCIÓN DE MARCAS
+// -------------------------
+function toggleBrands(solutionId){
+  const checkbox = document.getElementById('sol-'+solutionId);
+  const brandsGroup = document.getElementById('brands-'+solutionId);
+  const radios = brandsGroup ? brandsGroup.querySelectorAll('input[type="radio"]') : [];
+  if(checkbox.checked){
+    if(brandsGroup) brandsGroup.classList.add('active');
+    if(radios.length > 0){
+      const anyChecked = Array.from(radios).some(r => r.checked);
+      if(!anyChecked){
+        radios[0].checked = true;
+      }
+    }
+  }else{
+    if(brandsGroup) brandsGroup.classList.remove('active');
+    radios.forEach(r=>r.checked=false);
+  }
+}
+function getSelectedBrand(groupName){
+  const radio = document.querySelector(`input[name="${groupName}"]:checked`);
+  return radio ? radio.value : null;
+}
+
+// -------------------------
+// VALIDACIÓN FORM + MAILTO
+// -------------------------
+function getSelectedSolutions(){
+  const solutions = [];
+  function pick(id,name,group){
+    const chk = document.getElementById(id);
+    if(chk && chk.checked){
+      const brandText = group ? getSelectedBrand(group) : null;
+      solutions.push({name,brand:brandText || 'Sin marca seleccionada'});
+    }
+  }
+  pick('sol-fw-ot','FW OT','fw-ot-brand');
+  pick('sol-visibility','Visibilidad de Red OT','visibility-brand');
+  pick('sol-vuln','Gestión de vulnerabilidades OT','vuln-brand');
+  pick('sol-ips','IPS','ips-brand');
+  pick('sol-access','Acceso Seguro / ZTNA','access-brand');
+  pick('sol-deception','Deception OT','deception-brand');
+  pick('sol-soc','SOC','soc-brand');
+  return solutions;
+}
+
+function validateFormForMail(){
+  const name = document.getElementById('executiveName').textContent.trim();
+  const email = document.getElementById('email').textContent.trim();
+  const client = document.getElementById('clientName').value.trim();
+  const date = document.getElementById('requestedDate').value;
+
+  const solIds = [
+    {chk:'sol-fw-ot', brandGroup:'fw-ot-brand', label:'FW OT'},
+    {chk:'sol-visibility', brandGroup:'visibility-brand', label:'Visibilidad de Red OT'},
+    {chk:'sol-vuln', brandGroup:'vuln-brand', label:'Gestión de vulnerabilidades OT'},
+    {chk:'sol-ips', brandGroup:'ips-brand', label:'IPS'},
+    {chk:'sol-access', brandGroup:'access-brand', label:'Acceso Seguro / ZTNA'},
+    {chk:'sol-deception', brandGroup:'deception-brand', label:'Deception OT'},
+    {chk:'sol-soc', brandGroup:'soc-brand', label:'SOC'}
+  ];
+
+  const anySolutionChecked = solIds.some(s => document.getElementById(s.chk).checked);
+
+  if(!(name && email && client && date && anySolutionChecked)){
+    return false;
+  }
+
+  const missingBrands = [];
+  solIds.forEach(s=>{
+    const chk = document.getElementById(s.chk);
+    if(chk && chk.checked){
+      const brand = getSelectedBrand(s.brandGroup);
+      if(!brand){
+        missingBrands.push(s.label);
+      }
+    }
+  });
+
+  if(missingBrands.length > 0){
+    alert('Debe seleccionar una marca para: ' + missingBrands.join(', '));
+    return false;
+  }
+
+  return true;
+}
+
+function buildMailto(){
+  if(!validateFormForMail()){
+    alert('Por favor complete todos los campos obligatorios, seleccione al menos una solución y una marca para cada solución seleccionada.');
+    return null;
+  }
+  const name = document.getElementById('executiveName').textContent.trim();
+  const email = document.getElementById('email').textContent.trim();
+  const client = document.getElementById('clientName').value.trim();
+  const dateIso = document.getElementById('requestedDate').value;
+  const comments = document.getElementById('comments').value.trim();
+  const companyName = document.getElementById('companyName').value.trim();
+  const guestCount = document.getElementById('guestCount').value.trim();
+  const sector = document.getElementById('sector').value.trim();
+  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
+  const solutions = getSelectedSolutions();
+
+  const dateObj = new Date(dateIso);
+  const dateStr = dateObj.toLocaleString('es-ES',{
+    year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit'
+  });
+
+  const gList = guests || [];
+
+  const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${name} - ${client}`;
+  let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
+  body += `Solicito la reserva del showroom con los siguientes detalles:\n\n`;
+  body += `DATOS DEL EJECUTIVO\n`;
+  body += `-------------------\n`;
+  body += `Nombre: ${name}\n`;
+  body += `Correo: ${email}\n\n`;
+  body += `DATOS DEL CLIENTE\n`;
+  body += `-----------------\n`;
+  body += `Cliente (persona): ${client}\n`;
+  if(companyName) body += `Empresa: ${companyName}\n`;
+  if(sector) body += `Sector: ${sector}\n`;
+  if(guestCount) body += `Número de invitados: ${guestCount}\n`;
+  body += `Fecha solicitada: ${dateStr}\n\n`;
+
+  if(gList.length>0){
+    body += `INVITADOS DEL CLIENTE\n`;
+    body += `--------------------\n`;
+    gList.forEach((g,i)=>{
+      const nameInv = g.name || 'Sin nombre';
+      const roleInv = g.role || 'Sin puesto';
+      body += `${i+1}. ${nameInv} – ${roleInv}\n`;
+    });
+    body += `\n`;
+  }
+
+  body += `SOLUCIONES A DEMOSTRAR\n`;
+  body += `----------------------\n`;
+  solutions.forEach((s,i)=>{
+    body += `${i+1}. ${s.name} - Marca: ${s.brand}\n`;
+  });
+
+  if(comments){
+    body += `\nCOMENTARIOS ADICIONALES\n`;
+    body += `-----------------------\n`;
+    body += comments + '\n';
+  }
+
+  if(requiresLabTeam){
+    body += `\nREQUERIMIENTOS ADICIONALES\n`;
+    body += `------------------------\n`;
+    body += `• El cliente solicita que la presentación sea impartida por el equipo de laboratorio.\n`;
+  }
+
+  body += `\nSaludos cordiales,\n${name}`;
+
+  return {to:mailtoRecipient,subject,body};
+}
+
+function openOutlook(){
+  const mailData = buildMailto();
+  if(!mailData) return;
+  const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
+  if(mailtoLink.length>1900){
+    document.getElementById('fallback-to').textContent = mailData.to;
+    document.getElementById('fallback-subject').textContent = mailData.subject;
+    document.getElementById('fallback-body').value = mailData.body;
+    document.getElementById('fallback').style.display='block';
+  }else{
+    document.getElementById('fallback').style.display='none';
+    window.location.href = mailtoLink;
+  }
+}
+
+function copyToClipboard(){
+  const textarea = document.getElementById('fallback-body');
+  const to = document.getElementById('fallback-to').textContent;
+  const subject = document.getElementById('fallback-subject').textContent;
+  const fullText = `Para: ${to}\n\nAsunto: ${subject}\n\n${textarea.value}`;
+  navigator.clipboard.writeText(fullText).then(()=>{
+    alert('Contenido copiado al portapapeles');
+  }).catch(()=>{
+    textarea.select();
+    document.execCommand('copy');
+    alert('Contenido copiado al portapapeles');
+  });
+}
+
+// -------------------------
+// CALENDARIO + RESERVAS
+// -------------------------
+let reservations = []; // {date:'YYYY-MM-DD', start:'HH:MM', end:'HH:MM'}
+let selectedDay = null;
+let selectedTime = "10:00"; // slot por defecto
+let calendarBaseDate = new Date(); // mes actual (base para nav)
+
+function normalizeDate(d){
+  const copy = new Date(d);
+  copy.setHours(0,0,0,0);
+  return copy;
+}
+
+function buildCalendar(){
+  const container = document.getElementById('calendar-container');
+  if(!container) return;
+  container.innerHTML = '';
+
+  const calendar = document.createElement('div');
+  calendar.className = 'calendar';
+
+  // Navegación superior
+  const nav = document.createElement('div');
+  nav.className = 'calendar-top-nav';
+  const btnPrev = document.createElement('button');
+  btnPrev.className = 'calendar-nav-btn';
+  btnPrev.textContent = '◀ Mes anterior';
+  btnPrev.addEventListener('click', ()=>{
+    calendarBaseDate = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth()-1,1);
+    buildCalendar();
+  });
+  const btnNext = document.createElement('button');
+  btnNext.className = 'calendar-nav-btn';
+  btnNext.textContent = 'Mes siguiente ▶';
+  btnNext.addEventListener('click', ()=>{
+    calendarBaseDate = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth()+1,1);
+    buildCalendar();
+  });
+  nav.appendChild(btnPrev);
+  nav.appendChild(btnNext);
+  calendar.appendChild(nav);
+
+  const base = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth(),1);
+  const months = [
+    new Date(base.getFullYear(), base.getMonth(),1),
+    new Date(base.getFullYear(), base.getMonth()+1,1)
+  ];
+
+  const dayNames = ['L','M','X','J','V','S','D'];
+
+  months.forEach(month => {
+    const header = document.createElement('div');
+    header.className = 'calendar-header';
+    header.innerHTML = `<span class="calendar-month-title">${month.toLocaleString('es-ES',{month:'long',year:'numeric'})}</span>`;
+    calendar.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'calendar-grid';
+
+    dayNames.forEach(d=>{
+      const dn = document.createElement('div');
+      dn.className='calendar-day-name';
+      dn.textContent=d;
+      grid.appendChild(dn);
+    });
+
+    const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
+    const firstWeekDay = (firstDay.getDay() === 0 ? 6 : firstDay.getDay()-1);
+    for(let i=0;i<firstWeekDay;i++){
+      const empty = document.createElement('div');
+      grid.appendChild(empty);
+    }
+
+    const daysInMonth = new Date(month.getFullYear(), month.getMonth()+1, 0).getDate();
+    for(let day=1;day<=daysInMonth;day++){
+      const date = new Date(month.getFullYear(), month.getMonth(), day);
+      const isoDate = date.toISOString().slice(0,10); // YYYY-MM-DD
+
+      const dayEl = document.createElement('div');
+      dayEl.className='calendar-day';
+      dayEl.textContent = day;
+      dayEl.dataset.date = isoDate;
+
+      const today = normalizeDate(new Date());
+      const dateCopy = normalizeDate(date);
+
+      const weekDay = date.getDay(); // 0=Domingo,6=Sabado
+      const isPast = dateCopy < today;
+      const isWeekend = (weekDay === 0 || weekDay === 6);
+
+      if(isPast || isWeekend){
+        dayEl.classList.add('disabled');
+      }else{
+        dayEl.addEventListener('click', ()=>{
+          const reservedForDay = isDayReserved(isoDate);
+          if(reservedForDay){
+            alert('Esta fecha ya está reservada en el horario disponible.');
+            return;
+          }
+          document.querySelectorAll('.calendar-day').forEach(d=>d.classList.remove('selected'));
+          dayEl.classList.add('selected');
+          selectedDay = isoDate;
+          updateRequestedDateHidden();
+        });
+      }
+
+      grid.appendChild(dayEl);
+    }
+
+    calendar.appendChild(grid);
+  });
+
+  const timeDiv = document.createElement('div');
+  timeDiv.className='time-selector';
+
+  const timeOptions = [];
+  for(let h=10;h<=16;h++){
+    const start = String(h).padStart(2,'0')+':00';
+    const end = String(h+1).padStart(2,'0')+':00';
+    timeOptions.push({start,end});
+  }
+
+  let selectHtml = `<label>Horario *</label><select id="timeSelect">`;
+  timeOptions.forEach((slot,idx)=>{
+    const sel = (idx===0 ? 'selected' : '');
+    selectHtml += `<option value="${slot.start}" ${sel}>${slot.start} - ${slot.end}</option>`;
+  });
+  selectHtml += `</select>
+    <div class="calendar-legend">
+      <span><span class="calendar-dot dot-available"></span> Disponible</span>
+      <span><span class="calendar-dot dot-reserved"></span> Reservado</span>
+    </div>
+  `;
+  timeDiv.innerHTML = selectHtml;
+  calendar.appendChild(timeDiv);
+
+  container.appendChild(calendar);
+
+  const timeSelect = document.getElementById('timeSelect');
+  timeSelect.addEventListener('change',(e)=>{
+    selectedTime = e.target.value || "10:00";
+    updateRequestedDateHidden();
+  });
+
+  updateCalendarColors();
+}
+
+function isDayReserved(dateStr){
+  return reservations.some(r => r.date === dateStr);
+}
+
+function updateRequestedDateHidden(){
+  if(!selectedDay || !selectedTime) return;
+  const [hour,minute] = selectedTime.split(':');
+  const date = new Date(selectedDay+'T'+hour+':'+minute+':00');
+  document.getElementById('requestedDate').value = date.toISOString();
+}
+
+function updateCalendarColors(){
+  const dayEls = document.querySelectorAll('.calendar-day');
+  if(!dayEls.length) return;
+
+  dayEls.forEach(el=>{
+    if(el.classList.contains('disabled')) return;
+    const dateStr = el.dataset.date;
+    const reservedForDay = isDayReserved(dateStr);
+    el.classList.remove('available','reserved');
+    if(reservedForDay){
+      el.classList.add('reserved');
+    }else{
+      el.classList.add('available');
+    }
+  });
+}
+
+// Carga automática de reservas.xlsx desde la misma carpeta
+async function autoLoadExcelReservations(){
+  try{
+    const resp = await fetch('reservas.xlsx');
+    if(!resp.ok){
+      console.warn('No se encontró reservas.xlsx o no es accesible.');
+      return;
+    }
+    const data = await resp.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+
+    reservations = json.map(r => ({
+      date: String(r.Fecha || r.fecha || '').slice(0,10),
+      start: String(r.HoraInicio || r.horainicio || '10:00').slice(0,5),
+      end: String(r.HoraFin || r.horafin || '11:00').slice(0,5)
+    })).filter(r => r.date);
+
+    updateCalendarColors();
+  }catch(err){
+    console.error('Error cargando reservas.xlsx', err);
+  }
+}
+
+// -------------------------
+// OBTENER USUARIO DESDE SHAREPOINT (HTML en carpeta)
+// -------------------------
+async function getSPUser() {
+  try {
+    const response = await fetch(
+      "/_api/web/currentUser",
+      {
+        method: "GET",
+        headers: {
+          "Accept": "application/json;odata=verbose"
+        },
+        credentials: "include"
+      }
+    );
+
+    if (!response.ok) throw new Error("Request failed");
+
+    const data = await response.json();
+
+    return {
+      name: data.d.Title,
+      email: data.d.Email
+    };
+
+  } catch (e) {
+    console.error("Error obteniendo usuario de SP:", e);
+    return null;
+  }
+}
+
+function populateUserLabels(){
+  getSPUser().then(user => {
+    const nameEl = document.getElementById("executiveName");
+    const emailEl = document.getElementById("email");
+
+    if(user){
+      nameEl.textContent = user.name;
+      emailEl.textContent = user.email;
+    } else {
+      nameEl.textContent = "No disponible";
+      emailEl.textContent = "No disponible";
+    }
+  });
+}
+
+// -------------------------
+// INIT
+// -------------------------
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderGuestList();
+  buildCalendar();
+  autoLoadExcelReservations();
+  populateUserLabels();
+});
+</script>
+</body>
+</html>
