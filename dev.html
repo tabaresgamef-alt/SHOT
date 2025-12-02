@@ -801,11 +801,18 @@ function formatDateString(year,monthIndex,day){
 }
 
 function isDayAvailable(dateStr){
+  if(isWeekend(dateStr)) return false;
   const info = availabilityByDate[dateStr];
   if(!info) return true;
   return info.hasAvailableSlots;
 }
 
+  function isWeekend(dateStr){
+  const date = new Date(dateStr);
+  const day = date.getDay();
+  return day === 0 || day === 6; // domingo (0) o sábado (6)
+}
+  
 function renderCalendar(monthDate = currentMonthDate){
   currentMonthDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
   const monthLabel = document.getElementById('calendarMonthLabel');
