@@ -808,7 +808,9 @@ function isDayAvailable(dateStr){
 }
 
   function isWeekend(dateStr){
-  const date = new Date(dateStr);
+ // Parse as local date to avoid timezone shifts that could misclassify weekends
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const date = new Date(y, (m||1)-1, d||1);
   const day = date.getDay();
   return day === 0 || day === 6; // domingo (0) o sábado (6)
 }
