@@ -399,17 +399,13 @@ body{
     <h2>Datos de la solicitud</h2>
 
     <div class="form-group">
-      <label for="requestedDate">Fecha solicitada *</label>
-      <input type="datetime-local" id="requestedDate" required>
-    </div>
-    <div class="form-group">
-      <label for="comments">Comentarios (opcional)</label>
-      <textarea id="comments"></textarea>
+          <label for="companyName">Nombre de la empresa</label>
+      <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing">
     </div>
 
     <div class="form-group">
-      <label for="companyName">Nombre de la empresa</label>
-      <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing">
+      <label for="sector">Sector de la empresa</label>
+      <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
     </div>
 
     <div class="form-group">
@@ -428,8 +424,13 @@ body{
     </div>
 
     <div class="form-group">
-      <label for="sector">Sector de la empresa</label>
-      <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
+      <label for="requestedDate">Fecha solicitada *</label>
+      <input type="datetime-local" id="requestedDate" required>
+    </div>
+
+    <div class="form-group">
+      <label for="comments">Comentarios (opcional)</label>
+      <textarea id="comments"></textarea>
     </div>
 
     <div class="form-group" style="margin-top:10px;">
