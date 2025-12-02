@@ -132,7 +132,7 @@ body{
   color:#fff;
 }
 
-.solution-section{margin-top:25px}
+.solutions-section{margin-top:25px}
 .solution-item{
   margin-bottom:20px;
   padding:15px;
@@ -199,15 +199,22 @@ body{
   background:linear-gradient(135deg,#ff6b35 0%,#e85d2a 100%);
   color:#fff;
 }
+.btn-primary:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(255,107,53,.4);
+}
 .btn-secondary{
   background:linear-gradient(135deg,#457b9d 0%,#1d3557 100%);
   color:#fff;
+}
+.btn-secondary:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(69,123,157,.4);
 }
 .btn:disabled{
   opacity:.5;
   cursor:not-allowed;
 }
-
 .fallback-section{
   margin-top:20px;
   padding:20px;
@@ -217,6 +224,7 @@ body{
 }
 .fallback-section h3{
   color:#ff6b35;
+  margin-bottom:15px;
 }
 .fallback-section textarea{
   width:100%;
@@ -227,8 +235,8 @@ body{
   border:1px solid #2d3e50;
   border-radius:6px;
   font-family:monospace;
+  font-size:.9em;
 }
-
 .diagram-panel{
   background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
   padding:25px;
@@ -236,19 +244,26 @@ body{
   box-shadow:0 8px 25px rgba(0,0,0,.4);
   border:1px solid #2d3e50;
   min-height:1020px;
+  position:relative;
 }
 .diagram-panel h2{
   color:#ff6b35;
+  margin-bottom:10px;
+  font-size:1.4em;
+}
+.diagram-panel p{
+  font-size:.85em;
+  color:#a8dadc;
+  margin-bottom:10px;
 }
 #diagram-container{
   width:100%;
   height:980px;
+  position:relative;
   background:#0f1923;
   border-radius:8px;
-  position:relative;
   overflow:hidden;
 }
-
 .tooltip{
   position:fixed;
   background:rgba(30,42,58,.95);
@@ -258,6 +273,7 @@ body{
   border:2px solid #ff6b35;
   pointer-events:none;
   z-index:1000;
+  box-shadow:0 4px 15px rgba(0,0,0,.5);
   display:none;
   max-width:320px;
   font-size:.85em;
@@ -265,34 +281,32 @@ body{
 .tooltip.active{display:block}
 .tooltip strong{
   color:#ff6b35;
-  margin-bottom:4px;
   display:block;
+  margin-bottom:4px;
+  font-size:1em;
 }
-.dim-node{opacity:.18}
-.highlight-node{
-  opacity:1;
-  filter:drop-shadow(0 0 6px rgba(255,255,255,.5));
+.tooltip .layer{
+  color:#a8dadc;
+  font-size:.8em;
+  margin-bottom:4px;
 }
-.dim-link{opacity:.18}
-.highlight-link{
-  opacity:1;
-  stroke-width:3;
+.tooltip .description{
+  color:#c0c0c0;
+  font-size:.8em;
+  line-height:1.3;
 }
-
-.layer-rect{
-  stroke:#2d3e50;
-  stroke-width:1;
+.node-group{
+  cursor:grab;
+  transition:opacity .2s;
 }
-.layer-label{
-  font-size:11px;
-  fill:#a8dadc;
-  font-weight:600;
+.node-group:active{cursor:grabbing}
+.node-body{
+  stroke-width:2;
 }
 .node-label{
-  fill:#e0e0e0;
   font-size:11px;
   font-weight:600;
-  text-anchor:middle;
+  fill:#e0e0e0;
 }
 .link-path{
   fill:none;
@@ -304,169 +318,256 @@ body{
 .link-mgmt{stroke:#4ecca3;stroke-dasharray:6 4;}
 .link-span{stroke:#a8dadc;stroke-dasharray:3 3;}
 .link-api{stroke:#e63946;stroke-dasharray:4 4;}
+.dim-node{opacity:.18;}
+.dim-link{opacity:.18;}
+.highlight-node{
+  opacity:1;
+  filter:drop-shadow(0 0 6px rgba(255,255,255,.5));
+}
+.highlight-link{
+  opacity:1;
+  stroke-width:3;
+}
+.layer-rect{
+  stroke:#2d3e50;
+  stroke-width:1;
+}
+.layer-label{
+  font-size:11px;
+  fill:#a8dadc;
+  font-weight:600;
+}
+.cloud-label{
+  font-size:10px;
+  fill:#e0e0e0;
+}
+@media(max-width:1400px){
+  .container{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- PASO 1 -->
+<!-- PASO 1: Datos del ejecutivo -->
 <div id="step1-wrapper" class="container">
-  <div class="header"><h1>🏭 Showroom IT/OT</h1></div>
+  <div class="header">
+    <h1>🏭 Showroom IT/OT</h1>
+  </div>
 
   <div class="form-panel">
     <h2>Paso 1 – Datos del Ejecutivo</h2>
-
     <div class="form-group">
-      <label>Nombre del Ejecutivo *</label>
-      <input type="text" id="executiveName">
+      <label for="executiveName">Nombre del Ejecutivo *</label>
+      <input type="text" id="executiveName" required>
     </div>
-
     <div class="form-group">
-      <label>Correo Corporativo *</label>
-      <input type="email" id="email">
+      <label for="email">Correo Corporativo *</label>
+      <input type="email" id="email" required>
     </div>
-
     <div class="form-group">
-      <label>Nombre del cliente *</label>
-      <input type="text" id="clientName">
+      <label for="clientName">Nombre del cliente (persona de contacto) *</label>
+      <input type="text" id="clientName" required>
     </div>
-
     <div class="form-group">
-      <label>Fecha solicitada *</label>
-      <input type="datetime-local" id="requestedDate">
+      <label for="requestedDate">Fecha solicitada *</label>
+      <input type="datetime-local" id="requestedDate" required>
     </div>
-
     <div class="form-group">
-      <label>Comentarios</label>
+      <label for="comments">Comentarios (opcional)</label>
       <textarea id="comments"></textarea>
     </div>
 
     <div class="form-group">
-      <label>Empresa</label>
-      <input type="text" id="companyName">
+      <label for="companyName">Nombre de la empresa</label>
+      <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing">
     </div>
 
     <div class="form-group">
-      <label>Cantidad de invitados</label>
-      <input type="number" id="guestCount">
+      <label for="guestCount">Cantidad de invitados por parte del cliente</label>
+      <input type="number" id="guestCount" min="0" placeholder="Ej: 5">
     </div>
 
     <div class="form-group">
-      <label>Invitados</label>
+      <label>Invitados del cliente (nombre y puesto)</label>
       <div class="guest-form">
-        <input id="guestNameInput" placeholder="Nombre">
-        <input id="guestRoleInput" placeholder="Puesto">
-        <button class="btn-guest-add" onclick="addGuest()">Agregar</button>
+        <input type="text" id="guestNameInput" placeholder="Nombre del invitado">
+        <input type="text" id="guestRoleInput" placeholder="Puesto">
+        <button type="button" class="btn-guest-add" onclick="addGuest()">Agregar invitado</button>
       </div>
       <div id="guestList"></div>
     </div>
 
     <div class="form-group">
-      <label>Sector</label>
-      <input type="text" id="sector">
+      <label for="sector">Sector de la empresa</label>
+      <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
     </div>
 
-    <div class="form-group">
-      <label><input type="checkbox" id="labTeamPresent"> Requieren que presente el equipo de laboratorio</label>
+    <div class="form-group" style="margin-top:10px;">
+      <label>
+        <input type="checkbox" id="labTeamPresent" style="width:16px;height:16px;margin-right:6px;">
+        Requieren que la presentación la dé el equipo de laboratorio
+      </label>
     </div>
 
     <div class="buttons-group">
-      <button class="btn btn-primary" onclick="goToStep2()">Siguiente</button>
+      <button type="button" class="btn btn-primary" onclick="goToStep2()">Siguiente</button>
     </div>
   </div>
 
   <div class="diagram-panel">
     <h2>Bienvenido al Showroom IT/OT</h2>
-    <p>Captura los datos del cliente para continuar.</p>
+    <p>
+      En este primer paso capturamos los datos del ejecutivo y del cliente.
+      En el siguiente paso podrás seleccionar las tecnologías a demostrar y ver el diagrama dinámico de la maqueta IT/OT.
+    </p>
   </div>
 </div>
 
-<!-- PASO 2 -->
+<!-- PASO 2: Selección de tecnologías + diagrama -->
 <div id="step2-wrapper" class="container" style="display:none">
-  <div class="header"><h1>🏭 Showroom IT/OT</h1></div>
+  <div class="header">
+    <h1>🏭 Showroom IT/OT</h1>
+  </div>
 
   <div class="form-panel">
-    <h2>Paso 2 – Selección de Tecnologías</h2>
-
+    <h2>Paso 2 – Selección de Tecnologías y Envío</h2>
     <form id="reservationForm">
+      <div class="solutions-section">
+        <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a Demostrar *</h3>
 
-      <div class="solution-item">
-        <div class="solution-checkbox">
-          <input type="checkbox" id="sol-fw-ot" onchange="toggleBrands('fw-ot')">
-          <label>FW OT</label>
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-fw-ot" onchange="toggleBrands('fw-ot')">
+            <label for="sol-fw-ot">FW OT (Firewall OT)</label>
+          </div>
+          <div class="brands-group" id="brands-fw-ot">
+            <div class="brand-option">
+              <input type="radio" id="fw-fortinet" name="fw-ot-brand" value="Fortinet">
+              <label for="fw-fortinet">Fortinet</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point">
+              <label for="fw-checkpoint">Check Point</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks">
+              <label for="fw-txone">TXOne Networks</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="fw-paloalto" name="fw-ot-brand" value="Palo Alto Networks">
+              <label for="fw-paloalto">Palo Alto Networks</label>
+            </div>
+          </div>
         </div>
-        <div class="brands-group" id="brands-fw-ot">
-          <div class="brand-option"><input type="radio" name="fw-ot-brand" value="Fortinet"><label>Fortinet</label></div>
-          <div class="brand-option"><input type="radio" name="fw-ot-brand" value="Check Point"><label>Check Point</label></div>
-          <div class="brand-option"><input type="radio" name="fw-ot-brand" value="TXOne"><label>TXOne</label></div>
-          <div class="brand-option"><input type="radio" name="fw-ot-brand" value="Palo Alto Networks"><label>Palo Alto Networks</label></div>
-        </div>
-      </div>
 
-      <div class="solution-item">
-        <div class="solution-checkbox">
-          <input type="checkbox" id="sol-visibility" onchange="toggleBrands('visibility')">
-          <label>Visibilidad OT</label>
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-visibility" onchange="toggleBrands('visibility')">
+            <label for="sol-visibility">Visibilidad de Red OT</label>
+          </div>
+          <div class="brands-group" id="brands-visibility">
+            <div class="brand-option">
+              <input type="radio" id="vis-nozomi" name="visibility-brand" value="Nozomi">
+              <label for="vis-nozomi">Nozomi Networks</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vis-tenable" name="visibility-brand" value="Tenable OT">
+              <label for="vis-tenable">Tenable OT</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vis-claroty" name="visibility-brand" value="Claroty">
+              <label for="vis-claroty">Claroty</label>
+            </div>
+          </div>
         </div>
-        <div class="brands-group" id="brands-visibility">
-          <div class="brand-option"><input type="radio" name="visibility-brand" value="Nozomi"><label>Nozomi</label></div>
-          <div class="brand-option"><input type="radio" name="visibility-brand" value="Tenable OT"><label>Tenable OT</label></div>
-          <div class="brand-option"><input type="radio" name="visibility-brand" value="Claroty"><label>Claroty</label></div>
-        </div>
-      </div>
 
-      <div class="solution-item">
-        <div class="solution-checkbox">
-          <input type="checkbox" id="sol-vuln" onchange="toggleBrands('vuln')">
-          <label>Vulnerabilidades OT</label>
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-vuln" onchange="toggleBrands('vuln')">
+            <label for="sol-vuln">Gestión de vulnerabilidades OT</label>
+          </div>
+          <div class="brands-group" id="brands-vuln">
+            <div class="brand-option">
+              <input type="radio" id="vuln-nozomi" name="vuln-brand" value="Nozomi">
+              <label for="vuln-nozomi">Nozomi Networks</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vuln-tenable" name="vuln-brand" value="Tenable OT">
+              <label for="vuln-tenable">Tenable OT</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="vuln-claroty" name="vuln-brand" value="Claroty">
+              <label for="vuln-claroty">Claroty</label>
+            </div>
+          </div>
         </div>
-        <div class="brands-group" id="brands-vuln">
-          <div class="brand-option"><input type="radio" name="vuln-brand" value="Nozomi"><label>Nozomi</label></div>
-          <div class="brand-option"><input type="radio" name="vuln-brand" value="Tenable OT"><label>Tenable OT</label></div>
-          <div class="brand-option"><input type="radio" name="vuln-brand" value="Claroty"><label>Claroty</label></div>
-        </div>
-      </div>
 
-      <div class="solution-item">
-        <div class="solution-checkbox">
-          <input type="checkbox" id="sol-ips" onchange="toggleBrands('ips')">
-          <label>IPS</label>
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-ips" onchange="toggleBrands('ips')">
+            <label for="sol-ips">IPS (Intrusion Prevention System)</label>
+          </div>
+          <div class="brands-group" id="brands-ips">
+            <div class="brand-option">
+              <input type="radio" id="ips-txone" name="ips-brand" value="TXOne Networks">
+              <label for="ips-txone">TXOne Networks</label>
+            </div>
+          </div>
         </div>
-        <div class="brands-group" id="brands-ips">
-          <div class="brand-option"><input type="radio" name="ips-brand" value="TXOne"><label>TXOne</label></div>
-        </div>
-      </div>
 
-      <div class="solution-item">
-        <div class="solution-checkbox">
-          <input type="checkbox" id="sol-access" onchange="toggleBrands('access')">
-          <label>Acceso Seguro / ZTNA</label>
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-access" onchange="toggleBrands('access')">
+            <label for="sol-access">Acceso Seguro / ZTNA</label>
+          </div>
+          <div class="brands-group" id="brands-access">
+            <div class="brand-option">
+              <input type="radio" id="access-cyolo" name="access-brand" value="Cyolo">
+              <label for="access-cyolo">Cyolo</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="access-claroty" name="access-brand" value="Claroty">
+              <label for="access-claroty">Claroty</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="access-fortinet" name="access-brand" value="Fortinet">
+              <label for="access-fortinet">Fortinet</label>
+            </div>
+          </div>
         </div>
-        <div class="brands-group" id="brands-access">
-          <div class="brand-option"><input type="radio" name="access-brand" value="Cyolo"><label>Cyolo</label></div>
-          <div class="brand-option"><input type="radio" name="access-brand" value="Claroty"><label>Claroty</label></div>
-          <div class="brand-option"><input type="radio" name="access-brand" value="Fortinet"><label>Fortinet</label></div>
-        </div>
-      </div>
 
-      <div class="solution-item">
-        <div class="solution-checkbox">
-          <input type="checkbox" id="sol-deception" onchange="toggleBrands('deception')">
-          <label>Deception OT</label>
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-deception" onchange="toggleBrands('deception')">
+            <label for="sol-deception">Deception (Señuelos OT)</label>
+          </div>
+          <div class="brands-group" id="brands-deception">
+            <div class="brand-option">
+              <input type="radio" id="dec-fortinet" name="deception-brand" value="Fortinet">
+              <label for="dec-fortinet">Fortinet</label>
+            </div>
+            <div class="brand-option">
+              <input type="radio" id="dec-zscaler" name="deception-brand" value="Zscaler">
+              <label for="dec-zscaler">Zscaler</label>
+            </div>
+          </div>
         </div>
-        <div class="brands-group" id="brands-deception">
-          <div class="brand-option"><input type="radio" name="deception-brand" value="Fortinet"><label>Fortinet</label></div>
-          <div class="brand-option"><input type="radio" name="deception-brand" value="Zscaler"><label>Zscaler</label></div>
-        </div>
-      </div>
 
-      <div class="solution-item">
-        <div class="solution-checkbox">
-          <input type="checkbox" id="sol-soc" onchange="toggleBrands('soc')">
-          <label>SOC / SIEM</label>
+        <div class="solution-item">
+          <div class="solution-checkbox">
+            <input type="checkbox" id="sol-soc" onchange="toggleBrands('soc')">
+            <label for="sol-soc">SOC (SIEM / Monitoreo)</label>
+          </div>
+          <div class="brands-group" id="brands-soc">
+            <div class="brand-option">
+              <input type="radio" id="soc-splunk" name="soc-brand" value="Splunk">
+              <label for="soc-splunk">Splunk</label>
+            </div>
+          </div>
         </div>
-        <div class="brands-group" id="brands-soc">
-          <div class="brand-option"><input type="radio" name="soc-brand" value="Splunk"><label>Splunk</label></div>
-        </div>
+
       </div>
 
       <div class="buttons-group">
@@ -474,18 +575,19 @@ body{
       </div>
 
       <div id="fallback" style="display:none" class="fallback-section">
-        <h3>El enlace es muy largo</h3>
-        <p><strong>Para:</strong> <span id="fallback-to"></span></p>
-        <p><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
-        <textarea id="fallback-body"></textarea>
-        <button class="btn btn-primary" onclick="copyToClipboard()">Copiar</button>
+        <h3>El enlace mailto es muy largo. Copie el contenido:</h3>
+        <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
+        <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+        <textarea id="fallback-body" readonly></textarea>
+        <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
       </div>
-
     </form>
   </div>
 
   <div class="diagram-panel">
-    <h2>Diagrama IT/OT</h2>
+    <h2>Diagrama de la arquitectura de la maqueta</h2>
+    <p>Pasa el cursor sobre los componentes o líneas para ver detalles. Los componentes conectados se resaltan automáticamente.</p>
+
     <div id="diagram-container"></div>
   </div>
 </div>
@@ -493,395 +595,1533 @@ body{
 <div id="tooltip" class="tooltip"></div>
 
 <script>
-// ==== CONFIGURACIONES BÁSICAS =================================================
-const mailtoRecipient = "showroom-itot@ejemplo.com";
-const guests = [];
+const mailtoRecipient = 'showroom-itot@ejemplo.com';
+
+const LAYER_HEIGHT = 130;
+const purdueLayers = [
+  {level:5, label:'', height:Math.round(LAYER_HEIGHT*1.3)},
+  {level:4, label:'Nivel 4 – Enterprise Network', height:LAYER_HEIGHT},
+  {level:3.5, label:'Nivel 3.5 – IT/OT DMZ', height:LAYER_HEIGHT},
+  {level:3, label:'Nivel 3 – Site Operations', height:LAYER_HEIGHT},
+  {level:2, label:'Nivel 2 – Area Supervisory Control', height:LAYER_HEIGHT},
+  {level:1, label:'Nivel 1 – Basic Control', height:LAYER_HEIGHT},
+  {level:0, label:'Nivel 0 – Physical Process', height:LAYER_HEIGHT}
+];
+let currentY = 0;
+purdueLayers.forEach(l=>{
+  l.height = l.height || LAYER_HEIGHT;
+  l.y = currentY;
+  currentY += l.height;
+});
+
 let currentNodes = {};
 let currentLinks = [];
 let adjacency = {};
 let currentSvg = null;
+let dragState = null;
+let guests = [];
 
-// ==== ROBUST BRAND DETECTION ==================================================
-function getSelectedBrand(name) {
-  const r = document.querySelector(`input[name="${name}"]:checked`);
-  if (!r) return null;
-  const v = r.value.toLowerCase();
+const brandLogos = {
+  fortinet: {
+    color: { primary: '#EE3124', secondary: '#C41E3A', stroke: '#8B1A1A' },
+    logo: `<g transform="translate(-30, -30)">
+      <rect x="5" y="5" width="15" height="15" fill="#EE3124" rx="2"/>
+      <rect x="22" y="5" width="15" height="15" fill="#EE3124" rx="2"/>
+      <rect x="39" y="5" width="15" height="15" fill="#EE3124" rx="2"/>
+      <rect x="5" y="22" width="15" height="15" fill="#EE3124" rx="2"/>
+      <rect x="39" y="22" width="15" height="15" fill="#EE3124" rx="2"/>
+      <rect x="5" y="39" width="15" height="15" fill="#EE3124" rx="2"/>
+      <rect x="22" y="39" width="15" height="15" fill="#EE3124" rx="2"/>
+      <rect x="39" y="39" width="15" height="15" fill="#EE3124" rx="2"/>
+    </g>`
+  },
+  checkpoint: {
+    color: { primary: '#E6007E', secondary: '#C4006A', stroke: '#8B004D' },
+    logo: `<g transform="translate(-25, -25)">
+      <circle cx="25" cy="35" r="20" fill="none" stroke="#E6007E" stroke-width="6"/>
+      <circle cx="25" cy="35" r="6" fill="#E6007E"/>
+      <rect x="22" y="20" width="6" height="10" fill="#E6007E"/>
+      <rect x="30" y="23" width="8" height="4" fill="#E6007E"/>
+      <circle cx="38" cy="10" r="8" fill="#000"/>
+    </g>`
+  },
+  txone: {
+    color: { primary: '#D72027', secondary: '#A51B1F', stroke: '#7A1417' },
+    logo: `<g transform="translate(-25, -25)">
+      <circle cx="8" cy="15" r="2" fill="#D72027"/>
+      <circle cx="8" cy="22" r="2" fill="#D72027"/>
+      <circle cx="8" cy="29" r="2" fill="#D72027"/>
+      <circle cx="8" cy="36" r="2" fill="#D72027"/>
+      <rect x="14" y="14" width="12" height="2" fill="#D72027"/>
+      <rect x="14" y="21" width="16" height="2" fill="#D72027"/>
+      <rect x="14" y="28" width="12" height="2" fill="#D72027"/>
+      <rect x="14" y="35" width="16" height="2" fill="#D72027"/>
+      <path d="M 32 18 L 42 25 L 32 32 Z" fill="#D72027"/>
+    </g>`
+  },
+  paloalto: {
+    color: { primary: '#FA582D', secondary: '#E8501E', stroke: '#C4401A' },
+    logo: `<g transform="translate(-25, -25)">
+      <rect x="10" y="8" width="8" height="35" fill="#FA582D" transform="rotate(-25 14 25)"/>
+      <rect x="22" y="8" width="8" height="35" fill="#FA582D" transform="rotate(-25 26 25)"/>
+      <rect x="34" y="8" width="8" height="35" fill="#FA582D" transform="rotate(-25 38 25)"/>
+    </g>`
+  },
+  nozomi: {
+    color: { primary: '#0099CC', secondary: '#0077AA', stroke: '#005588' },
+    logo: `<g transform="translate(-30, -30)">
+      <path d="M 15 10 L 25 20 L 15 30 L 5 20 Z" fill="none" stroke="#0099CC" stroke-width="3"/>
+      <path d="M 25 20 L 35 30 L 25 40 L 15 30 Z" fill="none" stroke="#0099CC" stroke-width="3"/>
+      <path d="M 35 10 L 45 20 L 35 30 L 25 20 Z" fill="none" stroke="#0099CC" stroke-width="3"/>
+      <path d="M 45 20 L 55 30 L 45 40 L 35 30 Z" fill="none" stroke="#0099CC" stroke-width="3"/>
+    </g>`
+  },
+  tenable: {
+    color: { primary: '#00396B', secondary: '#002A4E', stroke: '#001A30' },
+    logo: `<g transform="translate(-25, -25)">
+      <circle cx="25" cy="25" r="22" fill="none" stroke="#00396B" stroke-width="3"/>
+      <path d="M 15 15 L 25 20 L 15 25 L 10 20 Z M 25 20 L 35 25 L 25 30 L 15 25 Z M 35 15 L 45 20 L 35 25 L 25 20 Z M 25 30 L 35 35 L 25 40 L 15 35 Z" fill="none" stroke="#00396B" stroke-width="2"/>
+    </g>`
+  },
+  cyolo: {
+    color: { primary: '#0B7285', secondary: '#15AABF', stroke: '#0B7285' },
+    logo: `<g transform="translate(-28,-28)">
+      <circle cx="0" cy="0" r="24" fill="#0B7285"/>
+      <circle cx="0" cy="0" r="16" fill="none" stroke="#ffffff" stroke-width="3"/>
+      <path d="M -6 2 L -1 7 L 7 -5" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>`
+  },
+  claroty: {
+    color: { primary: '#E6007E', secondary: '#C4006A', stroke: '#8B004D' },
+    logo: `<g transform="translate(-25, -25)">
+      <circle cx="25" cy="35" r="20" fill="none" stroke="#E6007E" stroke-width="6"/>
+      <circle cx="25" cy="35" r="6" fill="#E6007E"/>
+      <rect x="22" y="20" width="6" height="10" fill="#E6007E"/>
+      <rect x="30" y="23" width="8" height="4" fill="#E6007E"/>
+      <circle cx="38" cy="10" r="8" fill="#000"/>
+    </g>`
+  },
+  zscaler: {
+    color: { primary: '#0081FB', secondary: '#0066CC', stroke: '#004C99' },
+    logo: `<g transform="translate(-30, -30)">
+      <path d="M 10 20 Q 20 10 30 20 Q 40 30 30 40 Q 20 50 10 40 Q 20 30 30 30 Q 40 25 45 30" fill="none" stroke="#0081FB" stroke-width="6"/>
+      <path d="M 50 30 Q 40 20 30 30 Q 20 40 30 50 Q 40 60 50 50 Q 40 40 30 40 Q 20 45 15 40" fill="none" stroke="#0081FB" stroke-width="6"/>
+    </g>`
+  },
+  splunk: {
+    color: { primary: '#6DB33F', secondary: '#5A9C34', stroke: '#478529' },
+    logo: `<g transform="translate(-20, -20)">
+      <path d="M 5 30 L 20 15 L 35 30 L 20 45 Z" fill="none" stroke="#6DB33F" stroke-width="4"/>
+      <path d="M 20 15 L 25 10 L 30 15" fill="none" stroke="#6DB33F" stroke-width="3"/>
+    </g>`
+  }
+};
+
+function getSelectedBrand(groupName) {
+  const radio = document.querySelector(`input[name="${groupName}"]:checked`);
+  if (!radio) return null;
+  const value = radio.value.trim().toLowerCase();
+
   const map = {
-    fortinet:"fortinet", check:"checkpoint", point:"checkpoint",
-    txone:"txone", palo:"paloalto", alto:"paloalto",
-    nozomi:"nozomi", tenable:"tenable", claroty:"claroty",
-    cyolo:"cyolo", zscaler:"zscaler", splunk:"splunk"
+    fortinet: 'fortinet',
+    'check point': 'checkpoint',
+    check: 'checkpoint',
+    point: 'checkpoint',
+    txone: 'txone',
+    'palo alto': 'paloalto',
+    palo: 'paloalto',
+    alto: 'paloalto',
+    nozomi: 'nozomi',
+    tenable: 'tenable',
+    claroty: 'claroty',
+    cyolo: 'cyolo',
+    zscaler: 'zscaler',
+    splunk: 'splunk'
   };
-  for (const k in map) if (v.includes(k)) return map[k];
+
+  for (const key in map) {
+    if (value.includes(key)) return map[key];
+  }
   return null;
 }
 
-// ==== GUEST MANAGEMENT ========================================================
-function addGuest() {
-  const name = document.getElementById("guestNameInput").value.trim();
-  const role = document.getElementById("guestRoleInput").value.trim();
-  if (!name && !role) return;
+/* Invitados */
+function addGuest(){
+  const nameInput = document.getElementById('guestNameInput');
+  const roleInput = document.getElementById('guestRoleInput');
+  if(!nameInput || !roleInput) return;
+  const name = nameInput.value.trim();
+  const role = roleInput.value.trim();
+  if(!name && !role) return;
   guests.push({name, role});
-  document.getElementById("guestNameInput").value = "";
-  document.getElementById("guestRoleInput").value = "";
-  renderGuests();
+  nameInput.value = '';
+  roleInput.value = '';
+  renderGuestList();
 }
-function renderGuests() {
-  const c = document.getElementById("guestList");
-  if (guests.length === 0) {
-    c.innerHTML = "<span style='font-size:0.8em;color:#718096;'>Sin invitados aún.</span>";
+function editGuest(idx){
+  if(idx<0 || idx>=guests.length) return;
+  const g = guests[idx];
+  const newName = prompt('Nombre del invitado:', g.name || '');
+  if(newName === null) return;
+  const newRole = prompt('Puesto del invitado:', g.role || '');
+  if(newRole === null) return;
+  guests[idx] = {name:newName.trim(), role:newRole.trim()};
+  renderGuestList();
+}
+function removeGuest(idx){
+  if(idx<0 || idx>=guests.length) return;
+  guests.splice(idx,1);
+  renderGuestList();
+}
+function renderGuestList(){
+  const container = document.getElementById('guestList');
+  if(!container) return;
+  if(guests.length === 0){
+    container.innerHTML = '<span style="font-size:0.8em;color:#718096;">Sin invitados capturados aún.</span>';
     return;
   }
-  c.innerHTML = guests.map((g,i)=>`
-    <div class='guest-list-item'>
-      <span>${i+1}. ${g.name} – ${g.role}</span>
-      <div>
-        <button class='guest-btn delete' onclick='guests.splice(${i},1);renderGuests();'>Eliminar</button>
-      </div>
-    </div>
-  `).join("");
+  let html = '<ul style="padding-left:0;margin:0;list-style:none;">';
+  guests.forEach((g,idx)=>{
+    const safeName = g.name || 'Sin nombre';
+    const safeRole = g.role || 'Sin puesto';
+    html += `
+      <li class="guest-list-item">
+        <span class="guest-text">${idx+1}. ${safeName} – ${safeRole}</span>
+        <span class="guest-actions">
+          <button type="button" class="guest-btn edit" onclick="editGuest(${idx})">Editar</button>
+          <button type="button" class="guest-btn delete" onclick="removeGuest(${idx})">Eliminar</button>
+        </span>
+      </li>`;
+  });
+  html += '</ul>';
+  container.innerHTML = html;
 }
 
-// ==== WIZARD ================================================================
-function validateStep1() {
-  if (
-    !document.getElementById("executiveName").value.trim() ||
-    !document.getElementById("email").value.trim() ||
-    !document.getElementById("clientName").value.trim() ||
-    !document.getElementById("requestedDate").value
-  ) {
-    alert("Complete todos los campos obligatorios");
+/* Wizard: paso 1 -> paso 2 */
+function validateStep1(){
+  const name = document.getElementById('executiveName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const client = document.getElementById('clientName').value.trim();
+  const date = document.getElementById('requestedDate').value;
+  if(!name || !email || !client || !date){
+    alert('Por favor complete nombre del ejecutivo, correo, cliente y fecha antes de continuar.');
     return false;
   }
   return true;
 }
-function goToStep2() {
-  if (!validateStep1()) return;
-  document.getElementById("step1-wrapper").style.display="none";
-  document.getElementById("step2-wrapper").style.display="grid";
+function goToStep2(){
+  if(!validateStep1()) return;
+  document.getElementById('step1-wrapper').style.display = 'none';
+  document.getElementById('step2-wrapper').style.display = 'grid';
   updateDiagram();
 }
 
-// ==== TOGGLE BRANDS =========================================================
-function toggleBrands(id) {
-  const chk = document.getElementById("sol-"+id);
-  const grp = document.getElementById("brands-"+id);
-  if (!grp) return;
-  grp.classList.toggle("active", chk.checked);
-  if (!chk.checked) {
-    grp.querySelectorAll("input[type=radio]").forEach(r=>r.checked=false);
+function toggleBrands(solutionId){
+  const checkbox = document.getElementById('sol-'+solutionId);
+  const brandsGroup = document.getElementById('brands-'+solutionId);
+  const radios = brandsGroup ? brandsGroup.querySelectorAll('input[type="radio"]') : [];
+  if(checkbox.checked){
+    if(brandsGroup) brandsGroup.classList.add('active');
+    if(radios.length > 0){
+      const anyChecked = Array.from(radios).some(r => r.checked);
+      if(!anyChecked){
+        radios[0].checked = true;
+      }
+    }
+  }else{
+    if(brandsGroup) brandsGroup.classList.remove('active');
+    radios.forEach(r=>r.checked=false);
   }
   updateDiagram();
 }
 
-// ==== MAILTO ================================================================
-function buildMailto() {
-  const name = document.getElementById("executiveName").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const client = document.getElementById("clientName").value.trim();
-  const date = document.getElementById("requestedDate").value;
-  const comments = document.getElementById("comments").value.trim();
-  if (!name || !email || !client || !date) return null;
+function validateForm(){
+  const name = document.getElementById('executiveName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const client = document.getElementById('clientName').value.trim();
+  const date = document.getElementById('requestedDate').value;
 
-  const d = new Date(date).toLocaleString("es-ES",{hour12:false});
-  const subject = `Solicitud Showroom - ${d} - ${name}`;
-  let body = `Datos del Ejecutivo:\nNombre: ${name}\nCorreo: ${email}\n\n`;
-  body += `Cliente: ${client}\nFecha: ${d}\n\n`;
+  const solIds = [
+    {chk:'sol-fw-ot', brandGroup:'fw-ot-brand', label:'FW OT'},
+    {chk:'sol-visibility', brandGroup:'visibility-brand', label:'Visibilidad de Red OT'},
+    {chk:'sol-vuln', brandGroup:'vuln-brand', label:'Gestión de vulnerabilidades OT'},
+    {chk:'sol-ips', brandGroup:'ips-brand', label:'IPS'},
+    {chk:'sol-access', brandGroup:'access-brand', label:'Acceso Seguro / ZTNA'},
+    {chk:'sol-deception', brandGroup:'deception-brand', label:'Deception OT'},
+    {chk:'sol-soc', brandGroup:'soc-brand', label:'SOC'}
+  ];
 
-  if (guests.length){
-    body += `Invitados:\n`;
-    guests.forEach((g,i)=>body+=`${i+1}. ${g.name} - ${g.role}\n`);
-    body+="\n";
+  const anySolutionChecked = solIds.some(s => document.getElementById(s.chk).checked);
+
+  if(!(name && email && client && date && anySolutionChecked)){
+    return false;
   }
 
-  if (comments) body+=`Comentarios:\n${comments}\n\n`;
+  const missingBrands = [];
+  solIds.forEach(s=>{
+    const chk = document.getElementById(s.chk);
+    if(chk && chk.checked){
+      const brand = getSelectedBrand(s.brandGroup);
+      if(!brand){
+        missingBrands.push(s.label);
+      }
+    }
+  });
+
+  if(missingBrands.length > 0){
+    alert('Debe seleccionar una marca para: ' + missingBrands.join(', '));
+    return false;
+  }
+
+  return true;
+}
+
+function getSelectedSolutions(){
+  const solutions = [];
+  function pick(id,name,group){
+    if(document.getElementById(id).checked){
+      let brandText = null;
+      if(group){
+        const r = document.querySelector('input[name="'+group+'"]:checked');
+        brandText = r ? r.value : null;
+      }
+      solutions.push({name,brand:brandText || 'Sin marca seleccionada'});
+    }
+  }
+  pick('sol-fw-ot','FW OT','fw-ot-brand');
+  pick('sol-visibility','Visibilidad de Red OT','visibility-brand');
+  pick('sol-vuln','Gestión de vulnerabilidades OT','vuln-brand');
+  pick('sol-ips','IPS','ips-brand');
+  pick('sol-access','Acceso Seguro / ZTNA','access-brand');
+  pick('sol-deception','Deception OT','deception-brand');
+  pick('sol-soc','SOC','soc-brand');
+  return solutions;
+}
+
+function buildMailto(){
+  if(!validateForm()){
+    alert('Por favor complete todos los campos obligatorios, seleccione al menos una solución y una marca para cada solución seleccionada.');
+    return null;
+  }
+  const name = document.getElementById('executiveName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const client = document.getElementById('clientName').value.trim();
+  const date = document.getElementById('requestedDate').value;
+  const comments = document.getElementById('comments').value.trim();
+  const companyName = document.getElementById('companyName').value.trim();
+  const guestCount = document.getElementById('guestCount').value.trim();
+  const sector = document.getElementById('sector').value.trim();
+  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
+  const solutions = getSelectedSolutions();
+
+  const dateObj = new Date(date);
+  const dateStr = dateObj.toLocaleString('es-ES',{
+    year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit'
+  });
+
+  const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${name} - ${client}`;
+  let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
+  body += `Solicito la reserva del showroom con los siguientes detalles:\n\n`;
+  body += `DATOS DEL EJECUTIVO\n`;
+  body += `-------------------\n`;
+  body += `Nombre: ${name}\n`;
+  body += `Correo: ${email}\n\n`;
+  body += `DATOS DEL CLIENTE\n`;
+  body += `-----------------\n`;
+  body += `Cliente (persona): ${client}\n`;
+  if(companyName) body += `Empresa: ${companyName}\n`;
+  if(sector) body += `Sector: ${sector}\n`;
+  if(guestCount) body += `Número de invitados: ${guestCount}\n`;
+  body += `Fecha solicitada: ${dateStr}\n\n`;
+
+  if(guests.length>0){
+    body += `INVITADOS DEL CLIENTE\n`;
+    body += `--------------------\n`;
+    guests.forEach((g,i)=>{
+      const nameInv = g.name || 'Sin nombre';
+      const roleInv = g.role || 'Sin puesto';
+      body += `${i+1}. ${nameInv} – ${roleInv}\n`;
+    });
+    body += `\n`;
+  }
+
+  body += `SOLUCIONES A DEMOSTRAR\n`;
+  body += `----------------------\n`;
+  solutions.forEach((s,i)=>{
+    body += `${i+1}. ${s.name} - Marca: ${s.brand}\n`;
+  });
+
+  if(comments){
+    body += `\nCOMENTARIOS ADICIONALES\n`;
+    body += `-----------------------\n`;
+    body += comments + '\n';
+  }
+
+  if(requiresLabTeam){
+    body += `\nREQUERIMIENTOS ADICIONALES\n`;
+    body += `------------------------\n`;
+    body += `• El cliente solicita que la presentación sea impartida por el equipo de laboratorio.\n`;
+  }
+
+  body += `\nSaludos cordiales,\n${name}`;
 
   return {to:mailtoRecipient,subject,body};
 }
-function openOutlook() {
-  const m = buildMailto();
-  if (!m) { alert("Faltan datos"); return; }
-  const link = `mailto:${m.to}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
-  if (link.length>1800) {
-    document.getElementById("fallback").style.display="block";
-    document.getElementById("fallback-to").textContent=m.to;
-    document.getElementById("fallback-subject").textContent=m.subject;
-    document.getElementById("fallback-body").value=m.body;
-  } else {
-    location.href=link;
+
+function openOutlook(){
+  const mailData = buildMailto();
+  if(!mailData) return;
+  const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
+  if(mailtoLink.length>1900){
+    document.getElementById('fallback-to').textContent = mailData.to;
+    document.getElementById('fallback-subject').textContent = mailData.subject;
+    document.getElementById('fallback-body').value = mailData.body;
+    document.getElementById('fallback').style.display='block';
+  }else{
+    document.getElementById('fallback').style.display='none';
+    window.location.href = mailtoLink;
   }
 }
+
 function copyToClipboard(){
-  const b=document.getElementById("fallback-body");
-  navigator.clipboard.writeText(b.value);
-  alert("Copiado");
-}
-
-// ==== DIAGRAMA — CONSTANTES =================================================
-const LAYER_HEIGHT = 130;
-const purdueLayers = [
-  {level:5,label:"",height:LAYER_HEIGHT*1.3},
-  {level:4,label:"Nivel 4 – Enterprise"},
-  {level:3.5,label:"Nivel 3.5 – DMZ IT/OT"},
-  {level:3,label:"Nivel 3 – Site Ops"},
-  {level:2,label:"Nivel 2 – Supervisión"},
-  {level:1,label:"Nivel 1 – Control"},
-  {level:0,label:"Nivel 0 – Proceso Físico"}
-];
-let y=0; purdueLayers.forEach(l=>{l.y=y;y+=l.height||LAYER_HEIGHT;});
-
-// ==== HELPERS ================================================================
-function getLayerY(level){return purdueLayers.find(l=>l.level===level).y+(purdueLayers.find(l=>l.level===level).height/2);}
-function createSvg(w,h){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("width",w);s.setAttribute("height",h);return s;}
-
-// ==== DIBUJAR CAPAS =========================================================
-function drawLayers(svg,w){
-  purdueLayers.forEach(l=>{
-    const r=document.createElementNS("http://www.w3.org/2000/svg","rect");
-    r.setAttribute("x",0);
-    r.setAttribute("y",l.y);
-    r.setAttribute("width",w);
-    r.setAttribute("height",l.height);
-    r.setAttribute("class","layer-rect");
-    svg.appendChild(r);
-    if(l.label){
-      const t=document.createElementNS("http://www.w3.org/2000/svg","text");
-      t.setAttribute("x",10);
-      t.setAttribute("y",l.y+18);
-      t.setAttribute("class","layer-label");
-      t.textContent=l.label;
-      svg.appendChild(t);
-    }
+  const textarea = document.getElementById('fallback-body');
+  const to = document.getElementById('fallback-to').textContent;
+  const subject = document.getElementById('fallback-subject').textContent;
+  const fullText = `Para: ${to}\n\nAsunto: ${subject}\n\n${textarea.value}`;
+  navigator.clipboard.writeText(fullText).then(()=>{
+    alert('Contenido copiado al portapapeles');
+  }).catch(()=>{
+    textarea.select();
+    document.execCommand('copy');
+    alert('Contenido copiado al portapapeles');
   });
 }
 
-// ==== NODES BASE ============================================================
-function addNode(nodes,id,name,layer,x,type,desc,brand){
-  nodes[id]={id,name,layer,x,y:getLayerY(layer),type,desc,brand};
+function getLayerInfo(level){
+  return purdueLayers.find(l=>l.level===level);
 }
-function addLink(links,a,b,kind){
-  links.push({from:a,to:b,kind});
-}
-function buildLinkPath(a,b){
-  const A=currentNodes[a],B=currentNodes[b];
-  const mid=(A.y+B.y)/2;
-  return `M ${A.x} ${A.y} L ${A.x} ${mid} L ${B.x} ${mid} L ${B.x} ${B.y}`;
+function getLayerCenterY(level){
+  const layer = getLayerInfo(level);
+  return layer ? layer.y + layer.height/2 : 0;
 }
 
-// ==== ADJACENCIA ============================================================
-function buildAdjacency(){
-  adjacency={};
-  Object.keys(currentNodes).forEach(n=>adjacency[n]=new Set());
-  currentLinks.forEach(l=>{
-    adjacency[l.from].add(l.to);
-    adjacency[l.to].add(l.from);
-  });
-}
-
-// ==== TOOLTIP ===============================================================
-function showNodeTooltip(e,n){
-  const t=document.getElementById("tooltip");
-  t.innerHTML=`<strong>${n.name}</strong><div>${n.desc||""}</div>`;
-  t.classList.add("active");
-  t.style.left=(e.clientX+15)+"px";
-  t.style.top=(e.clientY+15)+"px";
-}
-function hideTooltip(){document.getElementById("tooltip").classList.remove("active");}
-
-// ==== HIGHLIGHT =============================================================
-function highlightFromNode(id){
-  const near=new Set([id]);
-  adjacency[id].forEach(n=>near.add(n));
-
-  currentSvg.querySelectorAll(".node-group").forEach(g=>{
-    const i=g.dataset.id;
-    g.classList.toggle("dim-node",!near.has(i));
-    g.classList.toggle("highlight-node",near.has(i));
-  });
-  currentSvg.querySelectorAll(".link-path").forEach(p=>{
-    const l=currentLinks[p.dataset.i];
-    const ok=near.has(l.from)&&near.has(l.to);
-    p.classList.toggle("dim-link",!ok);
-    p.classList.toggle("highlight-link",ok);
-  });
-}
-function clearHighlight(){
-  currentSvg.querySelectorAll(".node-group").forEach(g=>g.classList.remove("dim-node","highlight-node"));
-  currentSvg.querySelectorAll(".link-path").forEach(p=>p.classList.remove("dim-link","highlight-link"));
-}
-
-// ==== NODE SHAPES (MUY SIMPLIFICADO) =======================================
-function drawNodeShape(g,n){
-  const ns="http://www.w3.org/2000/svg";
-  const r=document.createElementNS(ns,"rect");
-  r.setAttribute("x",-24); r.setAttribute("y",-16);
-  r.setAttribute("width",48); r.setAttribute("height",32);
-  r.setAttribute("rx",4);
-  r.setAttribute("fill","#455a64");
-  r.setAttribute("stroke","#263238");
-  g.appendChild(r);
-}
-
-// ==== DRAW NODES ============================================================
-function drawNode(svg,n){
-  const ns="http://www.w3.org/2000/svg";
-  const g=document.createElementNS(ns,"g");
-  g.setAttribute("class","node-group");
-  g.dataset.id=n.id;
-  g.setAttribute("transform",`translate(${n.x},${n.y})`);
-
-  drawNodeShape(g,n);
-
-  const label=document.createElementNS(ns,"text");
-  label.setAttribute("y",30);
-  label.setAttribute("class","node-label");
-  label.textContent=n.name;
-  g.appendChild(label);
-
-  g.addEventListener("mouseenter",e=>{showNodeTooltip(e,n);highlightFromNode(n.id);});
-  g.addEventListener("mousemove",e=>{
-    const t=document.getElementById("tooltip");
-    t.style.left=(e.clientX+15)+"px";
-    t.style.top=(e.clientY+15)+"px";
-  });
-  g.addEventListener("mouseleave",()=>{hideTooltip();clearHighlight();});
-
-  svg.appendChild(g);
-  n.group=g;
-}
-
-// ==== DRAW LINKS ============================================================
-function drawLink(svg,l,i){
-  const ns="http://www.w3.org/2000/svg";
-  const p=document.createElementNS(ns,"path");
-  p.setAttribute("d",buildLinkPath(l.from,l.to));
-  p.setAttribute("class","link-path link-"+(l.kind||"data"));
-  p.dataset.i=i;
-
-  p.addEventListener("mouseenter",e=>{
-    const tt=document.getElementById("tooltip");
-    tt.innerHTML=`<strong>${l.from} → ${l.to}</strong>`;
-    tt.classList.add("active");
-    tt.style.left=(e.clientX+15)+"px";
-    tt.style.top=(e.clientY+15)+"px";
-    highlightFromNode(l.from);
-  });
-  p.addEventListener("mouseleave",()=>{hideTooltip();clearHighlight();});
-
-  svg.appendChild(p);
-  l.path=p;
-}
-
-// ==== UBICACIÓN DE CONSOLES SaaS ============================================
-function placeSaaS(nodes){
-  const internet=nodes["internet"];
-  if (!internet) return;
-  const centerX=internet.x;
-  const centerY=getLayerY(5);
-
-  const list=Object.values(nodes).filter(n=>n.type==="cloud-console");
-  if (!list.length) return;
-
-  const soc=list.find(n=>n.id.includes("soc"));
-  const others=list.filter(n=>n!==soc);
-
-  if (soc){soc.x=centerX; soc.y=centerY-80;}
-
-  let baseX=centerX+180;
-  others.forEach((n,i)=>{n.x=baseX+i*90; n.y=centerY+10;});
-}
-
-// ==== BUILD ARCHITECTURE (MUY RESUMIDO) =====================================
 function buildArchitecture(){
-  const nodes={},links=[];
+  const hasFwOt      = document.getElementById('sol-fw-ot').checked;
+  const hasVis       = document.getElementById('sol-visibility').checked;
+  const hasVuln      = document.getElementById('sol-vuln').checked;
+  const hasIps       = document.getElementById('sol-ips').checked;
+  const hasAccess    = document.getElementById('sol-access').checked;
+  const hasDeception = document.getElementById('sol-deception').checked;
+  const hasSoc       = document.getElementById('sol-soc').checked;
 
-  addNode(nodes,"internet","Internet",5,430,"internet","Salida a Internet");
-  addNode(nodes,"fw-perim","FW Perimetral",4,430,"firewall","Firewall Perimetral");
-  addNode(nodes,"sw-l2","Switch L2",3,430,"switch","Switch OT");
-  addNode(nodes,"plc1","PLC 1",1,300,"plc","PLC 1");
-  addNode(nodes,"plc2","PLC 2",1,430,"plc","PLC 2");
-  addNode(nodes,"plc3","PLC 3",1,560,"plc","PLC 3");
+  const fwOtBrand = getSelectedBrand('fw-ot-brand');
+  const visBrand = getSelectedBrand('visibility-brand');
+  const vulnBrand = getSelectedBrand('vuln-brand');
+  const ipsBrand = getSelectedBrand('ips-brand');
+  const accessBrand = getSelectedBrand('access-brand');
+  const deceptionBrand = getSelectedBrand('deception-brand');
+  const socBrand = getSelectedBrand('soc-brand');
 
-  addLink(links,"internet","fw-perim","data");
-  addLink(links,"sw-l2","fw-perim","data");
-  addLink(links,"plc1","sw-l2","data");
-  addLink(links,"plc2","sw-l2","data");
-  addLink(links,"plc3","sw-l2","data");
+  const nodes = {};
+  const links = [];
 
-  if (document.getElementById("sol-fw-ot").checked){
-    addNode(nodes,"fw-ot","FW OT",3.5,430,"firewall-brand","FW OT",getSelectedBrand("fw-ot-brand"));
-    addLink(links,"sw-l2","fw-ot","data");
-    addLink(links,"fw-ot","fw-perim","data");
+  function addNode(id,name,layer,x,type,description,brand){
+    nodes[id] = {id,name,layer,x, y:getLayerCenterY(layer), type,description,brand:brand||null};
+  }
+  function addLink(from,to,kind,descExtra){
+    links.push({from,to,kind:kind||'data',descExtra:descExtra||''});
   }
 
-  if (document.getElementById("sol-visibility").checked){
-    addNode(nodes,"sensor-vis","Sensor Visibilidad",3,650,"sensor","Sensor Visibilidad",getSelectedBrand("visibility-brand"));
-    addLink(links,"sw-l2","sensor-vis","span");
+  addNode('internet','Internet',5,430,'internet','Salida a Internet / Nube pública');
+
+  const fwPerimX = hasFwOt ? 800 : 430;
+  addNode('fw-perim','FW Perimetral',4,fwPerimX,'firewall-perimeter','Firewall perimetral que protege el perímetro IT/OT');
+
+  addNode('dc','Servidor de Dominio (DC)',4,200,'server','Controlador de dominio / servicios de autenticación');
+  addNode('hr-pc','PC Recursos Humanos',4,300,'workstation','Equipo de usuario en red de oficina');
+  addNode('sw-l2','Switch L2 OT',3,430,'switch','Switch L2 principal de la red OT');
+  addNode('hmi','HMI de Proceso',2,280,'hmi','Interfaz operador-proceso para supervisión de la planta');
+  addNode('eng','Estación de Ingeniería',2,580,'workstation','Estación de ingeniería para programación y mantenimiento de PLCs');
+  addNode('plc1','PLC 1',1,260,'plc','Controlador lógico programable – Línea 1');
+  addNode('plc2','PLC 2',1,430,'plc','Controlador lógico programable – Línea 2');
+  addNode('plc3','PLC 3',1,600,'plc','Controlador lógico programable – Línea 3');
+  addNode('motor','Motor',0,240,'motor','Motor eléctrico del proceso');
+  addNode('actuator','Actuador',0,360,'actuator','Actuador de válvulas / elementos finales');
+  addNode('piston','Pistón',0,480,'piston','Pistón neumático / hidráulico');
+  addNode('belt','Banda Transportadora',0,600,'belt','Banda para transporte de producto');
+
+  addLink('plc1','motor','data','Control de motor');
+  addLink('plc2','actuator','data','Control de actuadores');
+  addLink('plc3','belt','data','Control de bandas / pistones');
+  addLink('plc3','piston','data','Control de pistones');
+  addLink('internet','fw-perim','data','Conectividad hacia/desde Internet');
+
+  let swCoreId = null;
+
+  if(hasFwOt){
+    addNode('fw-ot','FW OT',3.5,430,'firewall-brand','Firewall OT en DMZ IT/OT (Nivel 3.5)',fwOtBrand);
+    addNode('sw-core','Switch Core IT/OT',4,430,'switch-core','Switch core para segmentación IT/OT y tráfico Norte-Sur');
+    swCoreId = 'sw-core';
+    addLink('sw-l2','fw-ot','data','Tráfico OT hacia DMZ IT/OT');
+    addLink('fw-ot','sw-core','data','Tráfico de DMZ hacia Core');
+    addLink('sw-core','fw-perim','data','Tráfico norte-sur hacia FW perimetral');
+    addLink('dc','sw-core','data','Tráfico DC ↔ Core');
+    addLink('hr-pc','sw-core','data','Tráfico HR ↔ Core');
+  }else{
+    addLink('dc','fw-perim','data','Tráfico DC ↔ FW perimetral');
+    addLink('hr-pc','fw-perim','data','Tráfico HR ↔ FW perimetral');
+    addLink('sw-l2','fw-perim','data','Tráfico OT ↔ FW perimetral');
   }
 
-  if (document.getElementById("sol-vuln").checked){
-    addNode(nodes,"sensor-vuln","Sensor Vuln",3,800,"sensor","Sensor Vuln",getSelectedBrand("vuln-brand"));
-    addLink(links,"sw-l2","sensor-vuln","span");
+  const hasIpsOption = hasIps;
+  if(hasIpsOption){
+    addNode('ips','IPS OT',2,430,'ips-brand','IPS inline para inspección de tráfico OT',ipsBrand);
+    addLink('ips','sw-l2','data','IPS en camino hacia el Switch L2');
+    addLink('hmi','ips','data','HMI protegida por IPS');
+    addLink('eng','ips','data','Estación de ingeniería protegida por IPS');
+    addLink('plc1','ips','data','PLC 1 protegido por IPS');
+    addLink('plc2','ips','data','PLC 2 protegido por IPS');
+    addLink('plc3','ips','data','PLC 3 protegido por IPS');
+  }else{
+    addLink('hmi','sw-l2','data','HMI conectada al SW L2');
+    addLink('eng','sw-l2','data','Estación de ingeniería conectada al SW L2');
+    addLink('plc1','sw-l2','data','PLC 1 conectado al SW L2');
+    addLink('plc2','sw-l2','data','PLC 2 conectado al SW L2');
+    addLink('plc3','sw-l2','data','PLC 3 conectado al SW L2');
   }
 
-  if (document.getElementById("sol-access").checked){
-    addNode(nodes,"jump","Jump Server",4,650,"server","Jump Server",getSelectedBrand("access-brand"));
-    addNode(nodes,"remote-user","Usuario Remoto",5,250,"remote","Remote");
-    addLink(links,"remote-user","internet","data");
-    addLink(links,"jump","fw-perim","data");
+  const spanSource = 'sw-l2';
+
+  if(hasVis){
+    addNode('sensor-vis','Sensor Visibilidad OT',3,650,'sensor','Sensor pasivo de visibilidad OT (SPAN)',visBrand);
+    addLink(spanSource,'sensor-vis','span','Tráfico copiado por puerto SPAN para visibilidad desde SW L2');
   }
 
-  if (document.getElementById("sol-deception").checked){
-    addNode(nodes,"dec","Deception",1,800,"deception","Deception",getSelectedBrand("deception-brand"));
-    addLink(links,"dec","sw-l2","data");
+  if(hasVuln){
+    addNode('sensor-vuln','Sensor Vuln. OT',3,800,'sensor','Sensor de gestión de vulnerabilidades OT (SPAN)',vulnBrand);
+    addLink(spanSource,'sensor-vuln','span','Tráfico copiado por puerto SPAN para vulnerabilidades desde SW L2');
   }
 
-  if (document.getElementById("sol-soc").checked){
-    addNode(nodes,"soc-collector","Collector SOC",4,250,"soc","Collector",getSelectedBrand("soc-brand"));
-    addLink(links,"soc-collector","fw-perim","data");
+  if(hasDeception){
+    addNode('dec-server','Servidor Deception (Señuelos)',1,800,'deception','Servidor Deception con múltiples señuelos OT simulados',deceptionBrand);
+    const deceptionUp = hasIpsOption ? 'ips' : 'sw-l2';
+    addLink('dec-server',deceptionUp,'data','Tráfico del servidor Deception hacia la red OT');
+  }
+
+  if(hasAccess){
+    addNode('jump','Jump Server / Bastión',4,650,'server','Jump Server para acceso remoto seguro a OT',accessBrand);
+    const upFromJump = swCoreId || 'fw-perim';
+    addLink('jump',upFromJump,'data','Acceso administrador desde Jump al Core/FW Perimetral');
+    addNode('remote-user','Usuario Remoto',5,250,'remote-user','Usuario remoto accediendo por ZTNA/VPN');
+    addLink('remote-user','internet','data','Usuario remoto entra por Internet');
+  }
+
+  if(hasSoc){
+    addNode('soc-collector','Collector SOC / SIEM',4,200,'soc','Collector / Forwarder hacia SOC (Splunk)',socBrand);
+    const socUp = swCoreId || 'fw-perim';
+    addLink('soc-collector',socUp,'data','Logs hacia collector SOC');
+  }
+
+  const mgmtItems = [];
+
+  if(hasFwOt && fwOtBrand){
+    mgmtItems.push({id:'fwot-console', name:'Consola FW OT (SaaS)', target:'fw-ot', brand:fwOtBrand});
+  }
+  if(hasVis && visBrand){
+    mgmtItems.push({id:'vis-console', name:'Consola Visibilidad OT (SaaS)', target:'sensor-vis', brand:visBrand});
+  }
+  if(hasVuln && vulnBrand){
+    mgmtItems.push({id:'vuln-console', name:'Consola Vuln OT (SaaS)', target:'sensor-vuln', brand:vulnBrand});
+  }
+  if(hasIpsOption && ipsBrand){
+    mgmtItems.push({id:'ips-console', name:'Consola IPS OT (SaaS)', target:'ips', brand:ipsBrand});
+  }
+  if(hasAccess && accessBrand){
+    mgmtItems.push({id:'access-console', name:'Consola Acceso Seguro (SaaS)', target:'jump', brand:accessBrand});
+  }
+  if(hasDeception && deceptionBrand){
+    mgmtItems.push({id:'dec-console', name:'Consola Deception (SaaS)', target:'dec-server', brand:deceptionBrand});
+  }
+  if(hasSoc && socBrand){
+    mgmtItems.push({id:'soc-console', name:'Consola SOC / SIEM (SaaS)', target:'soc-collector', brand:socBrand});
+  }
+
+  if(mgmtItems.length>0){
+    const baseX = 650;
+    const step  = 90;
+    const baseConsoleY = getLayerCenterY(5) + 25;
+    let socConsoleId = null;
+
+    mgmtItems.forEach((m,idx)=>{
+      let x = baseX + idx*step;
+      addNode(m.id,m.name,5,x,'cloud-console','Consola de gestión SaaS alcanzable vía Internet',m.brand);
+      if(m.id === 'soc-console'){
+        nodes[m.id].y = getLayerCenterY(5) - 140;
+        socConsoleId = m.id;
+      }else{
+        nodes[m.id].y = baseConsoleY;
+      }
+      addLink(m.id,m.target,'mgmt','Gestión remota desde consola SaaS');
+      addLink('internet',m.id,'data','Conectividad Internet ↔ Consola SaaS');
+    });
+
+    if(socConsoleId){
+      mgmtItems.forEach(m=>{
+        if(m.id !== socConsoleId){
+          addLink(m.id,socConsoleId,'api','Integración vía API para el envío de eventos de seguridad');
+        }
+      });
+    }
   }
 
   return {nodes,links};
 }
 
-// ==== UPDATE POSITIONS =======================================================
-function updatePositions(){
-  Object.values(currentNodes).forEach(n=>{
-    if (n.group) n.group.setAttribute("transform",`translate(${n.x},${n.y})`);
-  });
-  currentLinks.forEach(l=>{if(l.path)l.path.setAttribute("d",buildLinkPath(l.from,l.to));});
+function createSvg(width,height){
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width',width);
+  svg.setAttribute('height',height);
+  svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+  return svg;
 }
 
-// ==== UPDATE DIAGRAM ========================================================
+function drawLayers(svg,width){
+  purdueLayers.forEach(layer=>{
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',0);
+    rect.setAttribute('y',layer.y);
+    rect.setAttribute('width',width);
+    rect.setAttribute('height',layer.height);
+    rect.setAttribute('fill','rgba(13,27,42,0.6)');
+    rect.setAttribute('class','layer-rect');
+    svg.appendChild(rect);
+
+    if(layer.label){
+      const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x',10);
+      text.setAttribute('y',layer.y+18);
+      text.setAttribute('class','layer-label');
+      text.textContent = layer.label;
+      svg.appendChild(text);
+    }
+  });
+}
+
+function drawCloudIcon(group){
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d','M -25 5 C -30 5 -35 1 -35 -5 C -35 -12 -29 -16 -24 -16 C -22 -22 -16 -26 -10 -26 C -2 -26 5 -20 6 -13 C 12 -13 17 -8 17 -2 C 17 5 11 10 4 10 L -25 10 Z');
+  path.setAttribute('fill','#457b9d');
+  path.setAttribute('stroke','#1d3557');
+  path.setAttribute('stroke-width','2');
+  group.appendChild(path);
+}
+
+function drawFirewallWithBrand(group, brand){
+  const ns = 'http://www.w3.org/2000/svg';
+  const brandData = brandLogos[brand] || brandLogos.fortinet;
+  const defs = document.createElementNS(ns,'defs');
+  const grad = document.createElementNS(ns,'linearGradient');
+  const gradId = `grad-fw-${brand}-${Math.random().toString(36).slice(2)}`;
+  grad.setAttribute('id',gradId);
+  grad.setAttribute('x1','0%');
+  grad.setAttribute('y1','0%');
+  grad.setAttribute('x2','100%');
+  grad.setAttribute('y2','100%');
+  const stop1 = document.createElementNS(ns,'stop');
+  stop1.setAttribute('offset','0%');
+  stop1.setAttribute('stop-color',brandData.color.primary);
+  const stop2 = document.createElementNS(ns,'stop');
+  stop2.setAttribute('offset','100%');
+  stop2.setAttribute('stop-color',brandData.color.secondary);
+  grad.appendChild(stop1);
+  grad.appendChild(stop2);
+  defs.appendChild(grad);
+  group.appendChild(defs);
+
+  const rect = document.createElementNS(ns,'rect');
+  rect.setAttribute('x',-25);
+  rect.setAttribute('y',-20);
+  rect.setAttribute('width',50);
+  rect.setAttribute('height',40);
+  rect.setAttribute('rx',6);
+  rect.setAttribute('fill',`url(#${gradId})`);
+  rect.setAttribute('stroke',brandData.color.stroke);
+  rect.setAttribute('class','node-body');
+  group.appendChild(rect);
+
+  const line = document.createElementNS(ns,'line');
+  line.setAttribute('x1',-20);
+  line.setAttribute('y1',0);
+  line.setAttribute('x2',20);
+  line.setAttribute('y2',0);
+  line.setAttribute('stroke',brandData.color.stroke);
+  line.setAttribute('stroke-width','2');
+  group.appendChild(line);
+
+  for(let i=-15;i<=15;i+=10){
+    const port = document.createElementNS(ns,'rect');
+    port.setAttribute('x',i-2);
+    port.setAttribute('y',8);
+    port.setAttribute('width',4);
+    port.setAttribute('height',8);
+    port.setAttribute('fill',brandData.color.stroke);
+    group.appendChild(port);
+  }
+}
+
+function drawFirewallPerimeter(group){
+  const ns = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(ns,'defs');
+  const grad = document.createElementNS(ns,'linearGradient');
+  const gradId = `grad-perim-${Math.random().toString(36).slice(2)}`;
+  grad.setAttribute('id',gradId);
+  grad.setAttribute('x1','0%');
+  grad.setAttribute('y1','0%');
+  grad.setAttribute('x2','100%');
+  grad.setAttribute('y2','100%');
+  const stop1 = document.createElementNS(ns,'stop');
+  stop1.setAttribute('offset','0%');
+  stop1.setAttribute('stop-color','#ff6b35');
+  const stop2 = document.createElementNS(ns,'stop');
+  stop2.setAttribute('offset','100%');
+  stop2.setAttribute('stop-color','#e85d2a');
+  grad.appendChild(stop1);
+  grad.appendChild(stop2);
+  defs.appendChild(grad);
+  group.appendChild(defs);
+
+  const rect = document.createElementNS(ns,'rect');
+  rect.setAttribute('x',-25);
+  rect.setAttribute('y',-20);
+  rect.setAttribute('width',50);
+  rect.setAttribute('height',40);
+  rect.setAttribute('rx',6);
+  rect.setAttribute('fill',`url(#${gradId})`);
+  rect.setAttribute('stroke','#d04a1e');
+  rect.setAttribute('class','node-body');
+  group.appendChild(rect);
+
+  const line = document.createElementNS(ns,'line');
+  line.setAttribute('x1',-20);
+  line.setAttribute('y1',0);
+  line.setAttribute('x2',20);
+  line.setAttribute('y2',0);
+  line.setAttribute('stroke','#d04a1e');
+  line.setAttribute('stroke-width','2');
+  group.appendChild(line);
+
+  for(let i=-15;i<=15;i+=10){
+    const port = document.createElementNS(ns,'rect');
+    port.setAttribute('x',i-2);
+    port.setAttribute('y',8);
+    port.setAttribute('width',4);
+    port.setAttribute('height',8);
+    port.setAttribute('fill','#d04a1e');
+    group.appendChild(port);
+  }
+}
+
+function drawManagementConsole(group, brand){
+  const ns = 'http://www.w3.org/2000/svg';
+  const brandData = brandLogos[brand] || brandLogos.fortinet;
+
+  const defs = document.createElementNS(ns,'defs');
+  const grad = document.createElementNS(ns,'linearGradient');
+  const gradId = `grad-console-${brand}-${Math.random().toString(36).slice(2)}`;
+  grad.setAttribute('id',gradId);
+  grad.setAttribute('x1','0%');
+  grad.setAttribute('y1','0%');
+  grad.setAttribute('x2','100%');
+  grad.setAttribute('y2','100%');
+  const stop1 = document.createElementNS(ns,'stop');
+  stop1.setAttribute('offset','0%');
+  stop1.setAttribute('stop-color',brandData.color.primary);
+  stop1.setAttribute('stop-opacity','0.2');
+  const stop2 = document.createElementNS(ns,'stop');
+  stop2.setAttribute('offset','100%');
+  stop2.setAttribute('stop-color',brandData.color.secondary);
+  stop2.setAttribute('stop-opacity','0.3');
+  grad.appendChild(stop1);
+  grad.appendChild(stop2);
+  defs.appendChild(grad);
+  group.appendChild(defs);
+
+  const rect = document.createElementNS(ns,'rect');
+  rect.setAttribute('x',-30);
+  rect.setAttribute('y',-25);
+  rect.setAttribute('width',60);
+  rect.setAttribute('height',50);
+  rect.setAttribute('rx',6);
+  rect.setAttribute('fill',`url(#${gradId})`);
+  rect.setAttribute('stroke',brandData.color.primary);
+  rect.setAttribute('stroke-width','2');
+  rect.setAttribute('class','node-body');
+  group.appendChild(rect);
+
+  const logoG = document.createElementNS(ns,'g');
+  logoG.setAttribute('transform','translate(-15, -10) scale(0.4)');
+  logoG.innerHTML = brandData.logo;
+  group.appendChild(logoG);
+
+  for(let i=0; i<3; i++){
+    const cy = -15 + i*8;
+    const circle = document.createElementNS(ns,'circle');
+    circle.setAttribute('cx',15);
+    circle.setAttribute('cy',cy);
+    circle.setAttribute('r',1.5);
+    circle.setAttribute('fill',brandData.color.primary);
+    group.appendChild(circle);
+
+    const line = document.createElementNS(ns,'line');
+    line.setAttribute('x1',18);
+    line.setAttribute('y1',cy);
+    line.setAttribute('x2',26);
+    line.setAttribute('y2',cy);
+    line.setAttribute('stroke',brandData.color.primary);
+    line.setAttribute('stroke-width','1.5');
+    group.appendChild(line);
+  }
+
+  const barData = [8, 14, 10, 16, 12];
+  for(let i=0; i<barData.length; i++){
+    const barRect = document.createElementNS(ns,'rect');
+    barRect.setAttribute('x',-22 + i*9);
+    barRect.setAttribute('y',18 - barData[i]);
+    barRect.setAttribute('width',6);
+    barRect.setAttribute('height',barData[i]);
+    barRect.setAttribute('fill',brandData.color.primary);
+    barRect.setAttribute('rx',1);
+    group.appendChild(barRect);
+  }
+}
+
+function drawNodeShape(group,node){
+  const ns = 'http://www.w3.org/2000/svg';
+
+  if(node.type==='internet'){
+    drawCloudIcon(group);
+    const label = document.createElementNS(ns,'text');
+    label.setAttribute('class','cloud-label');
+    label.setAttribute('x',0);
+    label.setAttribute('y',18);
+    label.setAttribute('text-anchor','middle');
+    label.textContent = 'Internet';
+    group.appendChild(label);
+    return;
+  }
+
+  if(node.type==='cloud-console'){
+    if(node.brand){
+      drawManagementConsole(group, node.brand);
+    }else{
+      drawCloudIcon(group);
+    }
+    return;
+  }
+
+  if(node.type==='firewall-brand'){
+    if(node.brand){
+      drawFirewallWithBrand(group, node.brand);
+    }else{
+      drawFirewallPerimeter(group);
+    }
+    return;
+  }
+
+  if(node.type==='firewall-perimeter'){
+    drawFirewallPerimeter(group);
+    return;
+  }
+
+  if(node.type==='ips-brand'){
+    const rect = document.createElementNS(ns,'rect');
+    rect.setAttribute('x',-32);
+    rect.setAttribute('y',-14);
+    rect.setAttribute('width',64);
+    rect.setAttribute('height',28);
+    rect.setAttribute('rx',6);
+    rect.setAttribute('fill','#111827');
+    rect.setAttribute('stroke','#7f1d1d');
+    rect.setAttribute('class','node-body');
+    group.appendChild(rect);
+
+    const top = document.createElementNS(ns,'rect');
+    top.setAttribute('x',-32);
+    top.setAttribute('y',-14);
+    top.setAttribute('width',64);
+    top.setAttribute('height',8);
+    top.setAttribute('fill','#ff6b35');
+    group.appendChild(top);
+
+    const led1 = document.createElementNS(ns,'circle');
+    led1.setAttribute('cx',-20);
+    led1.setAttribute('cy',0);
+    led1.setAttribute('r',2.5);
+    led1.setAttribute('fill','#22c55e');
+    group.appendChild(led1);
+
+    const led2 = document.createElementNS(ns,'circle');
+    led2.setAttribute('cx',-10);
+    led2.setAttribute('cy',0);
+    led2.setAttribute('r',2.5);
+    led2.setAttribute('fill','#ffd166');
+    group.appendChild(led2);
+
+    const led3 = document.createElementNS(ns,'circle');
+    led3.setAttribute('cx',0);
+    led3.setAttribute('cy',0);
+    led3.setAttribute('r',2.5);
+    led3.setAttribute('fill','#e63946');
+    group.appendChild(led3);
+
+    ['10','22'].forEach((xOff)=>{
+      const port = document.createElementNS(ns,'rect');
+      port.setAttribute('x',parseInt(xOff) - 32);
+      port.setAttribute('y',-4);
+      port.setAttribute('width',10);
+      port.setAttribute('height',10);
+      port.setAttribute('fill','#0f1923');
+      group.appendChild(port);
+    });
+    return;
+  }
+
+  if(node.type==='switch' || node.type==='switch-core'){
+    const rect = document.createElementNS(ns,'rect');
+    rect.setAttribute('x',-30);
+    rect.setAttribute('y',-15);
+    rect.setAttribute('width',60);
+    rect.setAttribute('height',30);
+    rect.setAttribute('rx',4);
+    rect.setAttribute('fill', node.type==='switch-core' ? '#6c757d' : '#34495e');
+    rect.setAttribute('stroke','#2c3e50');
+    rect.setAttribute('class','node-body');
+    group.appendChild(rect);
+    for(let i=-24;i<=24;i+=8){
+      const port = document.createElementNS(ns,'rect');
+      port.setAttribute('x',i);
+      port.setAttribute('y',-7);
+      port.setAttribute('width',6);
+      port.setAttribute('height',14);
+      port.setAttribute('fill','#1a252f');
+      group.appendChild(port);
+    }
+    return;
+  }
+
+  if(node.type==='server' || node.type==='soc'){
+    const rect = document.createElementNS(ns,'rect');
+    rect.setAttribute('x',-20);
+    rect.setAttribute('y',-28);
+    rect.setAttribute('width',40);
+    rect.setAttribute('height',56);
+    rect.setAttribute('rx',4);
+    rect.setAttribute('fill', node.type==='soc' ? '#8d99ae' : '#495057');
+    rect.setAttribute('stroke','#343a40');
+    rect.setAttribute('class','node-body');
+    group.appendChild(rect);
+    for(let i=-18;i<=10;i+=15){
+      const unit = document.createElementNS(ns,'rect');
+      unit.setAttribute('x',-16);
+      unit.setAttribute('y',i);
+      unit.setAttribute('width',32);
+      unit.setAttribute('height',10);
+      unit.setAttribute('fill','#6c757d');
+      group.appendChild(unit);
+    }
+    return;
+  }
+
+  if(node.type==='workstation' || node.type==='remote-user'){
+    const base = document.createElementNS(ns,'rect');
+    base.setAttribute('x',-18);
+    base.setAttribute('y',10);
+    base.setAttribute('width',36);
+    base.setAttribute('height',10);
+    base.setAttribute('fill','#6c757d');
+    base.setAttribute('stroke','#495057');
+    base.setAttribute('class','node-body');
+    group.appendChild(base);
+    const monitor = document.createElementNS(ns,'rect');
+    monitor.setAttribute('x',-22);
+    monitor.setAttribute('y',-18);
+    monitor.setAttribute('width',44);
+    monitor.setAttribute('height',28);
+    monitor.setAttribute('rx',4);
+    monitor.setAttribute('fill', node.type==='remote-user' ? '#3a86ff' : '#2c3e50');
+    monitor.setAttribute('stroke','#1a252f');
+    group.appendChild(monitor);
+    return;
+  }
+
+  if(node.type==='hmi'){
+    const outer = document.createElementNS(ns,'rect');
+    outer.setAttribute('x',-30);
+    outer.setAttribute('y',-20);
+    outer.setAttribute('width',60);
+    outer.setAttribute('height',40);
+    outer.setAttribute('rx',10);
+    outer.setAttribute('fill','#1e2a3a');
+    outer.setAttribute('stroke','#2d3e50');
+    outer.setAttribute('class','node-body');
+    group.appendChild(outer);
+
+    const screen = document.createElementNS(ns,'rect');
+    screen.setAttribute('x',-24);
+    screen.setAttribute('y',-14);
+    screen.setAttribute('width',48);
+    screen.setAttribute('height',26);
+    screen.setAttribute('rx',6);
+    screen.setAttribute('fill','#0a4d68');
+    group.appendChild(screen);
+
+    const bottom = document.createElementNS(ns,'rect');
+    bottom.setAttribute('x',-24);
+    bottom.setAttribute('y',12);
+    bottom.setAttribute('width',48);
+    bottom.setAttribute('height',4);
+    bottom.setAttribute('fill','#0f1923');
+    group.appendChild(bottom);
+
+    const b1 = document.createElementNS(ns,'circle');
+    b1.setAttribute('cx',-18);
+    b1.setAttribute('cy',14);
+    b1.setAttribute('r',2);
+    b1.setAttribute('fill','#22c55e');
+    group.appendChild(b1);
+
+    const b2 = document.createElementNS(ns,'circle');
+    b2.setAttribute('cx',-12);
+    b2.setAttribute('cy',14);
+    b2.setAttribute('r',2);
+    b2.setAttribute('fill','#ffd166');
+    group.appendChild(b2);
+
+    const b3 = document.createElementNS(ns,'circle');
+    b3.setAttribute('cx',-6);
+    b3.setAttribute('cy',14);
+    b3.setAttribute('r',2);
+    b3.setAttribute('fill','#ff6b35');
+    group.appendChild(b3);
+
+    return;
+  }
+
+  if(node.type==='plc'){
+    const outer = document.createElementNS(ns,'rect');
+    outer.setAttribute('x',-32);
+    outer.setAttribute('y',-16);
+    outer.setAttribute('width',64);
+    outer.setAttribute('height',32);
+    outer.setAttribute('rx',8);
+    outer.setAttribute('fill','#1f2937');
+    outer.setAttribute('stroke','#2d3e50');
+    outer.setAttribute('class','node-body');
+    group.appendChild(outer);
+
+    const m1 = document.createElementNS(ns,'rect');
+    m1.setAttribute('x',-26);
+    m1.setAttribute('y',-10);
+    m1.setAttribute('width',16);
+    m1.setAttribute('height',20);
+    m1.setAttribute('fill','#0f172a');
+    group.appendChild(m1);
+
+    const m2 = document.createElementNS(ns,'rect');
+    m2.setAttribute('x',-6);
+    m2.setAttribute('y',-10);
+    m2.setAttribute('width',16);
+    m2.setAttribute('height',20);
+    m2.setAttribute('fill','#111827');
+    group.appendChild(m2);
+
+    const m3 = document.createElementNS(ns,'rect');
+    m3.setAttribute('x',14);
+    m3.setAttribute('y',-10);
+    m3.setAttribute('width',16);
+    m3.setAttribute('height',20);
+    m3.setAttribute('fill','#0f172a');
+    group.appendChild(m3);
+
+    const led1 = document.createElementNS(ns,'circle');
+    led1.setAttribute('cx',-20);
+    led1.setAttribute('cy',-4);
+    led1.setAttribute('r',2.2);
+    led1.setAttribute('fill','#22c55e');
+    group.appendChild(led1);
+
+    const led2 = document.createElementNS(ns,'circle');
+    led2.setAttribute('cx',0);
+    led2.setAttribute('cy',-4);
+    led2.setAttribute('r',2.2);
+    led2.setAttribute('fill','#22c55e');
+    group.appendChild(led2);
+
+    const led3 = document.createElementNS(ns,'circle');
+    led3.setAttribute('cx',20);
+    led3.setAttribute('cy',-4);
+    led3.setAttribute('r',2.2);
+    led3.setAttribute('fill','#ffd166');
+    group.appendChild(led3);
+
+    return;
+  }
+
+  if(node.type==='sensor'){
+    const body = document.createElementNS(ns,'rect');
+    body.setAttribute('x',-28);
+    body.setAttribute('y',-16);
+    body.setAttribute('width',56);
+    body.setAttribute('height',32);
+    body.setAttribute('rx',16);
+    body.setAttribute('fill','#e5e7eb');
+    body.setAttribute('stroke','#9ca3af');
+    body.setAttribute('class','node-body');
+    group.appendChild(body);
+
+    const eye = document.createElementNS(ns,'ellipse');
+    eye.setAttribute('cx',0);
+    eye.setAttribute('cy',0);
+    eye.setAttribute('rx',18);
+    eye.setAttribute('ry',10);
+    eye.setAttribute('fill','#111827');
+    group.appendChild(eye);
+
+    const pupil = document.createElementNS(ns,'circle');
+    pupil.setAttribute('cx',0);
+    pupil.setAttribute('cy',0);
+    pupil.setAttribute('r',6);
+    pupil.setAttribute('fill','#22c55e');
+    group.appendChild(pupil);
+
+    return;
+  }
+
+  if(node.type==='deception'){
+    const body = document.createElementNS(ns,'rect');
+    body.setAttribute('x',-34);
+    body.setAttribute('y',-18);
+    body.setAttribute('width',68);
+    body.setAttribute('height',36);
+    body.setAttribute('rx',10);
+    body.setAttribute('fill','#ff6b35');
+    body.setAttribute('stroke','#b45309');
+    body.setAttribute('class','node-body');
+    group.appendChild(body);
+
+    const p1 = document.createElementNS(ns,'rect');
+    p1.setAttribute('x',-28);
+    p1.setAttribute('y',-12);
+    p1.setAttribute('width',20);
+    p1.setAttribute('height',10);
+    p1.setAttribute('fill','#111827');
+    p1.setAttribute('opacity','0.9');
+    group.appendChild(p1);
+
+    const p2 = document.createElementNS(ns,'rect');
+    p2.setAttribute('x',-4);
+    p2.setAttribute('y',-12);
+    p2.setAttribute('width',20);
+    p2.setAttribute('height',10);
+    p2.setAttribute('fill','#111827');
+    p2.setAttribute('opacity','0.9');
+    group.appendChild(p2);
+
+    const p3 = document.createElementNS(ns,'rect');
+    p3.setAttribute('x',20);
+    p3.setAttribute('y',-12);
+    p3.setAttribute('width',14);
+    p3.setAttribute('height',10);
+    p3.setAttribute('fill','#111827');
+    p3.setAttribute('opacity','0.9');
+    group.appendChild(p3);
+
+    const p4 = document.createElementNS(ns,'rect');
+    p4.setAttribute('x',-28);
+    p4.setAttribute('y',2);
+    p4.setAttribute('width',20);
+    p4.setAttribute('height',10);
+    p4.setAttribute('fill','#020617');
+    p4.setAttribute('opacity','0.9');
+    group.appendChild(p4);
+
+    const p5 = document.createElementNS(ns,'rect');
+    p5.setAttribute('x',-4);
+    p5.setAttribute('y',2);
+    p5.setAttribute('width',20);
+    p5.setAttribute('height',10);
+    p5.setAttribute('fill','#020617');
+    p5.setAttribute('opacity','0.9');
+    group.appendChild(p5);
+
+    const p6 = document.createElementNS(ns,'rect');
+    p6.setAttribute('x',20);
+    p6.setAttribute('y',2);
+    p6.setAttribute('width',14);
+    p6.setAttribute('height',10);
+    p6.setAttribute('fill','#020617');
+    p6.setAttribute('opacity','0.9');
+    group.appendChild(p6);
+
+    const logo = document.createElementNS(ns,'rect');
+    logo.setAttribute('x',14);
+    logo.setAttribute('y',8);
+    logo.setAttribute('width',18);
+    logo.setAttribute('height',10);
+    logo.setAttribute('rx',3);
+    logo.setAttribute('fill','#111827');
+    logo.setAttribute('opacity','0.9');
+    group.appendChild(logo);
+
+    const t = document.createElementNS(ns,'text');
+    t.setAttribute('x',23);
+    t.setAttribute('y',16);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('fill','#facc15');
+    t.setAttribute('font-size','7');
+    t.setAttribute('font-weight','bold');
+    t.textContent = 'DEC';
+    group.appendChild(t);
+
+    return;
+  }
+
+  if(node.type==='motor' || node.type==='actuator' || node.type==='piston' || node.type==='belt'){
+    const rect = document.createElementNS(ns,'rect');
+    rect.setAttribute('x',-18);
+    rect.setAttribute('y',-12);
+    rect.setAttribute('width',36);
+    rect.setAttribute('height',24);
+    rect.setAttribute('rx',4);
+    rect.setAttribute('fill','#2f3e46');
+    rect.setAttribute('stroke','#1b262c');
+    rect.setAttribute('class','node-body');
+    group.appendChild(rect);
+    if(node.type==='motor'){
+      const circle = document.createElementNS(ns,'circle');
+      circle.setAttribute('cx',0);
+      circle.setAttribute('cy',0);
+      circle.setAttribute('r',7);
+      circle.setAttribute('fill','#457b9d');
+      group.appendChild(circle);
+    }else if(node.type==='belt'){
+      const belt = document.createElementNS(ns,'rect');
+      belt.setAttribute('x',-16);
+      belt.setAttribute('y',-4);
+      belt.setAttribute('width',32);
+      belt.setAttribute('height',8);
+      belt.setAttribute('fill','#6c757d');
+      group.appendChild(belt);
+    }
+    return;
+  }
+
+  const rect = document.createElementNS(ns,'rect');
+  rect.setAttribute('x',-24);
+  rect.setAttribute('y',-16);
+  rect.setAttribute('width',48);
+  rect.setAttribute('height',32);
+  rect.setAttribute('rx',4);
+  rect.setAttribute('fill','#6c757d');
+  rect.setAttribute('stroke','#495057');
+  rect.setAttribute('class','node-body');
+  group.appendChild(rect);
+}
+
+function drawNode(svg,node){
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = document.createElementNS(ns,'g');
+  g.setAttribute('class','node-group');
+  g.setAttribute('data-id',node.id);
+  if(typeof node.y !== 'number'){
+    node.y = getLayerCenterY(node.layer);
+  }
+  g.setAttribute('transform',`translate(${node.x},${node.y})`);
+
+  drawNodeShape(g,node);
+
+  const label = document.createElementNS(ns,'text');
+  label.setAttribute('class','node-label');
+  label.setAttribute('x',0);
+  label.setAttribute('y',30);
+  label.setAttribute('text-anchor','middle');
+  label.textContent = node.name;
+  g.appendChild(label);
+
+  g.addEventListener('mouseenter',(e)=>{
+    showNodeTooltip(e,node);
+    highlightFromNode(node.id);
+  });
+  g.addEventListener('mousemove',updateTooltipPosition);
+  g.addEventListener('mouseleave',()=>{
+    hideTooltip();
+    clearHighlight();
+  });
+
+  g.addEventListener('mousedown',(e)=>startDrag(e,node.id));
+
+  svg.appendChild(g);
+  node.group = g;
+}
+
+function getNodeAnchor(nodeId){
+  const n = currentNodes[nodeId];
+  return {x:n.x, y:n.y};
+}
+
+function buildLinkPath(from,to){
+  const a = getNodeAnchor(from);
+  const b = getNodeAnchor(to);
+  const midY = (a.y + b.y)/2;
+  return `M ${a.x} ${a.y} L ${a.x} ${midY} L ${b.x} ${midY} L ${b.x} ${b.y}`;
+}
+
+function drawLink(svg,link,index){
+  const ns = 'http://www.w3.org/2000/svg';
+  const path = document.createElementNS(ns,'path');
+  path.setAttribute('d',buildLinkPath(link.from,link.to));
+  path.setAttribute('class','link-path link-'+link.kind);
+  path.setAttribute('data-index',index);
+
+  const fromNode = currentNodes[link.from];
+  const toNode   = currentNodes[link.to];
+  let tipo = 'Conexión de datos';
+  if(link.kind==='mgmt') tipo = 'Conexión de gestión';
+  if(link.kind==='span') tipo = 'Conexión SPAN (copia de tráfico)';
+  if(link.kind==='api')  tipo = 'Integración vía API';
+  const desc = link.descExtra || '';
+  const label = `${tipo}: ${fromNode.name} ↔ ${toNode.name}${desc ? ' – '+desc : ''}`;
+
+  path.addEventListener('mouseenter',(e)=>{
+    showLineTooltip(e,label);
+    highlightFromNode(link.from);
+  });
+  path.addEventListener('mousemove',updateTooltipPosition);
+  path.addEventListener('mouseleave',()=>{
+    hideTooltip();
+    clearHighlight();
+  });
+
+  svg.appendChild(path);
+  link.path = path;
+}
+
+function buildAdjacency(){
+  adjacency = {};
+  Object.keys(currentNodes).forEach(id=>{adjacency[id]=new Set();});
+  currentLinks.forEach(l=>{
+    if(adjacency[l.from]) adjacency[l.from].add(l.to);
+    if(adjacency[l.to])   adjacency[l.to].add(l.from);
+  });
+}
+
+function getDirectNeighbors(startId){
+  const direct = new Set([startId]);
+  (adjacency[startId] || []).forEach(n => direct.add(n));
+  return direct;
+}
+
+function clearHighlight(){
+  if(!currentSvg) return;
+  const nodes = currentSvg.querySelectorAll('.node-group');
+  const links = currentSvg.querySelectorAll('.link-path');
+  nodes.forEach(n=>{
+    n.classList.remove('dim-node','highlight-node');
+  });
+  links.forEach(l=>{
+    l.classList.remove('dim-link','highlight-link');
+  });
+}
+
+function highlightFromNode(nodeId){
+  if(!currentSvg) return;
+  const reachable = getDirectNeighbors(nodeId);
+  const nodes = currentSvg.querySelectorAll('.node-group');
+  const links = currentSvg.querySelectorAll('.link-path');
+
+  nodes.forEach(n=>{
+    const id = n.getAttribute('data-id');
+    if(reachable.has(id)){
+      n.classList.add('highlight-node');
+      n.classList.remove('dim-node');
+    }else{
+      n.classList.add('dim-node');
+      n.classList.remove('highlight-node');
+    }
+  });
+
+  links.forEach(l=>{
+    const idx = Number(l.getAttribute('data-index'));
+    const link = currentLinks[idx];
+    if(reachable.has(link.from) && reachable.has(link.to)){
+      l.classList.add('highlight-link');
+      l.classList.remove('dim-link');
+    }else{
+      l.classList.add('dim-link');
+      l.classList.remove('highlight-link');
+    }
+  });
+}
+
+function showNodeTooltip(e,node){
+  const tooltip = document.getElementById('tooltip');
+  const layer = getLayerInfo(node.layer);
+  const layerName = (layer && layer.label) ? layer.label : 'Internet / Nube';
+  let brandInfo = '';
+  if(node.brand){
+    const brandKey = node.brand;
+    const brandName = brandKey.charAt(0).toUpperCase() + brandKey.slice(1);
+    brandInfo = `<div class="layer">Marca: ${brandName}</div>`;
+  }
+  tooltip.innerHTML = `
+    <strong>${node.name}</strong>
+    <div class="layer">${layerName}</div>
+    ${brandInfo}
+    <div class="description">${node.description||''}</div>
+  `;
+  tooltip.classList.add('active');
+  updateTooltipPosition(e);
+}
+
+function showLineTooltip(e,text){
+  const tooltip = document.getElementById('tooltip');
+  tooltip.innerHTML = `
+    <strong>Conexión representativa</strong>
+    <div class="description">${text}</div>
+  `;
+  tooltip.classList.add('active');
+  updateTooltipPosition(e);
+}
+
+function updateTooltipPosition(e){
+  const tooltip = document.getElementById('tooltip');
+  const offset = 15;
+  tooltip.style.left = (e.clientX + offset)+'px';
+  tooltip.style.top  = (e.clientY + offset)+'px';
+}
+
+function hideTooltip(){
+  const tooltip = document.getElementById('tooltip');
+  tooltip.classList.remove('active');
+}
+
+function startDrag(e,nodeId){
+  e.preventDefault();
+  if(!currentSvg) return;
+  const node = currentNodes[nodeId];
+  if(!node) return;
+  dragState = {
+    nodeId,
+    startMouseX: e.clientX,
+    startX: node.x,
+    animationsHidden: false
+  };
+  window.addEventListener('mousemove',onDragMove);
+  window.addEventListener('mouseup',endDrag);
+}
+
+function onDragMove(e){
+  if(!dragState) return;
+  const node = currentNodes[dragState.nodeId];
+  if(!node) return;
+  const dx = e.clientX - dragState.startMouseX;
+  const container = document.getElementById('diagram-container');
+  const width = container ? (container.clientWidth || 1000) : 1000;
+  let newX = dragState.startX + dx;
+  const margin = 40;
+  if(newX < margin) newX = margin;
+  if(newX > width - margin) newX = width - margin;
+  node.x = newX;
+  updatePositions();
+}
+
+function endDrag(){
+  if(!dragState) return;
+  window.removeEventListener('mousemove',onDragMove);
+  window.removeEventListener('mouseup',endDrag);
+  dragState = null;
+}
+
+function updatePositions(){
+  Object.values(currentNodes).forEach(node=>{
+    if(node.group){
+      node.group.setAttribute('transform',`translate(${node.x},${node.y})`);
+    }
+  });
+  currentLinks.forEach(link=>{
+    if(link.path){
+      link.path.setAttribute('d',buildLinkPath(link.from,link.to));
+    }
+  });
+}
+
 function updateDiagram(){
-  const c=document.getElementById("diagram-container");
-  const w=c.clientWidth||1000;
-  const h=purdueLayers.reduce((s,l)=>s+l.height,0);
+  const container = document.getElementById('diagram-container');
+  if(!container) return;
+  const width  = container.clientWidth || 1000;
+  const height = purdueLayers.reduce((acc,l)=>acc+l.height,0);
 
-  c.innerHTML="";
-  const svg=createSvg(w,h);
-  currentSvg=svg;
+  container.innerHTML = '';
+  const svg = createSvg(width,height);
+  currentSvg = svg;
 
-  drawLayers(svg,w);
+  drawLayers(svg,width);
 
-  const arch=buildArchitecture();
-  currentNodes=arch.nodes;
-  currentLinks=arch.links;
+  const arch = buildArchitecture();
+  currentNodes = arch.nodes;
+  currentLinks = arch.links;
 
-  currentLinks.forEach((l,i)=>drawLink(svg,l,i));
-  Object.values(currentNodes).forEach(n=>drawNode(svg,n));
+  currentLinks.forEach((link,idx)=>drawLink(svg,link,idx));
+  Object.values(currentNodes).forEach(node=>drawNode(svg,node));
 
   placeSaaS(currentNodes);
   updatePositions();
 
-  c.appendChild(svg);
+  container.appendChild(svg);
   buildAdjacency();
 }
 
-// ==== EVENTOS ===============================================================
-document.addEventListener("DOMContentLoaded",()=>{
-  renderGuests();
-  document.getElementById("reservationForm").addEventListener("change",updateDiagram);
+// Posicionar consolas SaaS en Capa 5
+function placeSaaS(nodes){
+  if(!nodes) return;
+  const allNodes = nodes;
+  const saas = Object.values(allNodes).filter(n => n.type === 'cloud-console');
+  if(saas.length === 0) return;
+
+  const internet = allNodes['internet'];
+  const centerX = internet ? internet.x : 430;
+  const centerY5 = getLayerCenterY(5);
+
+  const soc = saas.find(n => n.id === 'soc-console' || (n.name && n.name.toLowerCase().includes('soc')));
+  const others = saas.filter(n => n !== soc);
+
+  if(soc){
+    soc.x = centerX;
+    soc.y = centerY5 - 70;
+  }
+
+  let startX = centerX + 200;
+  const step = 90;
+  others.forEach((n,i)=>{
+    n.x = startX + i*step;
+    n.y = centerY5 + 10;
+  });
+
+  const remote = allNodes['remote-user'];
+  if(remote){
+    remote.x = centerX - 220;
+    remote.y = centerY5;
+  }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  renderGuestList();
+  updateDiagram();
+  const form = document.getElementById('reservationForm');
+  if(form){
+    form.addEventListener('change',updateDiagram);
+  }
 });
 </script>
 </body>
