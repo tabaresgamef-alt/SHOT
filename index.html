@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Showroom IT/OT - SHOTv9</title>
+<title>Showroom IT/OT - SHOTv18</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -13,18 +13,18 @@ body{
   min-height:100vh;
   padding:20px;
 }
-.container{
+
+/* Nuevo layout general */
+.page-container{
   max-width:1800px;
   margin:0 auto;
-  display:grid;
-  grid-template-columns:450px 1fr;
-  gap:30px;
-  align-items:start;
+  display:flex;
+  flex-direction:column;
+  gap:25px;
 }
+
 .header{
-  grid-column:1 / -1;
   text-align:center;
-  margin-bottom:20px;
   padding:20px;
   background:linear-gradient(135deg,#0f3460 0%,#16213e 100%);
   border-radius:10px;
@@ -35,6 +35,8 @@ body{
   font-size:2.5em;
   text-shadow:2px 2px 4px rgba(0,0,0,.5);
 }
+
+/* Panel formulario (ex Paso 1) */
 .form-panel{
   background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
   padding:30px;
@@ -42,6 +44,27 @@ body{
   box-shadow:0 8px 25px rgba(0,0,0,.4);
   border:1px solid #2d3e50;
 }
+.form-panel h2{
+  margin-bottom:20px;
+}
+
+/* Dos columnas: tecnologías (30%) + diagrama (70%) */
+.content-two-columns{
+  display:grid;
+  grid-template-columns:0.3fr 0.7fr;
+  gap:25px;
+  align-items:start;
+}
+
+/* Panel de opciones de tecnología */
+.tech-options{
+  background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,.4);
+  border:1px solid #2d3e50;
+}
+
 .form-group{margin-bottom:20px}
 .form-group label{
   display:block;
@@ -132,7 +155,8 @@ body{
   color:#fff;
 }
 
-.solutions-section{margin-top:25px}
+/* Soluciones */
+.solutions-section{margin-top:5px}
 .solution-item{
   margin-bottom:20px;
   padding:15px;
@@ -179,13 +203,9 @@ body{
   color:#a8dadc;
   font-size:.9em;
 }
-.buttons-group{
-  margin-top:30px;
-  display:flex;
-  gap:15px;
-}
+
+/* Botones generales */
 .btn{
-  flex:1;
   padding:15px 25px;
   border:none;
   border-radius:8px;
@@ -203,20 +223,30 @@ body{
   transform:translateY(-2px);
   box-shadow:0 6px 15px rgba(255,107,53,.4);
 }
-.btn-secondary{
-  background:linear-gradient(135deg,#457b9d 0%,#1d3557 100%);
-  color:#fff;
-}
-.btn-secondary:hover:not(:disabled){
-  transform:translateY(-2px);
-  box-shadow:0 6px 15px rgba(69,123,157,.4);
-}
 .btn:disabled{
   opacity:.5;
   cursor:not-allowed;
 }
+
+/* Footer con botón Enviar y fallback */
+.footer-actions{
+  display:flex;
+  justify-content:center;
+  padding:20px;
+}
+.footer-actions-inner{
+  max-width:800px;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:15px;
+}
+
+/* Fallback mailto */
 .fallback-section{
-  margin-top:20px;
+  width:100%;
+  margin-top:5px;
   padding:20px;
   background:#1a2332;
   border-radius:8px;
@@ -237,13 +267,15 @@ body{
   font-family:monospace;
   font-size:.9em;
 }
+
+/* Panel diagrama */
 .diagram-panel{
   background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
   padding:25px;
   border-radius:12px;
   box-shadow:0 8px 25px rgba(0,0,0,.4);
   border:1px solid #2d3e50;
-  min-height:1020px;
+  min-height:600px;
   position:relative;
 }
 .diagram-panel h2{
@@ -264,6 +296,8 @@ body{
   border-radius:8px;
   overflow:hidden;
 }
+
+/* Tooltip y estilos de nodos/enlaces */
 .tooltip{
   position:fixed;
   background:rgba(30,42,58,.95);
@@ -295,14 +329,13 @@ body{
   font-size:.8em;
   line-height:1.3;
 }
+
 .node-group{
   cursor:grab;
   transition:opacity .2s;
 }
 .node-group:active{cursor:grabbing}
-.node-body{
-  stroke-width:2;
-}
+.node-body{stroke-width:2;}
 .node-label{
   font-size:11px;
   font-weight:600;
@@ -342,84 +375,29 @@ body{
   fill:#e0e0e0;
 }
 
-/* Leyenda de flujos */
-.flow-legend{
-  margin-bottom:10px;
-  padding:8px 12px;
-  background:#1a2332;
-  border-radius:6px;
-  border:1px solid #2d3e50;
-  font-size:.8em;
-  display:inline-block;
-}
-.legend-item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:4px;
-}
-.legend-dot{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  display:inline-block;
-}
-.legend-yellow{background:#ffd166;}
-.legend-red{background:#ff4b4b;}
-
-/* Botón flotante descargar diagrama */
-.btn-download-diagram{
-  position:absolute;
-  top:15px;
-  right:20px;
-  padding:8px 14px;
-  border:none;
-  border-radius:999px;
-  background:#111827;
-  color:#e5e7eb;
-  font-size:.8em;
-  cursor:pointer;
-  border:1px solid #374151;
-  box-shadow:0 4px 10px rgba(0,0,0,.5);
-  display:flex;
-  align-items:center;
-  gap:6px;
-  z-index:10;
-}
-.btn-download-diagram:hover{
-  background:#1f2937;
-  transform:translateY(-1px);
-}
-
 @media(max-width:1400px){
-  .container{
+  .content-two-columns{
     grid-template-columns:1fr;
+  }
+  #diagram-container{
+    height:700px;
   }
 }
 </style>
 </head>
 <body>
 
-<!-- PASO 1: Datos del ejecutivo -->
-<div id="step1-wrapper" class="container">
+<div class="page-container">
+
+  <!-- ENCABEZADO -->
   <div class="header">
     <h1>🏭 Showroom IT/OT</h1>
   </div>
 
+  <!-- FORMULARIO DATOS DE LA SOLICITUD (igual que tu Paso 1) -->
   <div class="form-panel">
-    <h2>Paso 1 – Datos del Ejecutivo</h2>
-    <div class="form-group">
-      <label for="executiveName">Nombre del Ejecutivo *</label>
-      <input type="text" id="executiveName" required>
-    </div>
-    <div class="form-group">
-      <label for="email">Correo Corporativo *</label>
-      <input type="email" id="email" required>
-    </div>
-    <div class="form-group">
-      <label for="clientName">Nombre del cliente (persona de contacto) *</label>
-      <input type="text" id="clientName" required>
-    </div>
+    <h2>Datos de la solicitud</h2>
+
     <div class="form-group">
       <label for="requestedDate">Fecha solicitada *</label>
       <input type="datetime-local" id="requestedDate" required>
@@ -460,197 +438,176 @@ body{
         Requieren que la presentación la dé el equipo de laboratorio
       </label>
     </div>
+  </div>
 
-    <div class="buttons-group">
-      <button type="button" class="btn btn-primary" onclick="goToStep2()">Siguiente</button>
+  <!-- DOS COLUMNAS: TECNOLOGÍAS + DIAGRAMA -->
+  <div class="content-two-columns">
+
+    <!-- OPCIONES DE TECNOLOGÍA -->
+    <div class="tech-options">
+      <form id="reservationForm">
+        <div class="solutions-section">
+          <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a Demostrar *</h3>
+
+          <div class="solution-item">
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-fw-ot" onchange="toggleBrands('fw-ot')">
+              <label for="sol-fw-ot">FW OT (Firewall OT)</label>
+            </div>
+            <div class="brands-group" id="brands-fw-ot">
+              <div class="brand-option">
+                <input type="radio" id="fw-fortinet" name="fw-ot-brand" value="Fortinet">
+                <label for="fw-fortinet">Fortinet</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point">
+                <label for="fw-checkpoint">Check Point</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks">
+                <label for="fw-txone">TXOne Networks</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="fw-paloalto" name="fw-ot-brand" value="Palo Alto Networks">
+                <label for="fw-paloalto">Palo Alto Networks</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="solution-item">
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-visibility" onchange="toggleBrands('visibility')">
+              <label for="sol-visibility">Visibilidad de Red OT</label>
+            </div>
+            <div class="brands-group" id="brands-visibility">
+              <div class="brand-option">
+                <input type="radio" id="vis-nozomi" name="visibility-brand" value="Nozomi">
+                <label for="vis-nozomi">Nozomi Networks</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="vis-tenable" name="visibility-brand" value="Tenable OT">
+                <label for="vis-tenable">Tenable OT</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="vis-claroty" name="visibility-brand" value="Claroty">
+                <label for="vis-claroty">Claroty</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="solution-item">
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-vuln" onchange="toggleBrands('vuln')">
+              <label for="sol-vuln">Gestión de vulnerabilidades OT</label>
+            </div>
+            <div class="brands-group" id="brands-vuln">
+              <div class="brand-option">
+                <input type="radio" id="vuln-nozomi" name="vuln-brand" value="Nozomi">
+                <label for="vuln-nozomi">Nozomi Networks</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="vuln-tenable" name="vuln-brand" value="Tenable OT">
+                <label for="vuln-tenable">Tenable OT</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="vuln-claroty" name="vuln-brand" value="Claroty">
+                <label for="vuln-claroty">Claroty</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="solution-item">
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-ips" onchange="toggleBrands('ips')">
+              <label for="sol-ips">IPS (Intrusion Prevention System)</label>
+            </div>
+            <div class="brands-group" id="brands-ips">
+              <div class="brand-option">
+                <input type="radio" id="ips-txone" name="ips-brand" value="TXOne Networks">
+                <label for="ips-txone">TXOne Networks</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="solution-item">
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-access" onchange="toggleBrands('access')">
+              <label for="sol-access">Acceso Seguro / ZTNA</label>
+            </div>
+            <div class="brands-group" id="brands-access">
+              <div class="brand-option">
+                <input type="radio" id="access-cyolo" name="access-brand" value="Cyolo">
+                <label for="access-cyolo">Cyolo</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="access-claroty" name="access-brand" value="Claroty">
+                <label for="access-claroty">Claroty</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="access-fortinet" name="access-brand" value="Fortinet">
+                <label for="access-fortinet">Fortinet</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="solution-item">
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-deception" onchange="toggleBrands('deception')">
+              <label for="sol-deception">Deception (Señuelos OT)</label>
+            </div>
+            <div class="brands-group" id="brands-deception">
+              <div class="brand-option">
+                <input type="radio" id="dec-fortinet" name="deception-brand" value="Fortinet">
+                <label for="dec-fortinet">Fortinet</label>
+              </div>
+              <div class="brand-option">
+                <input type="radio" id="dec-zscaler" name="deception-brand" value="Zscaler">
+                <label for="dec-zscaler">Zscaler</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="solution-item">
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-soc" onchange="toggleBrands('soc')">
+              <label for="sol-soc">SOC (SIEM / Monitoreo)</label>
+            </div>
+            <div class="brands-group" id="brands-soc">
+              <div class="brand-option">
+                <input type="radio" id="soc-splunk" name="soc-brand" value="Splunk">
+                <label for="soc-splunk">Splunk</label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </form>
     </div>
+
+    <!-- DIAGRAMA -->
+    <div class="diagram-panel">
+      <h2>Diagrama de la arquitectura de la maqueta</h2>
+      <p>Pasa el cursor sobre los componentes o líneas para ver detalles. Los componentes conectados se resaltan automáticamente.</p>
+      <div id="diagram-container"></div>
+    </div>
+
   </div>
 
-  <div class="diagram-panel">
-    <h2>Bienvenido al Showroom IT/OT</h2>
-    <p>
-      En este primer paso capturamos los datos del ejecutivo y del cliente.
-      En el siguiente paso podrás seleccionar las tecnologías a demostrar y ver el diagrama dinámico de la maqueta IT/OT, con flujos animados de operación y de eventos de seguridad.
-    </p>
-  </div>
-</div>
-
-<!-- PASO 2: Selección de tecnologías + diagrama -->
-<div id="step2-wrapper" class="container" style="display:none">
-  <div class="header">
-    <h1>🏭 Showroom IT/OT</h1>
-  </div>
-
-  <div class="form-panel">
-    <h2>Paso 2 – Selección de Tecnologías y Envío</h2>
-    <form id="reservationForm">
-      <div class="solutions-section">
-        <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a Demostrar *</h3>
-
-        <div class="solution-item">
-          <div class="solution-checkbox">
-            <input type="checkbox" id="sol-fw-ot" onchange="toggleBrands('fw-ot')">
-            <label for="sol-fw-ot">FW OT (Firewall OT)</label>
-          </div>
-          <div class="brands-group" id="brands-fw-ot">
-            <div class="brand-option">
-              <input type="radio" id="fw-fortinet" name="fw-ot-brand" value="Fortinet">
-              <label for="fw-fortinet">Fortinet</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point">
-              <label for="fw-checkpoint">Check Point</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks">
-              <label for="fw-txone">TXOne Networks</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="fw-paloalto" name="fw-ot-brand" value="Palo Alto Networks">
-              <label for="fw-paloalto">Palo Alto Networks</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="solution-item">
-          <div class="solution-checkbox">
-            <input type="checkbox" id="sol-visibility" onchange="toggleBrands('visibility')">
-            <label for="sol-visibility">Visibilidad de Red OT</label>
-          </div>
-          <div class="brands-group" id="brands-visibility">
-            <div class="brand-option">
-              <input type="radio" id="vis-nozomi" name="visibility-brand" value="Nozomi">
-              <label for="vis-nozomi">Nozomi Networks</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="vis-tenable" name="visibility-brand" value="Tenable OT">
-              <label for="vis-tenable">Tenable OT</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="vis-claroty" name="visibility-brand" value="Claroty">
-              <label for="vis-claroty">Claroty</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="solution-item">
-          <div class="solution-checkbox">
-            <input type="checkbox" id="sol-vuln" onchange="toggleBrands('vuln')">
-            <label for="sol-vuln">Gestión de vulnerabilidades OT</label>
-          </div>
-          <div class="brands-group" id="brands-vuln">
-            <div class="brand-option">
-              <input type="radio" id="vuln-nozomi" name="vuln-brand" value="Nozomi">
-              <label for="vuln-nozomi">Nozomi Networks</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="vuln-tenable" name="vuln-brand" value="Tenable OT">
-              <label for="vuln-tenable">Tenable OT</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="vuln-claroty" name="vuln-brand" value="Claroty">
-              <label for="vuln-claroty">Claroty</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="solution-item">
-          <div class="solution-checkbox">
-            <input type="checkbox" id="sol-ips" onchange="toggleBrands('ips')">
-            <label for="sol-ips">IPS (Intrusion Prevention System)</label>
-          </div>
-          <div class="brands-group" id="brands-ips">
-            <div class="brand-option">
-              <input type="radio" id="ips-txone" name="ips-brand" value="TXOne Networks">
-              <label for="ips-txone">TXOne Networks</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="solution-item">
-          <div class="solution-checkbox">
-            <input type="checkbox" id="sol-access" onchange="toggleBrands('access')">
-            <label for="sol-access">Acceso Seguro / ZTNA</label>
-          </div>
-          <div class="brands-group" id="brands-access">
-            <div class="brand-option">
-              <input type="radio" id="access-cyolo" name="access-brand" value="Cyolo">
-              <label for="access-cyolo">Cyolo</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="access-claroty" name="access-brand" value="Claroty">
-              <label for="access-claroty">Claroty</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="access-fortinet" name="access-brand" value="Fortinet">
-              <label for="access-fortinet">Fortinet</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="solution-item">
-          <div class="solution-checkbox">
-            <input type="checkbox" id="sol-deception" onchange="toggleBrands('deception')">
-            <label for="sol-deception">Deception (Señuelos OT)</label>
-          </div>
-          <div class="brands-group" id="brands-deception">
-            <div class="brand-option">
-              <input type="radio" id="dec-fortinet" name="deception-brand" value="Fortinet">
-              <label for="dec-fortinet">Fortinet</label>
-            </div>
-            <div class="brand-option">
-              <input type="radio" id="dec-zscaler" name="deception-brand" value="Zscaler">
-              <label for="dec-zscaler">Zscaler</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="solution-item">
-          <div class="solution-checkbox">
-            <input type="checkbox" id="sol-soc" onchange="toggleBrands('soc')">
-            <label for="sol-soc">SOC (SIEM / Monitoreo)</label>
-          </div>
-          <div class="brands-group" id="brands-soc">
-            <div class="brand-option">
-              <input type="radio" id="soc-splunk" name="soc-brand" value="Splunk">
-              <label for="soc-splunk">Splunk</label>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="buttons-group">
-        <button type="button" class="btn btn-primary" onclick="openOutlook()">Abrir en Outlook</button>
-      </div>
+  <!-- BOTÓN ENVIAR + FALLBACK -->
+  <div class="footer-actions">
+    <div class="footer-actions-inner">
+      <button type="button" class="btn btn-primary" onclick="openOutlook()">Enviar</button>
 
       <div id="fallback" style="display:none" class="fallback-section">
-        <h3>El enlace mailto es muy largo. Copie el contenido:</h3>
+        <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
         <textarea id="fallback-body" readonly></textarea>
         <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
       </div>
-    </form>
-  </div>
-
-  <div class="diagram-panel">
-    <h2>Diagrama de la arquitectura de la maqueta</h2>
-    <p>Pasa el cursor sobre los componentes o líneas para ver detalles. Los componentes conectados se resaltan automáticamente.</p>
-
-    <div class="flow-legend">
-      <div class="legend-item">
-        <span class="legend-dot legend-yellow"></span>
-        <span>Flujo operativo (punto amarillo): comunicación OT interna, estación de ingeniería, HR, ZTNA, etc.</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot legend-red"></span>
-        <span>Eventos de seguridad / logs (punto rojo): desde soluciones de seguridad hacia sus consolas, collector SOC y consola Splunk.</span>
-      </div>
     </div>
-
-    <div id="diagram-container"></div>
   </div>
+
 </div>
 
 <div id="tooltip" class="tooltip"></div>
@@ -660,7 +617,7 @@ const mailtoRecipient = 'showroom-itot@ejemplo.com';
 
 const LAYER_HEIGHT = 130;
 const purdueLayers = [
-  {level:5, label:'', height:Math.round(LAYER_HEIGHT*1.3)}, // capa 5 más alta
+  {level:5, label:'', height:Math.round(LAYER_HEIGHT*1.3)},
   {level:4, label:'Nivel 4 – Enterprise Network', height:LAYER_HEIGHT},
   {level:3.5, label:'Nivel 3.5 – IT/OT DMZ', height:LAYER_HEIGHT},
   {level:3, label:'Nivel 3 – Site Operations', height:LAYER_HEIGHT},
@@ -744,7 +701,6 @@ const brandLogos = {
       <path d="M 15 15 L 25 20 L 15 25 L 10 20 Z M 25 20 L 35 25 L 25 30 L 15 25 Z M 35 15 L 45 20 L 35 25 L 25 20 Z M 25 30 L 35 35 L 25 40 L 15 35 Z" fill="none" stroke="#00396B" stroke-width="2"/>
     </g>`
   },
-
   cyolo: {
     color: { primary: '#0B7285', secondary: '#15AABF', stroke: '#0B7285' },
     logo: `<g transform="translate(-28,-28)">
@@ -782,17 +738,28 @@ const brandLogos = {
 function getSelectedBrand(groupName) {
   const radio = document.querySelector(`input[name="${groupName}"]:checked`);
   if (!radio) return null;
-  const value = radio.value.toLowerCase();
-  if (value.includes('fortinet')) return 'fortinet';
-  if (value.includes('check point')) return 'checkpoint';
-  if (value.includes('txone')) return 'txone';
-  if (value.includes('palo alto')) return 'paloalto';
-  if (value.includes('nozomi')) return 'nozomi';
-  if (value.includes('tenable')) return 'tenable';
-  if (value.includes('claroty')) return 'claroty';
-  if (value.includes('cyolo')) return 'cyolo';
-  if (value.includes('zscaler')) return 'zscaler';
-  if (value.includes('splunk')) return 'splunk';
+  const value = radio.value.trim().toLowerCase();
+
+  const map = {
+    fortinet: 'fortinet',
+    'check point': 'checkpoint',
+    check: 'checkpoint',
+    point: 'checkpoint',
+    txone: 'txone',
+    'palo alto': 'paloalto',
+    palo: 'paloalto',
+    alto: 'paloalto',
+    nozomi: 'nozomi',
+    tenable: 'tenable',
+    claroty: 'claroty',
+    cyolo: 'cyolo',
+    zscaler: 'zscaler',
+    splunk: 'splunk'
+  };
+
+  for (const key in map) {
+    if (value.includes(key)) return map[key];
+  }
   return null;
 }
 
@@ -848,49 +815,10 @@ function renderGuestList(){
   container.innerHTML = html;
 }
 
-/* Wizard: paso 1 -> paso 2 */
-function validateStep1(){
-  const name = document.getElementById('executiveName').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const client = document.getElementById('clientName').value.trim();
-  const date = document.getElementById('requestedDate').value;
-  if(!name || !email || !client || !date){
-    alert('Por favor complete nombre del ejecutivo, correo, cliente y fecha antes de continuar.');
-    return false;
-  }
-  return true;
-}
-function goToStep2(){
-  if(!validateStep1()) return;
-  document.getElementById('step1-wrapper').style.display = 'none';
-  document.getElementById('step2-wrapper').style.display = 'grid';
-  updateDiagram();
-}
-
-function toggleBrands(solutionId){
-  const checkbox = document.getElementById('sol-'+solutionId);
-  const brandsGroup = document.getElementById('brands-'+solutionId);
-  const radios = brandsGroup ? brandsGroup.querySelectorAll('input[type="radio"]') : [];
-  if(checkbox.checked){
-    if(brandsGroup) brandsGroup.classList.add('active');
-    if(radios.length > 0){
-      const anyChecked = Array.from(radios).some(r => r.checked);
-      if(!anyChecked){
-        radios[0].checked = true;
-      }
-    }
-  }else{
-    if(brandsGroup) brandsGroup.classList.remove('active');
-    radios.forEach(r=>r.checked=false);
-  }
-  updateDiagram();
-}
-
+/* Validación y armado de correo */
 function validateForm(){
-  const name = document.getElementById('executiveName').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const client = document.getElementById('clientName').value.trim();
   const date = document.getElementById('requestedDate').value;
+
 
   const solIds = [
     {chk:'sol-fw-ot', brandGroup:'fw-ot-brand', label:'FW OT'},
@@ -904,9 +832,10 @@ function validateForm(){
 
   const anySolutionChecked = solIds.some(s => document.getElementById(s.chk).checked);
 
-  if(!(name && email && client && date && anySolutionChecked)){
+  if(!(date && anySolutionChecked)){
     return false;
-  }
+}
+
 
   const missingBrands = [];
   solIds.forEach(s=>{
@@ -954,9 +883,6 @@ function buildMailto(){
     alert('Por favor complete todos los campos obligatorios, seleccione al menos una solución y una marca para cada solución seleccionada.');
     return null;
   }
-  const name = document.getElementById('executiveName').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const client = document.getElementById('clientName').value.trim();
   const date = document.getElementById('requestedDate').value;
   const comments = document.getElementById('comments').value.trim();
   const companyName = document.getElementById('companyName').value.trim();
@@ -971,17 +897,13 @@ function buildMailto(){
     hour:'2-digit',minute:'2-digit'
   });
 
-  const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${name} - ${client}`;
-  let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
+ const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${companyName || "Empresa no indicada"}`;
+ let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
   body += `Solicito la reserva del showroom con los siguientes detalles:\n\n`;
-  body += `DATOS DEL EJECUTIVO\n`;
-  body += `-------------------\n`;
-  body += `Nombre: ${name}\n`;
-  body += `Correo: ${email}\n\n`;
+  
   body += `DATOS DEL CLIENTE\n`;
   body += `-----------------\n`;
-  body += `Cliente (persona): ${client}\n`;
-  if(companyName) body += `Empresa: ${companyName}\n`;
+    if(companyName) body += `Empresa: ${companyName}\n`;
   if(sector) body += `Sector: ${sector}\n`;
   if(guestCount) body += `Número de invitados: ${guestCount}\n`;
   body += `Fecha solicitada: ${dateStr}\n\n`;
@@ -1015,7 +937,7 @@ function buildMailto(){
     body += `• El cliente solicita que la presentación sea impartida por el equipo de laboratorio.\n`;
   }
 
-  body += `\nSaludos cordiales,\n${name}`;
+  body += `\nSaludos cordiales`;
 
   return {to:mailtoRecipient,subject,body};
 }
@@ -1049,6 +971,7 @@ function copyToClipboard(){
   });
 }
 
+/* Purdue helpers */
 function getLayerInfo(level){
   return purdueLayers.find(l=>l.level===level);
 }
@@ -1057,6 +980,7 @@ function getLayerCenterY(level){
   return layer ? layer.y + layer.height/2 : 0;
 }
 
+/* Arquitectura IT/OT */
 function buildArchitecture(){
   const hasFwOt      = document.getElementById('sol-fw-ot').checked;
   const hasVis       = document.getElementById('sol-visibility').checked;
@@ -1208,7 +1132,7 @@ function buildArchitecture(){
       let x = baseX + idx*step;
       addNode(m.id,m.name,5,x,'cloud-console','Consola de gestión SaaS alcanzable vía Internet',m.brand);
       if(m.id === 'soc-console'){
-        nodes[m.id].y = getLayerCenterY(5) - 140; // SOC más arriba
+        nodes[m.id].y = getLayerCenterY(5) - 140;
         socConsoleId = m.id;
       }else{
         nodes[m.id].y = baseConsoleY;
@@ -1368,7 +1292,7 @@ function drawFirewallPerimeter(group){
     port.setAttribute('y',8);
     port.setAttribute('width',4);
     port.setAttribute('height',8);
-    port.setAttribute('fill','#d04a1e');
+        port.setAttribute('fill','#d04a1e');
     group.appendChild(port);
   }
 }
@@ -1486,7 +1410,6 @@ function drawNodeShape(group,node){
   }
 
   if(node.type==='ips-brand'){
-    // Estilo B industrial: chasis oscuro + franja naranja + puertos
     const rect = document.createElementNS(ns,'rect');
     rect.setAttribute('x',-32);
     rect.setAttribute('y',-14);
@@ -1608,7 +1531,6 @@ function drawNodeShape(group,node){
   }
 
   if(node.type==='hmi'){
-    // Estilo B adaptado: carcasa oscura + pantalla azul
     const outer = document.createElementNS(ns,'rect');
     outer.setAttribute('x',-30);
     outer.setAttribute('y',-20);
@@ -1662,7 +1584,6 @@ function drawNodeShape(group,node){
   }
 
   if(node.type==='plc'){
-    // Estilo B adaptado: bloque modular gris industrial
     const outer = document.createElementNS(ns,'rect');
     outer.setAttribute('x',-32);
     outer.setAttribute('y',-16);
@@ -1723,7 +1644,6 @@ function drawNodeShape(group,node){
   }
 
   if(node.type==='sensor'){
-    // Estilo B adaptado: caja clara con ojo
     const body = document.createElementNS(ns,'rect');
     body.setAttribute('x',-28);
     body.setAttribute('y',-16);
@@ -1754,7 +1674,6 @@ function drawNodeShape(group,node){
   }
 
   if(node.type==='deception'){
-    // Estilo B adaptado: rectángulo grande naranja con PLCs internos
     const body = document.createElementNS(ns,'rect');
     body.setAttribute('x',-34);
     body.setAttribute('y',-18);
@@ -1933,20 +1852,6 @@ function buildLinkPath(from,to){
   return `M ${a.x} ${a.y} L ${a.x} ${midY} L ${b.x} ${midY} L ${b.x} ${b.y}`;
 }
 
-function buildFlowPathFromNodeSequence(nodeIds){
-  if(!nodeIds || nodeIds.length < 2) return '';
-  let d = '';
-  for(let i=0;i<nodeIds.length-1;i++){
-    const seg = buildLinkPath(nodeIds[i], nodeIds[i+1]);
-    if(i===0){
-      d += seg;
-    }else{
-      d += seg.replace(/^M [^L]+/,'');
-    }
-  }
-  return d;
-}
-
 function drawLink(svg,link,index){
   const ns = 'http://www.w3.org/2000/svg';
   const path = document.createElementNS(ns,'path');
@@ -1965,7 +1870,7 @@ function drawLink(svg,link,index){
 
   path.addEventListener('mouseenter',(e)=>{
     showLineTooltip(e,label);
-    highlightFromLink(link.from,link.to);
+    highlightFromNode(link.from);
   });
   path.addEventListener('mousemove',updateTooltipPosition);
   path.addEventListener('mouseleave',()=>{
@@ -1984,44 +1889,6 @@ function buildAdjacency(){
     if(adjacency[l.from]) adjacency[l.from].add(l.to);
     if(adjacency[l.to])   adjacency[l.to].add(l.from);
   });
-}
-
-function buildAdjacencyForKinds(kinds){
-  const adj = {};
-  Object.keys(currentNodes).forEach(id=>{adj[id]=new Set();});
-  currentLinks.forEach(l=>{
-    const kind = l.kind || 'data';
-    if(!kinds.includes(kind)) return;
-    if(adj[l.from]) adj[l.from].add(l.to);
-    if(adj[l.to])   adj[l.to].add(l.from);
-  });
-  return adj;
-}
-
-function findPath(adj,start,goal){
-  if(!adj[start] || !adj[goal]) return null;
-  const queue = [start];
-  const visited = new Set([start]);
-  const parent = {};
-  while(queue.length){
-    const cur = queue.shift();
-    if(cur === goal) break;
-    adj[cur].forEach(n=>{
-      if(!visited.has(n)){
-        visited.add(n);
-        parent[n] = cur;
-        queue.push(n);
-      }
-    });
-  }
-  if(!visited.has(goal)) return null;
-  const path = [];
-  let cur = goal;
-  while(cur !== undefined){
-    path.unshift(cur);
-    cur = parent[cur];
-  }
-  return path;
 }
 
 function getDirectNeighbors(startId){
@@ -2070,10 +1937,6 @@ function highlightFromNode(nodeId){
       l.classList.remove('highlight-link');
     }
   });
-}
-
-function highlightFromLink(fromId,toId){
-  highlightFromNode(fromId);
 }
 
 function showNodeTooltip(e,node){
@@ -2126,14 +1989,8 @@ function startDrag(e,nodeId){
   dragState = {
     nodeId,
     startMouseX: e.clientX,
-    startX: node.x,
-    animationsHidden: false
+    startX: node.x
   };
-  const animLayer = currentSvg.querySelector('#animation-layer');
-  if(animLayer){
-    animLayer.style.display = 'none';
-    dragState.animationsHidden = true;
-  }
   window.addEventListener('mousemove',onDragMove);
   window.addEventListener('mouseup',endDrag);
 }
@@ -2160,7 +2017,6 @@ function endDrag(){
   dragState = null;
 }
 
-
 function updatePositions(){
   Object.values(currentNodes).forEach(node=>{
     if(node.group){
@@ -2174,154 +2030,7 @@ function updatePositions(){
   });
 }
 
-/* Animación de puntos con opción de "trail" atrasado */
-function animateDotAlongPath(dot, path, durationMs, phaseMs, isTrail=false){
-  const length = path.getTotalLength();
-  function step(timestamp){
-    const t = ((timestamp + (phaseMs||0)) % durationMs) / durationMs;
-    if(isTrail){
-      let t2 = t - 0.02;
-      if(t2 < 0) t2 = 0;
-      const p2 = path.getPointAtLength(length * t2);
-      dot.setAttribute('cx', p2.x);
-      dot.setAttribute('cy', p2.y);
-    }else{
-      const p = path.getPointAtLength(length * t);
-      dot.setAttribute('cx', p.x);
-      dot.setAttribute('cy', p.y);
-    }
-    requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-function createFlowPath(animLayer, nodePath, color, durationMs, phaseMs){
-  const ns = 'http://www.w3.org/2000/svg';
-  if(!nodePath || nodePath.length < 2) return;
-  const pathD = buildFlowPathFromNodeSequence(nodePath);
-  if(!pathD) return;
-  const pathEl = document.createElementNS(ns,'path');
-  pathEl.setAttribute('d', pathD);
-  pathEl.setAttribute('fill','none');
-  pathEl.setAttribute('stroke','none');
-  animLayer.appendChild(pathEl);
-
-  const dot = document.createElementNS(ns,'circle');
-  dot.setAttribute('r',6);
-  dot.setAttribute('fill',color);
-  animLayer.appendChild(dot);
-
-  const trail = document.createElementNS(ns,'circle');
-  trail.setAttribute('r',6);
-  trail.setAttribute('fill',color);
-  trail.setAttribute('opacity','0.4');
-  animLayer.appendChild(trail);
-
-  animateDotAlongPath(dot,pathEl,durationMs,phaseMs,false);
-  animateDotAlongPath(trail,pathEl,durationMs,phaseMs,true);
-}
-
-function createMultiFlow(animLayer, path, color, durationMs){
-  createFlowPath(animLayer,path,color,durationMs,0);
-  createFlowPath(animLayer,path,color,durationMs,durationMs/3);
-  createFlowPath(animLayer,path,color,durationMs,(2*durationMs)/3);
-}
-
-function setupAnimations(svg){
-  if(!svg) return;
-  const container = document.getElementById('diagram-container');
-  if(!container) return;
-
-  const ns = 'http://www.w3.org/2000/svg';
-  const animLayer = document.createElementNS(ns,'g');
-  animLayer.setAttribute('id','animation-layer');
-  svg.appendChild(animLayer);
-
-  const adjData = buildAdjacencyForKinds(['data']);
-
-  const internalPairs = [
-    ['plc1','plc2'],
-    ['plc2','plc3'],
-    ['hmi','plc1'],
-    ['eng','plc2']
-  ];
-  internalPairs.forEach(([from,to])=>{
-    if(currentNodes[from] && currentNodes[to]){
-      const path = findPath(adjData, from, to);
-      if(path){
-        createMultiFlow(animLayer,path,'#ffd166',6000);
-      }
-    }
-  });
-
-  if(currentNodes['eng'] && currentNodes['dc']){
-    const pathEngDc = findPath(adjData,'eng','dc');
-    if(pathEngDc){
-      createMultiFlow(animLayer,pathEngDc,'#ffd166',6000);
-    }
-  }
-
-  if(currentNodes['hr-pc'] && currentNodes['internet']){
-    const pathHrNet = findPath(adjData,'hr-pc','internet');
-    if(pathHrNet){
-      createMultiFlow(animLayer,pathHrNet,'#ffd166',6000);
-    }
-  }
-
-  if(currentNodes['remote-user'] && currentNodes['jump']){
-    const pathRemoteJump = findPath(adjData,'remote-user','jump');
-    if(pathRemoteJump){
-      createMultiFlow(animLayer,pathRemoteJump,'#ffd166',6000);
-      const backRJ = [...pathRemoteJump].reverse();
-      createMultiFlow(animLayer,backRJ,'#ffd166',6000);
-    }
-  }
-
-  if(currentNodes['jump'] && currentNodes['eng']){
-    const pathJumpEng = findPath(adjData,'jump','eng');
-    if(pathJumpEng){
-      createMultiFlow(animLayer,pathJumpEng,'#ffd166',6000);
-      const backJE = [...pathJumpEng].reverse();
-      createMultiFlow(animLayer,backJE,'#ffd166',6000);
-    }
-  }
-
-  const solutionToConsole = [
-    ['fw-ot','fwot-console'],
-    ['sensor-vis','vis-console'],
-    ['sensor-vuln','vuln-console'],
-    ['ips','ips-console'],
-    ['jump','access-console'],
-    ['dec-server','dec-console']
-  ];
-
-  const hasSocCollector = !!currentNodes['soc-collector'];
-  const hasSocConsole = !!currentNodes['soc-console'];
-
-  solutionToConsole.forEach(([solId, consoleId])=>{
-    if(!currentNodes[solId] || !currentNodes[consoleId]) return;
-
-    const path1 = findPath(adjData, solId, consoleId);
-    if(path1){
-      createMultiFlow(animLayer,path1,'#ff4b4b',9000);
-    }
-
-    if(hasSocCollector){
-      const path2 = findPath(adjData, consoleId, 'soc-collector');
-      if(path2){
-        createMultiFlow(animLayer,path2,'#ff4b4b',9000);
-      }
-    }
-  });
-
-  if(hasSocCollector && hasSocConsole){
-    const path3 = findPath(adjData, 'soc-collector', 'soc-console');
-    if(path3){
-      createMultiFlow(animLayer,path3,'#ff4b4b',9000);
-    }
-  }
-}
-
+/* Diagrama principal */
 function updateDiagram(){
   const container = document.getElementById('diagram-container');
   if(!container) return;
@@ -2338,72 +2047,17 @@ function updateDiagram(){
   currentNodes = arch.nodes;
   currentLinks = arch.links;
 
-  placeSaaS(currentNodes);
-
   currentLinks.forEach((link,idx)=>drawLink(svg,link,idx));
   Object.values(currentNodes).forEach(node=>drawNode(svg,node));
 
+  placeSaaS(currentNodes);
+  updatePositions();
+
   container.appendChild(svg);
   buildAdjacency();
-
 }
 
-/* Descargar diagrama como imagen (sin puntos de tráfico) */
-function downloadDiagram(){
-  if(!currentSvg) return;
-  const svgClone = currentSvg.cloneNode(true);
-  const animLayer = svgClone.querySelector('#animation-layer');
-  if(animLayer) animLayer.remove();
-
-  const width = parseInt(svgClone.getAttribute('width')) || 1000;
-  const height = parseInt(svgClone.getAttribute('height')) || 800;
-
-  const serializer = new XMLSerializer();
-  let source = serializer.serializeToString(svgClone);
-  if(!source.match(/^<svg[^>]+xmlns="/)){
-    source = source.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');
-  }
-
-  const svgBlob = new Blob([source], {type:'image/svg+xml;charset=utf-8'});
-  const url = URL.createObjectURL(svgBlob);
-
-  const img = new Image();
-  img.onload = function(){
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#0f1923';
-    ctx.fillRect(0,0,width,height);
-    ctx.drawImage(img,0,0);
-    URL.revokeObjectURL(url);
-    const pngUrl = canvas.toDataURL('image/png');
-    const a = document.createElement('a');
-    a.href = pngUrl;
-    a.download = 'showroom_it_ot_diagrama.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-  img.src = url;
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  renderGuestList();
-  updateDiagram();
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
-    cb.addEventListener('change',updateDiagram);
-  });
-  document.querySelectorAll('input[type="radio"]').forEach(r=>{
-    r.addEventListener('change',updateDiagram);
-  });
-});
-window.addEventListener('resize',updateDiagram);
-
-// Posicionar consolas SaaS en Capa 5:
-// - Consola SOC arriba de la nube
-// - Resto de consolas SaaS a la derecha de la nube
-// - Usuario remoto a la izquierda de la nube
+/* Posicionar consolas SaaS en capa 5 */
 function placeSaaS(nodes){
   if(!nodes) return;
   const allNodes = nodes;
@@ -2436,6 +2090,35 @@ function placeSaaS(nodes){
   }
 }
 
+/* Mostrar/ocultar marcas */
+function toggleBrands(solutionId){
+  const checkbox = document.getElementById('sol-'+solutionId);
+  const brandsGroup = document.getElementById('brands-'+solutionId);
+  const radios = brandsGroup ? brandsGroup.querySelectorAll('input[type="radio"]') : [];
+  if(checkbox.checked){
+    if(brandsGroup) brandsGroup.classList.add('active');
+    if(radios.length > 0){
+      const anyChecked = Array.from(radios).some(r => r.checked);
+      if(!anyChecked){
+        radios[0].checked = true;
+      }
+    }
+  }else{
+    if(brandsGroup) brandsGroup.classList.remove('active');
+    radios.forEach(r=>r.checked=false);
+  }
+  updateDiagram();
+}
+
+/* Init */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderGuestList();
+  updateDiagram();
+  const form = document.getElementById('reservationForm');
+  if(form){
+    form.addEventListener('change',updateDiagram);
+  }
+});
 </script>
 </body>
 </html>
