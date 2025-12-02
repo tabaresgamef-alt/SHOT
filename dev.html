@@ -399,18 +399,6 @@ body{
     <h2>Datos de la solicitud</h2>
 
     <div class="form-group">
-      <label for="executiveName">Nombre del Ejecutivo *</label>
-      <input type="text" id="executiveName" required>
-    </div>
-    <div class="form-group">
-      <label for="email">Correo Corporativo *</label>
-      <input type="email" id="email" required>
-    </div>
-    <div class="form-group">
-      <label for="clientName">Nombre del cliente (persona de contacto) *</label>
-      <input type="text" id="clientName" required>
-    </div>
-    <div class="form-group">
       <label for="requestedDate">Fecha solicitada *</label>
       <input type="datetime-local" id="requestedDate" required>
     </div>
@@ -829,9 +817,7 @@ function renderGuestList(){
 
 /* Validación y armado de correo */
 function validateForm(){
-  const name = document.getElementById('executiveName').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const client = document.getElementById('clientName').value.trim();
+  const date = document.getElementById('requestedDate').value;
   const date = document.getElementById('requestedDate').value;
 
   const solIds = [
@@ -846,9 +832,10 @@ function validateForm(){
 
   const anySolutionChecked = solIds.some(s => document.getElementById(s.chk).checked);
 
-  if(!(name && email && client && date && anySolutionChecked)){
+  if(!(date && anySolutionChecked)){
     return false;
-  }
+}
+
 
   const missingBrands = [];
   solIds.forEach(s=>{
@@ -896,9 +883,6 @@ function buildMailto(){
     alert('Por favor complete todos los campos obligatorios, seleccione al menos una solución y una marca para cada solución seleccionada.');
     return null;
   }
-  const name = document.getElementById('executiveName').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const client = document.getElementById('clientName').value.trim();
   const date = document.getElementById('requestedDate').value;
   const comments = document.getElementById('comments').value.trim();
   const companyName = document.getElementById('companyName').value.trim();
@@ -913,17 +897,13 @@ function buildMailto(){
     hour:'2-digit',minute:'2-digit'
   });
 
-  const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${name} - ${client}`;
-  let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
+ const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${companyName || "Empresa no indicada"}`;
+ let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
   body += `Solicito la reserva del showroom con los siguientes detalles:\n\n`;
-  body += `DATOS DEL EJECUTIVO\n`;
-  body += `-------------------\n`;
-  body += `Nombre: ${name}\n`;
-  body += `Correo: ${email}\n\n`;
+  
   body += `DATOS DEL CLIENTE\n`;
   body += `-----------------\n`;
-  body += `Cliente (persona): ${client}\n`;
-  if(companyName) body += `Empresa: ${companyName}\n`;
+    if(companyName) body += `Empresa: ${companyName}\n`;
   if(sector) body += `Sector: ${sector}\n`;
   if(guestCount) body += `Número de invitados: ${guestCount}\n`;
   body += `Fecha solicitada: ${dateStr}\n\n`;
@@ -957,7 +937,7 @@ function buildMailto(){
     body += `• El cliente solicita que la presentación sea impartida por el equipo de laboratorio.\n`;
   }
 
-  body += `\nSaludos cordiales,\n${name}`;
+  body += `\nSaludos cordiales`;
 
   return {to:mailtoRecipient,subject,body};
 }
