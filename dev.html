@@ -339,6 +339,11 @@ body{
   color: #fecaca;
   cursor: not-allowed;
 }
+.calendar-day.disabled{
+  opacity:.3;
+  cursor:not-allowed;
+  background:transparent;
+}
 
 .time-selector {
   margin-top: 10px;
@@ -649,7 +654,7 @@ body{
     <h2>Diagrama IT/OT – Maqueta Showroom</h2>
     <p style="font-size:.8em;color:#9ca3af;margin-bottom:8px;">
       Se muestran todas las capas Purdue (Nivel 4 a Nivel 0), junto con los componentes principales:
-      ERP/MES, DMZ, FW OT, IPS, visibilidad OT, estación de ingeniería, HMI, PLCs, motores/sensores y la consola de SOC.
+      ERP/MES, FW OT, IPS, visibilidad OT, estación de ingeniería, HMI, PLCs, motores/sensores y la consola de SOC.
     </p>
     <div id="diagram-container"></div>
   </div>
@@ -740,6 +745,12 @@ function goToStep2(){
 function goBackStep1(){
   document.getElementById('step2-wrapper').style.display = 'none';
   document.getElementById('step1-wrapper').style.display = 'grid';
+  // Reset de selección de día y hora al regresar
+  selectedDay = null;
+  selectedTime = null;
+  const hidden = document.getElementById('requestedDate');
+  if (hidden) hidden.value = '';
+  buildCalendar();
 }
 
 /* -------------------------
@@ -995,6 +1006,7 @@ function buildCalendar() {
 
   const today = new Date();
   const todayKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+  const todayDate = new Date(todayKey); // normalizado sin hora
 
   for (let day = 1; day <= daysInMonth; day++) {
     const cell = document.createElement('div');
@@ -1002,12 +1014,17 @@ function buildCalendar() {
     cell.className = 'calendar-day';
 
     const dateKey = formatDateKey(base.getFullYear(), base.getMonth(), day);
+    const cellDate = new Date(dateKey);
 
     if (dateKey === todayKey) {
       cell.classList.add('today');
     }
 
-    if (isDayFullyBooked(dateKey)) {
+    // No permitir seleccionar días pasados
+    if (cellDate < todayDate) {
+      cell.classList.add('disabled');
+      cell.onclick = null;
+    } else if (isDayFullyBooked(dateKey)) {
       cell.classList.add('fully-booked');
       cell.onclick = null;
     } else {
@@ -1188,7 +1205,7 @@ function exportReservationsToCSV() {
 }
 
 /* -------------------------
-   DIAGRAMA IT/OT (estático, sin animaciones)
+   DIAGRAMA IT/OT (sencillo)
 ------------------------- */
 
 // Helper: obtener marca actual o texto genérico
@@ -1210,7 +1227,7 @@ function renderArchitectureDiagram(){
 
   const svgNS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(svgNS,'svg');
-  svg.setAttribute('viewBox','0 0 900 400');
+  svg.setAttribute('viewBox','0 0 900 450');
   svg.setAttribute('width','100%');
   svg.setAttribute('height','100%');
 
@@ -1219,7 +1236,7 @@ function renderArchitectureDiagram(){
   bg.setAttribute('x','0');
   bg.setAttribute('y','0');
   bg.setAttribute('width','900');
-  bg.setAttribute('height','400');
+  bg.setAttribute('height','450');
   bg.setAttribute('fill','#020617');
   svg.appendChild(bg);
 
@@ -1296,7 +1313,6 @@ function renderArchitectureDiagram(){
   const fwBrand      = getBrandLabel('fw-ot-brand','FW OT');
   const fwFill       = fwSelected ? '#7c2d12' : '#020617';
   const fwStroke     = fwSelected ? '#f97316' : '#374151';
-
   addBox(40,110,140,40,'FW OT',fwBrand,fwFill,fwStroke);
 
   const ipsSelected  = isSolutionSelected('sol-ips');
@@ -1313,16 +1329,16 @@ function renderArchitectureDiagram(){
 
   // Nivel 2 – Estación de Ingeniería / HMI
   addBox(60,170,150,40,'Estación de Ingeniería','SCADA / Eng.','#0b1120','#374151');
-  addBox(230,170,150,40,'HMI','#0b1120','#374151');
+  addBox(230,170,150,40,'HMI',null,'#0b1120','#374151');
 
   // Nivel 1 – PLCs
   addBox(110,230,130,40,'PLCs','Control','#020617','#4b5563');
 
   // Nivel 0 – Motores / Sensores
-  addBox(80,290,130,40,'Motores','#020617','#4b5563');
-  addBox(230,290,130,40,'Sensores','#020617','#4b5563');
+  addBox(80,290,130,40,'Motores',null,'#020617','#4b5563');
+  addBox(230,290,130,40,'Sensores',null,'#020617','#4b5563');
 
-  // Access Seguro / ZTNA
+  // Acceso Seguro / ZTNA
   const accessSelected = isSolutionSelected('sol-access');
   const accessBrand    = getBrandLabel('access-brand','ZTNA / VPN');
   const accFill        = accessSelected ? '#022c22' : '#020617';
@@ -1409,18 +1425,6 @@ function renderArchitectureDiagram(){
   svg.appendChild(splunkText);
 
   // Flechas simples (sin animación)
-  function addArrow(x1,y1,x2,y2,color){
-    const line = document.createElementNS(svgNS,'line');
-    line.setAttribute('x1',String(x1));
-    line.setAttribute('y1',String(y1));
-    line.setAttribute('x2',String(x2));
-    line.setAttribute('y2',String(y2));
-    line.setAttribute('stroke',color);
-    line.setAttribute('stroke-width','2');
-    line.setAttribute('marker-end','url(#arrowhead)');
-    svg.appendChild(line);
-  }
-
   const defs = document.createElementNS(svgNS,'defs');
   const marker = document.createElementNS(svgNS,'marker');
   marker.setAttribute('id','arrowhead');
@@ -1436,8 +1440,19 @@ function renderArchitectureDiagram(){
   defs.appendChild(marker);
   svg.appendChild(defs);
 
+  function addArrow(x1,y1,x2,y2,color){
+    const line = document.createElementNS(svgNS,'line');
+    line.setAttribute('x1',String(x1));
+    line.setAttribute('y1',String(y1));
+    line.setAttribute('x2',String(x2));
+    line.setAttribute('y2',String(y2));
+    line.setAttribute('stroke',color);
+    line.setAttribute('stroke-width','2');
+    line.setAttribute('marker-end','url(#arrowhead)');
+    svg.appendChild(line);
+  }
+
   // Flujos principales
-  // Tráfico de PLCs/HMI hacia SOC (amarillo = datos, rojo = seguridad)
   // Datos (amarillo)
   addArrow(260,190, 640,120, '#facc15'); // HMI -> SOC
   addArrow(240,250, 640,120, '#facc15'); // PLCs -> SOC (datos)
@@ -1458,7 +1473,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buildCalendar();
 
   // Cada cambio de radio/checkbox en soluciones actualiza diagrama
-  document.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(el=>{
+  document.querySelectorAll('#step2-wrapper input[type="radio"],#step2-wrapper input[type="checkbox"]').forEach(el=>{
     el.addEventListener('change', ()=>{
       renderArchitectureDiagram();
     });
@@ -1467,4 +1482,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
