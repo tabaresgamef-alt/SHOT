@@ -1,8 +1,18 @@
 diff --git a/dev/dev.html b/dev/dev.html
-index afa34ebd527dde0a8c782a6d78cc2a2098e94b13..d444d2d1dbfe70515b51a878bf04cb5bf6125f26 100644
+index 8e639f0cc4efdd32effe5200037c955d7cc92589..94a4a336b51b3af86da561327ab256b6697a814a 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -711,50 +711,74 @@ body{
+@@ -701,118 +701,148 @@ body{
+ 
+   </div>
+ 
+   <!-- BOTÓN ENVIAR + FALLBACK -->
+   <div class="footer-actions">
+     <div class="footer-actions-inner">
+       <button type="button" class="btn btn-primary" onclick="handleSubmit()">Enviar</button>
+ 
+       <div id="fallback" style="display:none" class="fallback-section">
+         <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
          <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
          <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
          <textarea id="fallback-body" readonly></textarea>
@@ -10,15 +20,263 @@ index afa34ebd527dde0a8c782a6d78cc2a2098e94b13..d444d2d1dbfe70515b51a878bf04cb5b
        </div>
      </div>
    </div>
-
+ 
  </div>
-
+ 
  <div id="tooltip" class="tooltip"></div>
-
+ 
  <script>
  const mailtoRecipient = 'showroom-itot@ejemplo.com';
-
-+// Construye un registro completo con todos los campos del formulario y tecnologías seleccionadas
+ 
+-// --- NUEVO: lógica de calendario y horarios con SharePoint ---
+-const LIST_NAME = 'ReservasShowroom'; // Nombre de la lista de SharePoint (ajustable)
++// --- NUEVO: lógica de calendario y horarios con lectura de CSV ---
+ const DISPLAY_HOURS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+ const RESERVABLE_HOURS = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
+ let selectedDate = null;      // 'YYYY-MM-DD'
+ let selectedTime = null;      // 'HH:MM'
+ let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
+ let availabilityByDate = {};
+ let currentMonthDate = new Date();
+ 
++async function reservasdb(){
++  try{
++    const response = await fetch('/reservas.csv');
++    if(!response.ok) throw new Error('No se pudo leer reservas.csv');
++    const csvText = await response.text();
++    const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
++    if(lines.length === 0) return [];
++
++    const headers = lines[0].split(',').map(h=>h.trim());
++    return lines.slice(1).map(line=>{
++      const values = line.split(',').map(v=>v.trim());
++      const record = {};
++      headers.forEach((h,idx)=>{record[h]=values[idx]||'';});
++      const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
++
++      return {
++        fecha: record.Fecha || record.fecha || record.date || '',
++        horaInicio: record.HoraInicio || record.Hora || record.hora || '',
++        horaFin: record.HoraFin || record.horafin || '',
++        estado: record.Estado || record.estado || '',
++        empresa: record.Empresa || record.empresa || '',
++        sector: record.Sector || record.sector || '',
++        numeroInvitados: record.NumeroInvitados || record.invitados || '',
++        comentarios: record.Comentarios || record.comentarios || '',
++        requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
++        invitadosDetalle: record.InvitadosJson || record.Invitados || '',
++        tecnologias: techList
++      };
++    });
++  }catch(err){
++    console.error('No se pudieron leer las reservas desde el CSV', err);
++    return [];
++  }
++}
++
+ function normalizeTimeSlot(timeStr){
+   if(!timeStr) return null;
+   const parts = timeStr.toString().trim().split(':');
+   const hour = parts[0];
+   if(hour === undefined) return null;
+   const hourNum = Number(hour);
+   if(Number.isNaN(hourNum)) return null;
+   return `${String(hourNum).padStart(2,'0')}:00`;
+ }
+ 
+ function addBlockedSlot(blockedSet,timeStr){
+   const normalized = normalizeTimeSlot(timeStr);
+   if(!normalized) return;
+   const hour = parseInt(normalized.split(':')[0],10);
+   if(Number.isNaN(hour)) return;
+   [hour-1,hour,hour+1].forEach(h=>{
+     const slot = `${String(h).padStart(2,'0')}:00`;
+     if(DISPLAY_HOURS.includes(slot)){
+       blockedSet.add(slot);
+     }
+   });
+ }
+ 
+ function buildAvailabilityMap(){
+   availabilityByDate = {};
+   Object.keys(reservationsByDate).forEach(dateStr=>{
+     const blocked = new Set();
+     (reservationsByDate[dateStr] || []).forEach(time=>addBlockedSlot(blocked,time));
+     const hasAvailableSlots = RESERVABLE_HOURS.some(h=>!blocked.has(h));
+     availabilityByDate[dateStr] = {blockedTimes:blocked, hasAvailableSlots};
+   });
+ }
+ 
+-async function loadReservationsFromSharePoint(){
++async function loadReservationsFromCsv(){
+   try{
+-    const response = await fetch(`/_api/web/lists/getbytitle('${LIST_NAME}')/items?$select=FechaReserva,HoraReserva`,{
+-      headers:{'Accept':'application/json;odata=nometadata'}
+-    });
+-    if(!response.ok) throw new Error('Error al obtener reservas');
+-    const data = await response.json();
++    const data = await reservasdb();
+     reservationsByDate = {};
+-    if(Array.isArray(data.value)){
+-      data.value.forEach(item=>{
+-        const dateStr = item.FechaReserva ? item.FechaReserva.split('T')[0] : null;
+-        const timeStr = normalizeTimeSlot(item.HoraReserva);
+-        if(dateStr && timeStr){
+-          if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
+-          reservationsByDate[dateStr].push(timeStr);
+-        }
+-      });
+-    }
++
++    data.forEach(item=>{
++      const dateStr = item.fecha ? item.fecha.split('T')[0] : null;
++      const timeStr = normalizeTimeSlot(item.horaInicio || item.horaFin || item.hora || item.Hora);
++      if(dateStr && timeStr){
++        if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
++        reservationsByDate[dateStr].push(timeStr);
++      }
++    });
++
+     buildAvailabilityMap();
+     renderCalendar(currentMonthDate);
+     if(selectedDate){
+       renderTimeOptionsForSelectedDay();
+     }
+   }catch(err){
+-    console.error('No se pudieron cargar las reservas desde SharePoint',err);
++    console.error('No se pudieron cargar las reservas desde el CSV',err);
+   }
+ }
+ 
+ function formatDateString(year,monthIndex,day){
+   const m = String(monthIndex+1).padStart(2,'0');
+   const d = String(day).padStart(2,'0');
+   return `${year}-${m}-${d}`;
+ }
+ 
+ function isDayAvailable(dateStr){
+   if(isWeekend(dateStr)) return false;
+   const info = availabilityByDate[dateStr];
+   if(!info) return true;
+   return info.hasAvailableSlots;
+ }
+ 
+   function isWeekend(dateStr){
+  // Parse as local date to avoid timezone shifts that could misclassify weekends
+   const [y,m,d] = dateStr.split('-').map(Number);
+   const date = new Date(y, (m||1)-1, d||1);
+   const day = date.getDay();
+   return day === 0 || day === 6; // domingo (0) o sábado (6)
+ }
+   
+ function renderCalendar(monthDate = currentMonthDate){
+@@ -892,80 +922,50 @@ function renderTimeOptionsForSelectedDay(){
+       option.style.color = '#e63946';
+     }
+     select.appendChild(option);
+   });
+ 
+   if(selectedDate){
+     const firstAvailable = RESERVABLE_HOURS.find(h=>!blocked.has(h));
+     if(firstAvailable){
+       const valueToSelect = (selectedTime && !blocked.has(selectedTime)) ? selectedTime : firstAvailable;
+       select.value = valueToSelect;
+       selectedTime = valueToSelect;
+     }else{
+       select.value = '';
+       selectedTime = null;
+     }
+   }else{
+     selectedTime = null;
+   }
+ }
+ 
+ function changeMonth(delta){
+   currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+delta, 1);
+   renderCalendar(currentMonthDate);
+ }
+ 
+-async function createSharePointReservation(selectedDate, selectedTime, companyName, sector, guestCount, comments, labTeam, guestsArray){
+-  const payload = {
+-    '__metadata': { 'type': 'SP.Data.ReservasShowroomListItem' }, // Ajustar "type" al nombre interno de la lista
+-    'FechaReserva': selectedDate,
+-    'HoraReserva': selectedTime,
+-    'Empresa': companyName || '',
+-    'Sector': sector || '',
+-    'NumeroInvitados': guestCount ? Number(guestCount) : 0,
+-    'Comentarios': comments || '',
+-    'RequiereEquipoLab': labTeam === true,
+-    'InvitadosJson': JSON.stringify(guestsArray || [])
+-  };
+-
+-  const response = await fetch(`/_api/web/lists/getbytitle('${LIST_NAME}')/items`,{
+-    method:'POST',
+-    headers:{
+-      'Accept':'application/json;odata=nometadata',
+-      'Content-Type':'application/json;odata=verbose',
+-      'odata-version':'3.0',
+-      'X-RequestDigest': document.getElementById('__REQUESTDIGEST')?.value || ''
+-    },
+-    body: JSON.stringify(payload)
+-  });
+-
+-  if(!response.ok){
+-    throw new Error('Error al crear el ítem en SharePoint');
+-  }
+-}
+-
+-
+ const LAYER_HEIGHT = 130;
+ const purdueLayers = [
+   {level:5, label:'', height:Math.round(LAYER_HEIGHT*1.3)},
+   {level:4, label:'Nivel 4 – Enterprise Network', height:LAYER_HEIGHT},
+   {level:3.5, label:'Nivel 3.5 – IT/OT DMZ', height:LAYER_HEIGHT},
+   {level:3, label:'Nivel 3 – Site Operations', height:LAYER_HEIGHT},
+   {level:2, label:'Nivel 2 – Area Supervisory Control', height:LAYER_HEIGHT},
+   {level:1, label:'Nivel 1 – Basic Control', height:LAYER_HEIGHT},
+   {level:0, label:'Nivel 0 – Physical Process', height:LAYER_HEIGHT}
+ ];
+ let currentY = 0;
+ purdueLayers.forEach(l=>{
+   l.height = l.height || LAYER_HEIGHT;
+   l.y = currentY;
+   currentY += l.height;
+ });
+ 
+ let currentNodes = {};
+ let currentLinks = [];
+ let adjacency = {};
+ let currentSvg = null;
+ let dragState = null;
+ let guests = [];
+ 
+ const brandLogos = {
+@@ -1264,81 +1264,81 @@ function buildMailto(){
+     body += `\nREQUERIMIENTOS ADICIONALES\n`;
+     body += `------------------------\n`;
+     body += `• El cliente solicita que la presentación sea impartida por el equipo de laboratorio.\n`;
+   }
+ 
+   body += `\nSaludos cordiales`;
+ 
+   return {to:mailtoRecipient,subject,body};
+ }
+ 
+ function openOutlook(){
+   const mailData = buildMailto();
+   if(!mailData) return;
+   const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
+   if(mailtoLink.length>1900){
+     document.getElementById('fallback-to').textContent = mailData.to;
+     document.getElementById('fallback-subject').textContent = mailData.subject;
+     document.getElementById('fallback-body').value = mailData.body;
+     document.getElementById('fallback').style.display='block';
+   }else{
+     document.getElementById('fallback').style.display='none';
+     window.location.href = mailtoLink;
+   }
+ }
+ 
 +function buildReservationRecord(){
 +  const companyName = document.getElementById('companyName').value.trim();
 +  const sector = document.getElementById('sector').value.trim();
@@ -28,43 +286,116 @@ index afa34ebd527dde0a8c782a6d78cc2a2098e94b13..d444d2d1dbfe70515b51a878bf04cb5b
 +  const solutions = getSelectedSolutions();
 +
 +  return {
-+    Fecha: selectedDate,
-+    FechaReserva: selectedDate,
-+    HoraInicio: selectedTime,
-+    HoraReserva: selectedTime,
-+    Empresa: companyName || '',
-+    Sector: sector || '',
-+    NumeroInvitados: guestCount ? Number(guestCount) : 0,
-+    Comentarios: comments || '',
-+    RequiereEquipoLab: requiresLabTeam === true,
-+    InvitadosJson: JSON.stringify(guests || []),
-+    Tecnologias: JSON.stringify(solutions || [])
++    fecha: selectedDate,
++    hora: selectedTime,
++    empresa: companyName,
++    sector,
++    numeroInvitados: guestCount,
++    comentarios: comments,
++    requiereEquipoLab: requiresLabTeam,
++    invitados: [...guests],
++    tecnologias: solutions.map(s=>`${s.name} (${s.brand})`)
 +  };
 +}
-@@ -1282,69 +1306,51 @@ function openOutlook(prebuiltMailData){
-   if(!mailData) return;
-   const mailStarted = openOutlook(mailData);
-   if(!mailStarted) return;
-
--  const companyName = document.getElementById('companyName').value.trim();
--  const sector = document.getElementById('sector').value.trim();
--  const guestCount = document.getElementById('guestCount').value.trim();
--  const comments = document.getElementById('comments').value.trim();
--  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
--  const solutions = getSelectedSolutions();
++
+  async function handleSubmit(){
+   if(!validateForm()){
+     alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
+     return;
+   }
+ 
+   openOutlook();
+ 
+-  try{
+-    const companyName = document.getElementById('companyName').value.trim();
+-    const sector = document.getElementById('sector').value.trim();
+-    const guestCount = document.getElementById('guestCount').value.trim();
+-    const comments = document.getElementById('comments').value.trim();
+-    const requiresLabTeam = document.getElementById('labTeamPresent').checked;
 -
--  const record = {
--    FechaReserva: selectedDate,
--    HoraReserva: selectedTime,
--    Empresa: companyName || '',
--    Sector: sector || '',
--    NumeroInvitados: guestCount ? Number(guestCount) : 0,
--    Comentarios: comments || '',
--    RequiereEquipoLab: requiresLabTeam === true,
--    InvitadosJson: JSON.stringify(guests || []),
--    Tecnologias: JSON.stringify(solutions)
--  };
+-    await createSharePointReservation(
+-      selectedDate,
+-      selectedTime,
+-      companyName,
+-      sector,
+-      guestCount,
+-      comments,
+-      requiresLabTeam,
+-      guests
+-    );
 -
-+  const record = buildReservationRecord();
-   addReservationToLocalStore(record);
+-    await loadReservationsFromSharePoint();
+-  }catch(err){
+-    console.error('No se pudo registrar la reserva en SharePoint', err);
+-    alert('El correo fue generado, pero hubo un problema al registrar la reserva en SharePoint.');
+-  }
++  const reservationData = buildReservationRecord();
++  console.log('Datos listos para almacenar en reservasdb:', reservationData);
  }
+ 
+ function copyToClipboard(){
+   const textarea = document.getElementById('fallback-body');
+   const to = document.getElementById('fallback-to').textContent;
+   const subject = document.getElementById('fallback-subject').textContent;
+   const fullText = `Para: ${to}\n\nAsunto: ${subject}\n\n${textarea.value}`;
+   navigator.clipboard.writeText(fullText).then(()=>{
+     alert('Contenido copiado al portapapeles');
+   }).catch(()=>{
+     textarea.select();
+     document.execCommand('copy');
+     alert('Contenido copiado al portapapeles');
+   });
+ }
+ 
+ /* Purdue helpers */
+ function getLayerInfo(level){
+   return purdueLayers.find(l=>l.level===level);
+ }
+ function getLayerCenterY(level){
+   const layer = getLayerInfo(level);
+   return layer ? layer.y + layer.height/2 : 0;
+ }
+ 
+@@ -2456,41 +2456,41 @@ function placeSaaS(nodes){
+ function toggleBrands(solutionId){
+   const checkbox = document.getElementById('sol-'+solutionId);
+   const brandsGroup = document.getElementById('brands-'+solutionId);
+   const radios = brandsGroup ? brandsGroup.querySelectorAll('input[type="radio"]') : [];
+   if(checkbox.checked){
+     if(brandsGroup) brandsGroup.classList.add('active');
+     if(radios.length > 0){
+       const anyChecked = Array.from(radios).some(r => r.checked);
+       if(!anyChecked){
+         radios[0].checked = true;
+       }
+     }
+   }else{
+     if(brandsGroup) brandsGroup.classList.remove('active');
+     radios.forEach(r=>r.checked=false);
+   }
+   updateDiagram();
+ }
+ 
+ /* Init */
+ document.addEventListener('DOMContentLoaded',()=>{
+   renderGuestList();
+   updateDiagram();
+    renderCalendar(currentMonthDate);
+   renderTimeOptionsForSelectedDay();
+-  loadReservationsFromSharePoint();
++  loadReservationsFromCsv();
+   const timeSelect = document.getElementById('requestedTime');
+   if(timeSelect){
+     timeSelect.addEventListener('change',(e)=>{
+       selectedTime = e.target.value || null;
+     });
+   }
+   const form = document.getElementById('reservationForm');
+   if(form){
+     form.addEventListener('change',updateDiagram);
+   }
+ });
+ </script>
+ </body>
+ </html>
+ 
