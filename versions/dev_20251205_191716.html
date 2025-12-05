@@ -723,7 +723,8 @@ body{
 <script>
 const mailtoRecipient = 'showroom-itot@ejemplo.com';
 
-// --- NUEVO: lógica de calendario y horarios con lectura de CSV ---
+// --- NUEVO: lógica de calendario y horarios con SharePoint ---
+const LIST_NAME = 'ReservasShowroom'; // Nombre de la lista de SharePoint (ajustable)
 const DISPLAY_HOURS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
 const RESERVABLE_HOURS = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
 let selectedDate = null;      // 'YYYY-MM-DD'
@@ -731,41 +732,6 @@ let selectedTime = null;      // 'HH:MM'
 let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
 let availabilityByDate = {};
 let currentMonthDate = new Date();
-
-async function reservasdb(){
-  try{
-    const response = await fetch('/reservas.csv');
-    if(!response.ok) throw new Error('No se pudo leer reservas.csv');
-    const csvText = await response.text();
-    const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
-    if(lines.length === 0) return [];
-
-    const headers = lines[0].split(',').map(h=>h.trim());
-    return lines.slice(1).map(line=>{
-      const values = line.split(',').map(v=>v.trim());
-      const record = {};
-      headers.forEach((h,idx)=>{record[h]=values[idx]||'';});
-      const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
-
-      return {
-        fecha: record.Fecha || record.fecha || record.date || '',
-        horaInicio: record.HoraInicio || record.Hora || record.hora || '',
-        horaFin: record.HoraFin || record.horafin || '',
-        estado: record.Estado || record.estado || '',
-        empresa: record.Empresa || record.empresa || '',
-        sector: record.Sector || record.sector || '',
-        numeroInvitados: record.NumeroInvitados || record.invitados || '',
-        comentarios: record.Comentarios || record.comentarios || '',
-        requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
-        invitadosDetalle: record.InvitadosJson || record.Invitados || '',
-        tecnologias: techList
-      };
-    });
-  }catch(err){
-    console.error('No se pudieron leer las reservas desde el CSV', err);
-    return [];
-  }
-}
 
 function normalizeTimeSlot(timeStr){
   if(!timeStr) return null;
@@ -800,27 +766,31 @@ function buildAvailabilityMap(){
   });
 }
 
-async function loadReservationsFromCsv(){
+async function loadReservationsFromSharePoint(){
   try{
-    const data = await reservasdb();
-    reservationsByDate = {};
-
-    data.forEach(item=>{
-      const dateStr = item.fecha ? item.fecha.split('T')[0] : null;
-      const timeStr = normalizeTimeSlot(item.horaInicio || item.horaFin || item.hora || item.Hora);
-      if(dateStr && timeStr){
-        if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
-        reservationsByDate[dateStr].push(timeStr);
-      }
+    const response = await fetch(`/_api/web/lists/getbytitle('${LIST_NAME}')/items?$select=FechaReserva,HoraReserva`,{
+      headers:{'Accept':'application/json;odata=nometadata'}
     });
-
+    if(!response.ok) throw new Error('Error al obtener reservas');
+    const data = await response.json();
+    reservationsByDate = {};
+    if(Array.isArray(data.value)){
+      data.value.forEach(item=>{
+        const dateStr = item.FechaReserva ? item.FechaReserva.split('T')[0] : null;
+        const timeStr = normalizeTimeSlot(item.HoraReserva);
+        if(dateStr && timeStr){
+          if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
+          reservationsByDate[dateStr].push(timeStr);
+        }
+      });
+    }
     buildAvailabilityMap();
     renderCalendar(currentMonthDate);
     if(selectedDate){
       renderTimeOptionsForSelectedDay();
     }
   }catch(err){
-    console.error('No se pudieron cargar las reservas desde el CSV',err);
+    console.error('No se pudieron cargar las reservas desde SharePoint',err);
   }
 }
 
@@ -943,6 +913,36 @@ function changeMonth(delta){
   currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+delta, 1);
   renderCalendar(currentMonthDate);
 }
+
+async function createSharePointReservation(selectedDate, selectedTime, companyName, sector, guestCount, comments, labTeam, guestsArray){
+  const payload = {
+    '__metadata': { 'type': 'SP.Data.ReservasShowroomListItem' }, // Ajustar "type" al nombre interno de la lista
+    'FechaReserva': selectedDate,
+    'HoraReserva': selectedTime,
+    'Empresa': companyName || '',
+    'Sector': sector || '',
+    'NumeroInvitados': guestCount ? Number(guestCount) : 0,
+    'Comentarios': comments || '',
+    'RequiereEquipoLab': labTeam === true,
+    'InvitadosJson': JSON.stringify(guestsArray || [])
+  };
+
+  const response = await fetch(`/_api/web/lists/getbytitle('${LIST_NAME}')/items`,{
+    method:'POST',
+    headers:{
+      'Accept':'application/json;odata=nometadata',
+      'Content-Type':'application/json;odata=verbose',
+      'odata-version':'3.0',
+      'X-RequestDigest': document.getElementById('__REQUESTDIGEST')?.value || ''
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if(!response.ok){
+    throw new Error('Error al crear el ítem en SharePoint');
+  }
+}
+
 
 const LAYER_HEIGHT = 130;
 const purdueLayers = [
@@ -1286,27 +1286,6 @@ function openOutlook(){
   }
 }
 
-function buildReservationRecord(){
-  const companyName = document.getElementById('companyName').value.trim();
-  const sector = document.getElementById('sector').value.trim();
-  const guestCount = document.getElementById('guestCount').value.trim();
-  const comments = document.getElementById('comments').value.trim();
-  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
-  const solutions = getSelectedSolutions();
-
-  return {
-    fecha: selectedDate,
-    hora: selectedTime,
-    empresa: companyName,
-    sector,
-    numeroInvitados: guestCount,
-    comentarios: comments,
-    requiereEquipoLab: requiresLabTeam,
-    invitados: [...guests],
-    tecnologias: solutions.map(s=>`${s.name} (${s.brand})`)
-  };
-}
-
  async function handleSubmit(){
   if(!validateForm()){
     alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
@@ -1315,8 +1294,29 @@ function buildReservationRecord(){
 
   openOutlook();
 
-  const reservationData = buildReservationRecord();
-  console.log('Datos listos para almacenar en reservasdb:', reservationData);
+  try{
+    const companyName = document.getElementById('companyName').value.trim();
+    const sector = document.getElementById('sector').value.trim();
+    const guestCount = document.getElementById('guestCount').value.trim();
+    const comments = document.getElementById('comments').value.trim();
+    const requiresLabTeam = document.getElementById('labTeamPresent').checked;
+
+    await createSharePointReservation(
+      selectedDate,
+      selectedTime,
+      companyName,
+      sector,
+      guestCount,
+      comments,
+      requiresLabTeam,
+      guests
+    );
+
+    await loadReservationsFromSharePoint();
+  }catch(err){
+    console.error('No se pudo registrar la reserva en SharePoint', err);
+    alert('El correo fue generado, pero hubo un problema al registrar la reserva en SharePoint.');
+  }
 }
 
 function copyToClipboard(){
@@ -2478,7 +2478,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   updateDiagram();
    renderCalendar(currentMonthDate);
   renderTimeOptionsForSelectedDay();
-  loadReservationsFromCsv();
+  loadReservationsFromSharePoint();
   const timeSelect = document.getElementById('requestedTime');
   if(timeSelect){
     timeSelect.addEventListener('change',(e)=>{
