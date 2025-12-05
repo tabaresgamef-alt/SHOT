@@ -477,6 +477,8 @@ body{
 </head>
 <body>
 
+<div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;z-index:9999;">DEV | versión no disponible</div>
+
 <div class="page-container">
 
   <!-- ENCABEZADO -->
@@ -2490,6 +2492,32 @@ document.addEventListener('DOMContentLoaded',()=>{
     form.addEventListener('change',updateDiagram);
   }
 });
+</script>
+<script>
+(() => {
+  const badge = document.getElementById('version-badge');
+  if (!badge) return;
+
+  fetch('../version.json')
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      const version = data?.version;
+      const patchCounter = data?.patching?.patchCounter;
+      const lastPatch = data?.patching?.lastPatch ?? 'N/A';
+
+      if (version !== undefined && patchCounter !== undefined) {
+        badge.textContent = `DEV ${version} | Patch #${patchCounter} (${lastPatch})`;
+      } else {
+        badge.textContent = 'DEV | versión no disponible';
+      }
+    })
+    .catch(() => {
+      badge.textContent = 'DEV | versión no disponible';
+    });
+})();
 </script>
 </body>
 </html>
