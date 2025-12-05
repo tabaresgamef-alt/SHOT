@@ -1,1 +1,9 @@
-
+{
+  "version": "v1.0",
+  "status": "stable",
+  "build": "2025-02-06",
+  "semver": "1.0.0",
+  "patchCounter": 0,
+  "lastPatch": null,
+  "changelog": []
+}
