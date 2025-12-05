@@ -2519,6 +2519,30 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
 })();
 </script>
+  <script>
+(() => {
+  if (window.__shotTitleUpdaterLoaded) return;
+  window.__shotTitleUpdaterLoaded = true;
+
+  const fallbackTitle = 'SHOT DEV (versión desconocida)';
+  const applyTitle = (version) => {
+    const normalized = typeof version === 'string' || typeof version === 'number' ? version : null;
+    document.title = normalized ? `SHOT DEV ${normalized}` : fallbackTitle;
+  };
+
+  fetch('../version.json')
+    .then((response) => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then((data) => {
+      applyTitle(data?.version);
+    })
+    .catch(() => {
+      applyTitle();
+    });
+})();
+</script>
 </body>
 </html>
 
