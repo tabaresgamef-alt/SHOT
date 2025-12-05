@@ -2494,22 +2494,23 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 <script>
-(() => {
-  const badge = document.getElementById('version-badge');
-  if (!badge) return;
-
+(() => {␊
+  const badge = document.getElementById('version-badge');␊
+  if (!badge) return;␊
+␊
   fetch('version.json')␊
     .then(response => {␊
       if (!response.ok) throw new Error('Network response was not ok');␊
-        return response.json();
+ return response.json();
     })
     .then(data => {
-      const version = data?.version;
-      if (version) {
+      const version = data && typeof data === 'object' ? data.version : null;
+      if (version !== undefined && version !== null && version !== '') {
         badge.textContent = `Versión estable: ${version}`;
-      } else {
-        badge.textContent = 'Versión no disponible';
+        return;
       }
+
+      badge.textContent = 'Versión no disponible';
  })
     .catch(() => {
       badge.textContent = 'Versión no disponible';
@@ -2521,11 +2522,27 @@ document.addEventListener('DOMContentLoaded',()=>{
   if (window.__shotTitleUpdaterLoaded) return;
   window.__shotTitleUpdaterLoaded = true;
 
-  const fallbackTitle = 'SHOT (versión desconocida)';
-  const applyTitle = (version) => {
-    const normalized = typeof version === 'string' || typeof version === 'number' ? version : null;
-    document.title = normalized ? `SHOT ${normalized}` : fallbackTitle;
+  const fallbackTitle = 'SHOT (versión desconocida
+  const normalizeVersion = (data) => {
+    if (!data || typeof data !== 'object') return null;
+
+    const versionCandidate =
+      data.version !== undefined && data.version !== null
+        ? data.version
+        : data.semver !== undefined && data.semver !== null
+          ? data.semver
+          : data.build && data.build.number !== undefined && data.build.number !== null
+            ? data.build.number
+            : null;
+
+    return typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
+      ? versionCandidate
+      : null;
   };
+
+  const applyTitle = (version) => {
+      document.title = version ? `SHOT ${version}` : fallbackTitle;
+      };
 
   fetch('version.json')
     .then((response) => {
@@ -2533,7 +2550,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       return response.json();
     })
     .then((data) => {
-      applyTitle(data?.version);
+    applyTitle(normalizeVersion(data));
     })
     .catch(() => {
       applyTitle();
@@ -2542,3 +2559,4 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
+
