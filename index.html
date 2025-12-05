@@ -2498,10 +2498,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   const badge = document.getElementById('version-badge');
   if (!badge) return;
 
-  fetch('version.json')
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
+  fetch('version.json')␊
+    .then(response => {␊
+      if (!response.ok) throw new Error('Network response was not ok');␊
+        return response.json();
     })
     .then(data => {
       const version = data?.version;
@@ -2510,14 +2510,35 @@ document.addEventListener('DOMContentLoaded',()=>{
       } else {
         badge.textContent = 'Versión no disponible';
       }
-    })
+ })
     .catch(() => {
       badge.textContent = 'Versión no disponible';
     });
 })();
 </script>
+<script>
+(() => {
+  if (window.__shotTitleUpdaterLoaded) return;
+  window.__shotTitleUpdaterLoaded = true;
+
+  const fallbackTitle = 'SHOT (versión desconocida)';
+  const applyTitle = (version) => {
+    const normalized = typeof version === 'string' || typeof version === 'number' ? version : null;
+    document.title = normalized ? `SHOT ${normalized}` : fallbackTitle;
+  };
+
+  fetch('version.json')
+    .then((response) => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then((data) => {
+      applyTitle(data?.version);
+    })
+    .catch(() => {
+      applyTitle();
+    });
+})();
+</script>
 </body>
 </html>
-
-
-
