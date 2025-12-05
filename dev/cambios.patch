@@ -41,16 +41,7 @@ index afa34ebd527dde0a8c782a6d78cc2a2098e94b13..d444d2d1dbfe70515b51a878bf04cb5b
 +    Tecnologias: JSON.stringify(solutions || [])
 +  };
 +}
-
 @@ -1282,69 +1306,51 @@ function openOutlook(prebuiltMailData){
-
- async function handleSubmit(){
-   if(!validateForm()){
-     alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
-     return;
-   }
-
-   const mailData = buildMailto();
    if(!mailData) return;
    const mailStarted = openOutlook(mailData);
    if(!mailStarted) return;
