@@ -1,1 +1,79 @@
+diff --git a/dev/dev.html b/dev/dev.html
+index afa34ebd527dde0a8c782a6d78cc2a2098e94b13..d444d2d1dbfe70515b51a878bf04cb5bf6125f26 100644
+--- a/dev/dev.html
++++ b/dev/dev.html
+@@ -711,50 +711,74 @@ body{
+         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
+         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+         <textarea id="fallback-body" readonly></textarea>
+         <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+       </div>
+     </div>
+   </div>
 
+ </div>
+
+ <div id="tooltip" class="tooltip"></div>
+
+ <script>
+ const mailtoRecipient = 'showroom-itot@ejemplo.com';
+
++// Construye un registro completo con todos los campos del formulario y tecnologías seleccionadas
++function buildReservationRecord(){
++  const companyName = document.getElementById('companyName').value.trim();
++  const sector = document.getElementById('sector').value.trim();
++  const guestCount = document.getElementById('guestCount').value.trim();
++  const comments = document.getElementById('comments').value.trim();
++  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
++  const solutions = getSelectedSolutions();
++
++  return {
++    Fecha: selectedDate,
++    FechaReserva: selectedDate,
++    HoraInicio: selectedTime,
++    HoraReserva: selectedTime,
++    Empresa: companyName || '',
++    Sector: sector || '',
++    NumeroInvitados: guestCount ? Number(guestCount) : 0,
++    Comentarios: comments || '',
++    RequiereEquipoLab: requiresLabTeam === true,
++    InvitadosJson: JSON.stringify(guests || []),
++    Tecnologias: JSON.stringify(solutions || [])
++  };
++}
+
+@@ -1282,69 +1306,51 @@ function openOutlook(prebuiltMailData){
+
+ async function handleSubmit(){
+   if(!validateForm()){
+     alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
+     return;
+   }
+
+   const mailData = buildMailto();
+   if(!mailData) return;
+   const mailStarted = openOutlook(mailData);
+   if(!mailStarted) return;
+
+-  const companyName = document.getElementById('companyName').value.trim();
+-  const sector = document.getElementById('sector').value.trim();
+-  const guestCount = document.getElementById('guestCount').value.trim();
+-  const comments = document.getElementById('comments').value.trim();
+-  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
+-  const solutions = getSelectedSolutions();
+-
+-  const record = {
+-    FechaReserva: selectedDate,
+-    HoraReserva: selectedTime,
+-    Empresa: companyName || '',
+-    Sector: sector || '',
+-    NumeroInvitados: guestCount ? Number(guestCount) : 0,
+-    Comentarios: comments || '',
+-    RequiereEquipoLab: requiresLabTeam === true,
+-    InvitadosJson: JSON.stringify(guests || []),
+-    Tecnologias: JSON.stringify(solutions)
+-  };
+-
++  const record = buildReservationRecord();
+   addReservationToLocalStore(record);
+ }
