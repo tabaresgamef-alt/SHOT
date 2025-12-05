@@ -2504,15 +2504,18 @@ document.addEventListener('DOMContentLoaded',()=>{
       return response.json();
     })
     .then(data => {
-      const version = data?.version;
-      const patchCounter = data?.patching?.patchCounter;
-      const lastPatch = data?.patching?.lastPatch ?? 'N/A';
-
-      if (version !== undefined && patchCounter !== undefined) {
+      const safeData = data && typeof data === 'object' ? data : null;
+      const version = safeData ? safeData.version : null;
+      const patching = safeData && safeData.patching && typeof safeData.patching === 'object' ? safeData.patching : null;
+      const patchCounter = patching && patching.patchCounter !== undefined ? patching.patchCounter : null;
+      const lastPatch = patching && patching.lastPatch !== undefined && patching.lastPatch !== null ? patching.lastPatch : 'N/A'; 
+      
+       if (version !== undefined && version !== null && version !== '' && patchCounter !== undefined && patchCounter !== null) {
         badge.textContent = `DEV ${version} | Patch #${patchCounter} (${lastPatch})`;
-      } else {
-        badge.textContent = 'DEV | versión no disponible';
+      return;
       }
+
+      badge.textContent = 'DEV | versión no disponible';
     })
     .catch(() => {
       badge.textContent = 'DEV | versión no disponible';
@@ -2525,9 +2528,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.__shotTitleUpdaterLoaded = true;
 
   const fallbackTitle = 'SHOT DEV (versión desconocida)';
+  const normalizeVersion = (data) => {
+    if (!data || typeof data !== 'object') return null;
+
+    const versionCandidate =
+      data.version !== undefined && data.version !== null
+        ? data.version
+        : data.semver !== undefined && data.semver !== null
+          ? data.semver
+          : data.build && data.build.number !== undefined && data.build.number !== null
+            ? data.build.number
+            : null;
+
+    return typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
+      ? versionCandidate
+      : null;
+  };
+
   const applyTitle = (version) => {
-    const normalized = typeof version === 'string' || typeof version === 'number' ? version : null;
-    document.title = normalized ? `SHOT DEV ${normalized}` : fallbackTitle;
+  document.title = version ? `SHOT DEV ${version}` : fallbackTitle; 
   };
 
   fetch('../version.json')
@@ -2536,7 +2555,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       return response.json();
     })
     .then((data) => {
-      applyTitle(data?.version);
+     applyTitle(normalizeVersion(data));
     })
     .catch(() => {
       applyTitle();
