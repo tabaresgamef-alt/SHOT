@@ -22,7 +22,7 @@
   "metadata": {
     "description": "Versión inicial estable del Showroom IT/OT.",
     "environment": "production",
-    "repository": "github.com/tu-repo/showroom",
+    "repository": "https://github.com/tabaresgamef-alt/SHOT",
     "usesCsv": true,
     "csvPath": "data/reservas.csv"
   }
