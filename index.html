@@ -477,6 +477,8 @@ body{
 </head>
 <body>
 
+<div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;z-index:9999;">Versión no disponible</div>
+
 <div class="page-container">
 
   <!-- ENCABEZADO -->
@@ -2486,11 +2488,36 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
   const form = document.getElementById('reservationForm');
-  if(form){
+   if(form){
     form.addEventListener('change',updateDiagram);
   }
 });
 </script>
+<script>
+(() => {
+  const badge = document.getElementById('version-badge');
+  if (!badge) return;
+
+  fetch('version.json')
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      const version = data?.version;
+      if (version) {
+        badge.textContent = `Versión estable: ${version}`;
+      } else {
+        badge.textContent = 'Versión no disponible';
+      }
+    })
+    .catch(() => {
+      badge.textContent = 'Versión no disponible';
+    });
+})();
+</script>
 </body>
 </html>
+
+
 
