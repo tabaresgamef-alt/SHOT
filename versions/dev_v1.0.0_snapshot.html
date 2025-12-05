@@ -477,7 +477,7 @@ body{
 </head>
 <body>
 
-<div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.6);color:white;padding:6px 12px;border-radius:6px;font-size:11px;z-index:9999;">DEV | versión no disponible</div>
+<div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;z-index:9999;">DEV | versión no disponible</div>
 
 <div class="page-container">
 
@@ -2495,58 +2495,58 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 <script>
 (() => {
-  const ensureBadge = () => {
-    let badge = document.getElementById('version-badge');
-    if (!badge) {
-      badge = document.createElement('div');
-      badge.id = 'version-badge';
-      document.body.insertBefore(badge, document.body.firstChild);
-    }
+  const badge = document.getElementById('version-badge');
+  if (!badge) return;
 
-    Object.assign(badge.style, {
-      position: 'fixed',
-      bottom: '10px',
-      right: '10px',
-      background: 'rgba(0, 0, 0, 0.6)',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '6px',
-      fontSize: '11px',
-      zIndex: '9999',
+  fetch('../version.json')
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      const safeData = data && typeof data === 'object' ? data : null;
+      const version = safeData ? safeData.version : null;
+      const patching = safeData && safeData.patching && typeof safeData.patching === 'object' ? safeData.patching : null;
+      const patchCounter = patching && patching.patchCounter !== undefined ? patching.patchCounter : null;
+      const lastPatch = patching && patching.lastPatch !== undefined && patching.lastPatch !== null ? patching.lastPatch : 'N/A'; 
+      
+       if (version !== undefined && version !== null && version !== '' && patchCounter !== undefined && patchCounter !== null) {
+        badge.textContent = `DEV ${version} | Patch #${patchCounter} (${lastPatch})`;
+      return;
+      }
+
+      badge.textContent = 'DEV | versión no disponible';
+    })
+    .catch(() => {
+      badge.textContent = 'DEV | versión no disponible';
     });
+})();
+</script>
+  <script>
+(() => {
+  if (window.__shotTitleUpdaterLoaded) return;
+  window.__shotTitleUpdaterLoaded = true;
 
-    return badge;
+  const fallbackTitle = 'SHOT DEV (versión desconocida)';
+  const normalizeVersion = (data) => {
+    if (!data || typeof data !== 'object') return null;
+
+    const versionCandidate =
+      data.version !== undefined && data.version !== null
+        ? data.version
+        : data.semver !== undefined && data.semver !== null
+          ? data.semver
+          : data.build && data.build.number !== undefined && data.build.number !== null
+            ? data.build.number
+            : null;
+
+    return typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
+      ? versionCandidate
+      : null;
   };
 
-  const badge = ensureBadge();
-  const fallbackTitle = 'SHOT DEV (versión desconocida)';
-  const fallbackBadge = 'DEV | versión no disponible';
-
-  const applyVersionData = (data) => {
-    const safeData = data && typeof data === 'object' ? data : {};
-    const versionCandidate = safeData.version ?? safeData.semver ?? null;
-    const version =
-      typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
-        ? versionCandidate
-        : null;
-
-    const patching = safeData.patching && typeof safeData.patching === 'object' ? safeData.patching : {};
-    const patchCounterRaw = patching.patchCounter;
-    const lastPatchRaw = patching.lastPatch;
-
-    const patchCounter =
-      patchCounterRaw === 0 || patchCounterRaw
-        ? patchCounterRaw
-        : 'N/A';
-    const lastPatch =
-      typeof lastPatchRaw === 'string' || typeof lastPatchRaw === 'number'
-        ? lastPatchRaw
-        : 'N/A';
-
-    document.title = version ? `SHOT DEV ${version}` : fallbackTitle;
-    badge.textContent = version
-      ? `DEV ${version} | Patch #${patchCounter} (${lastPatch})`
-      : fallbackBadge;
+  const applyTitle = (version) => {
+  document.title = version ? `SHOT DEV ${version}` : fallbackTitle; 
   };
 
   fetch('../version.json')
@@ -2555,15 +2555,13 @@ document.addEventListener('DOMContentLoaded',()=>{
       return response.json();
     })
     .then((data) => {
-      applyVersionData(data);
+     applyTitle(normalizeVersion(data));
     })
     .catch(() => {
-      document.title = fallbackTitle;
-      badge.textContent = fallbackBadge;
+      applyTitle();
     });
 })();
 </script>
-
 </body>
 </html>
 

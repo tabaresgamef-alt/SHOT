@@ -1,6 +1,6 @@
 {
   "application": "SHOT",
-  "version": "v5.0",
+  "version": "v1.0",
   "semver": "1.0.0",
   "status": "stable",
 
@@ -11,8 +11,8 @@
   },
 
   "patching": {
-    "patchCounter": 0,
-    "lastPatch": null,
+    "patchCounter": 1,
+    "lastPatch": patch-dev-001,
     "patchPrefix": "patch",
     "nextPatchName": "patch-0001"
   },
