@@ -1,5 +1,5 @@
 {
-  "application": "Showroom IT/OT",
+  "application": "SHOT",
   "version": "v1.0",
   "semver": "1.0.0",
   "status": "stable",
@@ -7,7 +7,7 @@
   "build": {
     "number": 1,
     "date": "2025-02-06",
-    "author": "Felipe Tavares"
+    "author": "Felipe Tabares"
   },
 
   "patching": {
