@@ -12,7 +12,7 @@
 
   "patching": {
     "patchCounter": 1,
-    "lastPatch": patch-dev-001,
+    "lastPatch": "patch-dev-001",
     "patchPrefix": "patch",
     "nextPatchName": "patch-0001"
   },
