@@ -85,3 +85,20 @@ read PATCH_DESCRIPTION
 jq \
   --arg newPatch "$NEW_PATCH_NAME" \
   --arg nextPatch "$(printf "%04d" $
+
+  # -------------------------------------------------------------
+# 8. Commit automático
+# -------------------------------------------------------------
+echo "¿Deseas hacer commit automático? (s/n)"
+read DO_COMMIT
+
+if [[ "$DO_COMMIT" == "s" ]]; then
+  git add "$TARGET_FILE" "$VERSION_FILE" "$PATCH_FILE" "$SNAPSHOT_FILE"
+  git commit -m "Aplicado parche ${NEW_PATCH_NAME}: ${PATCH_DESCRIPTION}"
+  echo "✔ Commit realizado"
+else
+  echo "ℹ Saltando commit. Recuerda hacerlo manualmente."
+fi
+
+echo ""
+echo "🎉 Proceso completado. Parche aplicado: $PATCH_FILE"
