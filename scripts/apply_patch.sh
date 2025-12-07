@@ -32,7 +32,7 @@ if [[ ! -f "$TARGET_FILE" ]]; then
 fi
 
 if [[ ! -f "$PATCH_FILE" ]]; then
-  echo "❌ ERROR: No existe el patch: $PATCH_FILE"
+  echo "❌ ERROR: No existe el archivo patch: $PATCH_FILE"
   exit 1
 fi
 
@@ -44,7 +44,6 @@ mkdir -p "$SNAPSHOT_DIR"
 PATCH_COUNTER=$(jq '.patching.patchCounter' "$VERSION_FILE")
 PATCH_PREFIX=$(jq -r '.patching.patchPrefix' "$VERSION_FILE")
 
-PATCH_BASENAME=$(basename "$PATCH_FILE" .patch)
 NEW_PATCH_NAME="${PATCH_PREFIX}-dev-$(printf "%04d" $((PATCH_COUNTER + 1)))"
 
 echo "➡ PatchCounter actual : $PATCH_COUNTER"
@@ -58,15 +57,17 @@ SNAPSHOT_FILE="${SNAPSHOT_DIR}/dev-before-${NEW_PATCH_NAME}.html"
 cp "$TARGET_FILE" "$SNAPSHOT_FILE"
 
 echo "📸 Snapshot guardado: $SNAPSHOT_FILE"
+echo ""
 
 # -------------------------------------------------------------
 # 5. Aplicar el patch
 # -------------------------------------------------------------
 echo "🧩 Aplicando patch con git apply..."
+
 if ! git apply "$PATCH_FILE"; then
-  echo "❌ ERROR: Falló git apply. Revisa conflictos o el contenido del patch."
+  echo "❌ ERROR: Falló git apply. El parche NO coincide con el archivo actual."
+  echo "ℹ Restaurando dev.html desde snapshot..."
   cp "$SNAPSHOT_FILE" "$TARGET_FILE"
-  echo "ℹ Se restauró $TARGET_FILE desde el snapshot."
   exit 1
 fi
 
@@ -86,21 +87,24 @@ jq \
   --arg newPatch "$NEW_PATCH_NAME" \
   --arg nextPatch "$(printf "%04d" $((PATCH_COUNTER + 2)))" \
   --arg desc "$PATCH_DESCRIPTION" \
+  --arg patchfile "$PATCH_FILE" \
   '
   .patching.patchCounter += 1
   | .patching.lastPatch = $newPatch
   | .patching.nextPatchName = "patch-" + $nextPatch
   | .changelog += [{
       patch: $newPatch,
-      file: $ENV_PATCH_FILE,
+      file: $patchfile,
       description: $desc,
       date: (now | strftime("%Y-%m-%d %H:%M:%S"))
     }]
   ' "$VERSION_FILE" > version.tmp && mv version.tmp "$VERSION_FILE"
 
+echo ""
 echo "📄 version.json actualizado:"
 echo "   - patchCounter  += 1"
 echo "   - lastPatch       = $NEW_PATCH_NAME"
+echo "   - file registrado : $PATCH_FILE"
 echo "   - nextPatchName   = patch-$(printf '%04d' $((PATCH_COUNTER + 2)))"
 echo ""
 
@@ -115,7 +119,7 @@ if [[ "$DO_COMMIT" == "s" ]]; then
   git commit -m "Aplicado parche ${NEW_PATCH_NAME}: ${PATCH_DESCRIPTION}"
   echo "✔ Commit realizado"
 else
-  echo "ℹ Saltando commit. Recuerda hacerlo manualmente."
+  echo "ℹ Commit no realizado. Recuerda hacerlo manualmente."
 fi
 
 echo ""
