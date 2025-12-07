@@ -1,208 +1,61 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/dev/dev.html b/dev/dev.html
-index 93b5c9117060a6c24ecd1e81bacd14b0be2fd647..2a41457422f6b1dbb8ff69a62248f9c83f161a03 100644
+index 2a41457422f6b1dbb8ff69a62248f9c83f161a03..fd7685d3bd433e43d537ef7f4734d707fc5c0425 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -455,51 +455,51 @@ body{
-   stroke:#2d3e50;
-   stroke-width:1;
- }
- .layer-label{
-   font-size:11px;
-   fill:#a8dadc;
-   font-weight:600;
- }
- .cloud-label{
-   font-size:10px;
-   fill:#e0e0e0;
+@@ -9,51 +9,51 @@
+ body{
+   font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+   background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+   color:#e0e0e0;
+   min-height:100vh;
+   padding:20px;
  }
  
- @media(max-width:1400px){
-   .content-two-columns{
-     grid-template-columns:1fr;
-   }
-   #diagram-container{
-     height:700px;
-   }
- }
- </style>
- </head>
- <body>
- 
--<div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;z-index:9999;">DEV | versión no disponible</div>
-+<div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.6);color:white;padding:6px 12px;border-radius:6px;font-size:11px;z-index:9999;">DEV | versión no disponible</div>
- 
- <div class="page-container">
- 
-   <!-- ENCABEZADO -->
-   <div class="header">
-     <h1>🏭 Showroom IT/OT</h1>
-   </div>
- 
-   <!-- FORMULARIO DATOS DE LA SOLICITUD (igual que tu Paso 1) -->
-   <div class="form-panel">
-     <h2>Datos de la solicitud</h2>
- 
-     <div class="form-group">
-           <label for="companyName">Nombre de la empresa</label>
-       <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing">
-     </div>
- 
-     <div class="form-group">
-       <label for="sector">Sector de la empresa</label>
-       <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
-     </div>
- 
-     <div class="form-group">
-       <label for="guestCount">Cantidad de invitados por parte del cliente</label>
-       <input type="number" id="guestCount" min="0" placeholder="Ej: 5">
-@@ -2473,95 +2473,97 @@ function toggleBrands(solutionId){
-   }
-   updateDiagram();
+ /* Nuevo layout general */
+ .page-container{
+   max-width:1800px;
+   margin:0 auto;
+   display:flex;
+   flex-direction:column;
+   gap:25px;
  }
  
- /* Init */
- document.addEventListener('DOMContentLoaded',()=>{
-   renderGuestList();
-   updateDiagram();
-    renderCalendar(currentMonthDate);
-   renderTimeOptionsForSelectedDay();
-   loadReservationsFromCsv();
-   const timeSelect = document.getElementById('requestedTime');
-   if(timeSelect){
-     timeSelect.addEventListener('change',(e)=>{
-       selectedTime = e.target.value || null;
-     });
-   }
-   const form = document.getElementById('reservationForm');
-   if(form){
-     form.addEventListener('change',updateDiagram);
-   }
- });
- </script>
- <script>
- (() => {
--  const badge = document.getElementById('version-badge');
--  if (!badge) return;
--
--  fetch('../version.json')
--    .then(response => {
--      if (!response.ok) throw new Error('Network response was not ok');
--      return response.json();
--    })
--    .then(data => {
--      const safeData = data && typeof data === 'object' ? data : null;
--      const version = safeData ? safeData.version : null;
--      const patching = safeData && safeData.patching && typeof safeData.patching === 'object' ? safeData.patching : null;
--      const patchCounter = patching && patching.patchCounter !== undefined ? patching.patchCounter : null;
--      const lastPatch = patching && patching.lastPatch !== undefined && patching.lastPatch !== null ? patching.lastPatch : 'N/A'; 
--      
--       if (version !== undefined && version !== null && version !== '' && patchCounter !== undefined && patchCounter !== null) {
--        badge.textContent = `DEV ${version} | Patch #${patchCounter} (${lastPatch})`;
--      return;
--      }
-+  const ensureBadge = () => {
-+    let badge = document.getElementById('version-badge');
-+    if (!badge) {
-+      badge = document.createElement('div');
-+      badge.id = 'version-badge';
-+      document.body.insertBefore(badge, document.body.firstChild);
-+    }
+ .header{
+   text-align:center;
+   padding:20px;
+   background:linear-gradient(135deg,#0f3460 0%,#16213e 100%);
+   border-radius:10px;
+   box-shadow:0 4px 15px rgba(0,0,0,.3);
+ }
+ .header h1{
+-  color:#ff6b35;
++  color:#fff;
+   font-size:2.5em;
+   text-shadow:2px 2px 4px rgba(0,0,0,.5);
+ }
  
--      badge.textContent = 'DEV | versión no disponible';
--    })
--    .catch(() => {
--      badge.textContent = 'DEV | versión no disponible';
-+    Object.assign(badge.style, {
-+      position: 'fixed',
-+      bottom: '10px',
-+      right: '10px',
-+      background: 'rgba(0, 0, 0, 0.6)',
-+      color: 'white',
-+      padding: '6px 12px',
-+      borderRadius: '6px',
-+      fontSize: '11px',
-+      zIndex: '9999',
-     });
--})();
--</script>
--  <script>
--(() => {
--  if (window.__shotTitleUpdaterLoaded) return;
--  window.__shotTitleUpdaterLoaded = true;
+ /* Panel formulario (ex Paso 1) */
+ .form-panel{
+   background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
+   padding:30px;
+   border-radius:12px;
+   box-shadow:0 8px 25px rgba(0,0,0,.4);
+   border:1px solid #2d3e50;
+ }
+ .form-panel h2{
+   margin-bottom:20px;
+ }
  
--  const fallbackTitle = 'SHOT DEV (versión desconocida)';
--  const normalizeVersion = (data) => {
--    if (!data || typeof data !== 'object') return null;
--
--    const versionCandidate =
--      data.version !== undefined && data.version !== null
--        ? data.version
--        : data.semver !== undefined && data.semver !== null
--          ? data.semver
--          : data.build && data.build.number !== undefined && data.build.number !== null
--            ? data.build.number
--            : null;
--
--    return typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
--      ? versionCandidate
--      : null;
-+    return badge;
-   };
+ /* Dos columnas: tecnologías (30%) + diagrama (70%) */
+ .content-two-columns{
+   display:grid;
+   grid-template-columns:0.3fr 0.7fr;
+   gap:25px;
+   align-items:start;
+ }
  
--  const applyTitle = (version) => {
--  document.title = version ? `SHOT DEV ${version}` : fallbackTitle; 
-+  const badge = ensureBadge();
-+  const fallbackTitle = 'SHOT DEV (versión desconocida)';
-+  const fallbackBadge = 'DEV | versión no disponible';
-+
-+  const applyVersionData = (data) => {
-+    const safeData = data && typeof data === 'object' ? data : {};
-+    const versionCandidate = safeData.version ?? safeData.semver ?? null;
-+    const version =
-+      typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
-+        ? versionCandidate
-+        : null;
-+
-+    const patching = safeData.patching && typeof safeData.patching === 'object' ? safeData.patching : {};
-+    const patchCounterRaw = patching.patchCounter;
-+    const lastPatchRaw = patching.lastPatch;
-+
-+    const patchCounter =
-+      patchCounterRaw === 0 || patchCounterRaw
-+        ? patchCounterRaw
-+        : 'N/A';
-+    const lastPatch =
-+      typeof lastPatchRaw === 'string' || typeof lastPatchRaw === 'number'
-+        ? lastPatchRaw
-+        : 'N/A';
-+
-+    document.title = version ? `SHOT DEV ${version}` : fallbackTitle;
-+    badge.textContent = version
-+      ? `DEV ${version} | Patch #${patchCounter} (${lastPatch})`
-+      : fallbackBadge;
-   };
- 
-   fetch('../version.json')
-     .then((response) => {
-       if (!response.ok) throw new Error('Network response was not ok');
-       return response.json();
-     })
-     .then((data) => {
--     applyTitle(normalizeVersion(data));
-+      applyVersionData(data);
-     })
-     .catch(() => {
--      applyTitle();
-+      document.title = fallbackTitle;
-+      badge.textContent = fallbackBadge;
-     });
- })();
- </script>
-+
- </body>
- </html>
- 
+ /* Panel de opciones de tecnología */
  
 EOF
 )
