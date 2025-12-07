@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ========================================
-#  AUTO PATCH GENERATOR FOR SHOT
-#  Generates .patch files based on changes
-#  Author: ChatGPT + Felipe Tabares
+#  APPLY PATCH FOR SHOT (dev.html)
+#  Aplica un .patch existente a dev/dev.html
+#  Autor: ChatGPT + Felipe Tabares
 # ========================================
 
 VERSION_FILE="version.json"
@@ -11,80 +11,81 @@ TARGET_FILE="dev/dev.html"
 PATCH_DIR="patches"
 SNAPSHOT_DIR="snapshots"
 
-mkdir -p "$PATCH_DIR"
-mkdir -p "$SNAPSHOT_DIR"
+# 1) Patch a aplicar (argumento o por defecto cambios.patch)
+PATCH_FILE="${1:-$PATCH_DIR/cambios.patch}"
 
-echo "=== 🚀 Iniciando generador automático de parches (.patch) ==="
+echo "=== 🚀 Aplicando parche sobre $TARGET_FILE ==="
+echo "Patch a usar: $PATCH_FILE"
+echo ""
 
 # -------------------------------------------------------------
-# 1. Validar archivos requeridos
+# 2. Validar archivos requeridos
 # -------------------------------------------------------------
 if [[ ! -f "$VERSION_FILE" ]]; then
-  echo "❌ ERROR: No existe version.json"
+  echo "❌ ERROR: No existe $VERSION_FILE"
   exit 1
 fi
 
 if [[ ! -f "$TARGET_FILE" ]]; then
-  echo "❌ ERROR: No existe dev/dev.html"
+  echo "❌ ERROR: No existe $TARGET_FILE"
   exit 1
 fi
 
+if [[ ! -f "$PATCH_FILE" ]]; then
+  echo "❌ ERROR: No existe el patch: $PATCH_FILE"
+  exit 1
+fi
+
+mkdir -p "$SNAPSHOT_DIR"
+
 # -------------------------------------------------------------
-# 2. Leer información del JSON
+# 3. Leer información de version.json
 # -------------------------------------------------------------
 PATCH_COUNTER=$(jq '.patching.patchCounter' "$VERSION_FILE")
 PATCH_PREFIX=$(jq -r '.patching.patchPrefix' "$VERSION_FILE")
 
-NEW_PATCH_NUM=$(printf "%04d" $((PATCH_COUNTER + 1)))
-NEW_PATCH="${PATCH_PREFIX}-dev-${NEW_PATCH_NUM}"
+# Nombre lógico del parche basado en el archivo
+PATCH_BASENAME=$(basename "$PATCH_FILE" .patch)   # ej: cambios  ó patch-dev-0002
+NEW_PATCH_NAME="${PATCH_PREFIX}-dev-$(printf "%04d" $((PATCH_COUNTER + 1)))"
 
-echo "➡ Patch anterior: $PATCH_COUNTER"
-echo "➡ Nuevo patch    : $NEW_PATCH"
+echo "➡ PatchCounter actual : $PATCH_COUNTER"
+echo "➡ Nuevo identificador : $NEW_PATCH_NAME"
+echo ""
 
 # -------------------------------------------------------------
-# 3. Crear snapshot previo
+# 4. Crear snapshot antes de aplicar
 # -------------------------------------------------------------
-SNAPSHOT_FILE="${SNAPSHOT_DIR}/dev-before-${NEW_PATCH}.html"
+SNAPSHOT_FILE="${SNAPSHOT_DIR}/dev-before-${NEW_PATCH_NAME}.html"
 cp "$TARGET_FILE" "$SNAPSHOT_FILE"
 
 echo "📸 Snapshot guardado: $SNAPSHOT_FILE"
 
 # -------------------------------------------------------------
-# 4. Pedir descripción del parche
+# 5. Aplicar el patch
 # -------------------------------------------------------------
-echo ""
-echo "✏️  Escribe una breve descripción del parche:"
-read PATCH_DESCRIPTION
-
-# -------------------------------------------------------------
-# 5. Asegurar que hay cambios sin commit (para generar diff)
-# -------------------------------------------------------------
-# Git solo genera diff con cambios no committeados
-if git diff --quiet "$TARGET_FILE"; then
-  echo "⚠ No hay cambios detectados en $TARGET_FILE"
-  echo "   Debes modificar dev/dev.html antes de generar el parche."
+echo "🧩 Aplicando patch con git apply..."
+if ! git apply "$PATCH_FILE"; then
+  echo "❌ ERROR: Falló git apply. Revisa conflictos o el contenido del patch."
+  # restaurar snapshot para no dejar el archivo roto
+  cp "$SNAPSHOT_FILE" "$TARGET_FILE"
+  echo "ℹ Se restauró $TARGET_FILE desde el snapshot."
   exit 1
 fi
 
-# -------------------------------------------------------------
-# 6. Generar el archivo del parche usando git diff
-# -------------------------------------------------------------
-PATCH_FILE="${PATCH_DIR}/${NEW_PATCH}.patch"
-
-git diff "$TARGET_FILE" > "$PATCH_FILE"
-
-echo "🧩 Parche generado: $PATCH_FILE"
+echo "✔ Patch aplicado correctamente sobre $TARGET_FILE"
+echo ""
 
 # -------------------------------------------------------------
-# 7. Agregar encabezado del parche
+# 6. Pedir descripción del parche para el changelog
 # -------------------------------------------------------------
-echo -e "\n# PATCH: $NEW_PATCH | $PATCH_DESCRIPTION" >> "$PATCH_FILE"
+echo "✏️  Escribe una breve descripción para version.json:"
+read PATCH_DESCRIPTION
 
 # -------------------------------------------------------------
-# 8. Actualizar version.json
+# 7. Actualizar version.json
 # -------------------------------------------------------------
 jq \
-  --arg newPatch "$NEW_PATCH" \
+  --arg newPatch "$NEW_PATCH_NAME" \
   --arg nextPatch "$(printf "%04d" $((PATCH_COUNTER + 2)))" \
   --arg desc "$PATCH_DESCRIPTION" \
   '
@@ -93,27 +94,31 @@ jq \
   | .patching.nextPatchName = "patch-" + $nextPatch
   | .changelog += [{
       patch: $newPatch,
+      file:  "'"$PATCH_FILE"'",
       description: $desc,
       date: (now | strftime("%Y-%m-%d %H:%M:%S"))
     }]
   ' "$VERSION_FILE" > version.tmp && mv version.tmp "$VERSION_FILE"
 
-echo "📄 version.json actualizado con éxito"
+echo "📄 version.json actualizado:"
+echo "   - patchCounter  += 1"
+echo "   - lastPatch       = $NEW_PATCH_NAME"
+echo "   - nextPatchName   = patch-$(printf "%04d" $((PATCH_COUNTER + 2)))"
+echo ""
 
 # -------------------------------------------------------------
-# 9. Confirmar commit
+# 8. Preguntar por commit automático
 # -------------------------------------------------------------
-echo ""
-echo "¿Deseas realizar commit automático? (s/n)"
+echo "¿Deseas hacer commit automático? (s/n)"
 read DO_COMMIT
 
 if [[ "$DO_COMMIT" == "s" ]]; then
   git add "$TARGET_FILE" "$VERSION_FILE" "$PATCH_FILE" "$SNAPSHOT_FILE"
-  git commit -m "Parche automático ${NEW_PATCH}: ${PATCH_DESCRIPTION}"
+  git commit -m "Aplicado parche ${NEW_PATCH_NAME}: ${PATCH_DESCRIPTION}"
   echo "✔ Commit realizado"
 else
   echo "ℹ Saltando commit. Recuerda hacerlo manualmente."
 fi
 
 echo ""
-echo "🎉 Proceso completado. Parche creado: $PATCH_FILE"
+echo "🎉 Proceso completado. Parche aplicado: $PATCH_FILE"
