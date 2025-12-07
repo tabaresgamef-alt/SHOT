@@ -84,9 +84,27 @@ read PATCH_DESCRIPTION
 # -------------------------------------------------------------
 jq \
   --arg newPatch "$NEW_PATCH_NAME" \
-  --arg nextPatch "$(printf "%04d" $
+  --arg nextPatch "$(printf "%04d" $((PATCH_COUNTER + 2)))" \
+  --arg desc "$PATCH_DESCRIPTION" \
+  '
+  .patching.patchCounter += 1
+  | .patching.lastPatch = $newPatch
+  | .patching.nextPatchName = "patch-" + $nextPatch
+  | .changelog += [{
+      patch: $newPatch,
+      file: $ENV_PATCH_FILE,
+      description: $desc,
+      date: (now | strftime("%Y-%m-%d %H:%M:%S"))
+    }]
+  ' "$VERSION_FILE" > version.tmp && mv version.tmp "$VERSION_FILE"
 
-  # -------------------------------------------------------------
+echo "📄 version.json actualizado:"
+echo "   - patchCounter  += 1"
+echo "   - lastPatch       = $NEW_PATCH_NAME"
+echo "   - nextPatchName   = patch-$(printf '%04d' $((PATCH_COUNTER + 2)))"
+echo ""
+
+# -------------------------------------------------------------
 # 8. Commit automático
 # -------------------------------------------------------------
 echo "¿Deseas hacer commit automático? (s/n)"
