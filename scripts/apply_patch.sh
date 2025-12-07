@@ -1,104 +1,119 @@
 #!/bin/bash
 
 # ========================================
-#  AUTO-PATCH SCRIPT FOR SHOT (dev.html)
+#  AUTO PATCH GENERATOR FOR SHOT
+#  Generates .patch files based on changes
 #  Author: ChatGPT + Felipe Tabares
-#  =======================================
+# ========================================
 
 VERSION_FILE="version.json"
 TARGET_FILE="dev/dev.html"
+PATCH_DIR="patches"
 SNAPSHOT_DIR="snapshots"
 
-# Ensure snapshot directory exists
+mkdir -p "$PATCH_DIR"
 mkdir -p "$SNAPSHOT_DIR"
 
-echo "=== 🚀 Iniciando proceso automático de parcheo ==="
+echo "=== 🚀 Iniciando generador automático de parches (.patch) ==="
 
-# -------------------------------------------------------
-# 1. Validate required files
-# -------------------------------------------------------
+# -------------------------------------------------------------
+# 1. Validar archivos requeridos
+# -------------------------------------------------------------
 if [[ ! -f "$VERSION_FILE" ]]; then
-  echo "❌ ERROR: No se encontró version.json"
+  echo "❌ ERROR: No existe version.json"
   exit 1
 fi
 
 if [[ ! -f "$TARGET_FILE" ]]; then
-  echo "❌ ERROR: No se encontró dev/dev.html"
+  echo "❌ ERROR: No existe dev/dev.html"
   exit 1
 fi
 
-# -------------------------------------------------------
-# 2. Read patchCounter
-# -------------------------------------------------------
+# -------------------------------------------------------------
+# 2. Leer información del JSON
+# -------------------------------------------------------------
 PATCH_COUNTER=$(jq '.patching.patchCounter' "$VERSION_FILE")
 PATCH_PREFIX=$(jq -r '.patching.patchPrefix' "$VERSION_FILE")
 
-NEW_PATCH_NUMBER=$(printf "%04d" $((PATCH_COUNTER + 1)))
-NEW_PATCH="${PATCH_PREFIX}-dev-${NEW_PATCH_NUMBER}"
+NEW_PATCH_NUM=$(printf "%04d" $((PATCH_COUNTER + 1)))
+NEW_PATCH="${PATCH_PREFIX}-dev-${NEW_PATCH_NUM}"
 
-echo "➡ Patch actual: $PATCH_COUNTER"
-echo "➡ Nuevo patch: $NEW_PATCH"
+echo "➡ Patch anterior: $PATCH_COUNTER"
+echo "➡ Nuevo patch    : $NEW_PATCH"
 
-# -------------------------------------------------------
-# 3. Create snapshot of dev.html
-# -------------------------------------------------------
-SNAPSHOT_FILE="${SNAPSHOT_DIR}/dev-${NEW_PATCH}.html"
-
+# -------------------------------------------------------------
+# 3. Crear snapshot previo
+# -------------------------------------------------------------
+SNAPSHOT_FILE="${SNAPSHOT_DIR}/dev-before-${NEW_PATCH}.html"
 cp "$TARGET_FILE" "$SNAPSHOT_FILE"
 
-echo "📸 Snapshot creado: $SNAPSHOT_FILE"
+echo "📸 Snapshot guardado: $SNAPSHOT_FILE"
 
-# -------------------------------------------------------
-# 4. Apply patch (Insert code modification automatically)
-# -------------------------------------------------------
+# -------------------------------------------------------------
+# 4. Pedir descripción del parche
+# -------------------------------------------------------------
 echo ""
-echo "✏️ Escribe una breve descripción del cambio:"
+echo "✏️  Escribe una breve descripción del parche:"
 read PATCH_DESCRIPTION
 
-# Example automatic modification:
-# (Aquí puedes colocar lo que sea: insertar badge, modificar script, etc.)
-# El ejemplo agrega un comentario al final indicando que fue parchado.
+# -------------------------------------------------------------
+# 5. Asegurar que hay cambios sin commit (para generar diff)
+# -------------------------------------------------------------
+# Git solo genera diff con cambios no committeados
+if git diff --quiet "$TARGET_FILE"; then
+  echo "⚠ No hay cambios detectados en $TARGET_FILE"
+  echo "   Debes modificar dev/dev.html antes de generar el parche."
+  exit 1
+fi
 
-echo "<!-- PATCH: $NEW_PATCH | $PATCH_DESCRIPTION -->" >> "$TARGET_FILE"
+# -------------------------------------------------------------
+# 6. Generar el archivo del parche usando git diff
+# -------------------------------------------------------------
+PATCH_FILE="${PATCH_DIR}/${NEW_PATCH}.patch"
 
-echo "🛠 Modificación aplicada a dev/dev.html"
+git diff "$TARGET_FILE" > "$PATCH_FILE"
 
-# -------------------------------------------------------
-# 5. Update version.json
-# -------------------------------------------------------
+echo "🧩 Parche generado: $PATCH_FILE"
+
+# -------------------------------------------------------------
+# 7. Agregar encabezado del parche
+# -------------------------------------------------------------
+echo -e "\n# PATCH: $NEW_PATCH | $PATCH_DESCRIPTION" >> "$PATCH_FILE"
+
+# -------------------------------------------------------------
+# 8. Actualizar version.json
+# -------------------------------------------------------------
 jq \
-    --arg newPatch "$NEW_PATCH" \
-    --arg nextPatch "$(printf "%04d" $((PATCH_COUNTER + 2)) )" \
-    --arg description "$PATCH_DESCRIPTION" \
-    '
-    .patching.patchCounter += 1
-    | .patching.lastPatch = $newPatch
-    | .patching.nextPatchName = "patch-" + $nextPatch
-    | .changelog += [{
-        patch: $newPatch,
-        description: $description,
-        date: (now | strftime("%Y-%m-%d %H:%M:%S"))
-      }]
-    ' "$VERSION_FILE" > version.tmp.json && mv version.tmp.json "$VERSION_FILE"
+  --arg newPatch "$NEW_PATCH" \
+  --arg nextPatch "$(printf "%04d" $((PATCH_COUNTER + 2)))" \
+  --arg desc "$PATCH_DESCRIPTION" \
+  '
+  .patching.patchCounter += 1
+  | .patching.lastPatch = $newPatch
+  | .patching.nextPatchName = "patch-" + $nextPatch
+  | .changelog += [{
+      patch: $newPatch,
+      description: $desc,
+      date: (now | strftime("%Y-%m-%d %H:%M:%S"))
+    }]
+  ' "$VERSION_FILE" > version.tmp && mv version.tmp "$VERSION_FILE"
 
-echo "📄 version.json actualizado correctamente"
+echo "📄 version.json actualizado con éxito"
 
-# -------------------------------------------------------
-# 6. Git add + commit (optional)
-# -------------------------------------------------------
+# -------------------------------------------------------------
+# 9. Confirmar commit
+# -------------------------------------------------------------
 echo ""
-echo "¿Deseas hacer commit automático? (s/n)"
+echo "¿Deseas realizar commit automático? (s/n)"
 read DO_COMMIT
 
 if [[ "$DO_COMMIT" == "s" ]]; then
-    git add "$TARGET_FILE" "$VERSION_FILE" "$SNAPSHOT_FILE"
-    git commit -m "Parche automático: $NEW_PATCH — $PATCH_DESCRIPTION"
-    echo "✔ Commit realizado"
+  git add "$TARGET_FILE" "$VERSION_FILE" "$PATCH_FILE" "$SNAPSHOT_FILE"
+  git commit -m "Parche automático ${NEW_PATCH}: ${PATCH_DESCRIPTION}"
+  echo "✔ Commit realizado"
 else
-    echo "ℹ No se hizo commit. Recuerda agregarlo manualmente."
+  echo "ℹ Saltando commit. Recuerda hacerlo manualmente."
 fi
 
 echo ""
-echo "🎉 Proceso de parche completado exitosamente"
-echo "Nuevo parche: $NEW_PATCH"
-
+echo "🎉 Proceso completado. Parche creado: $PATCH_FILE"
