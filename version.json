@@ -9,12 +9,19 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 1,
-    "lastPatch": null,
+    "patchCounter": 2,
+    "lastPatch": "patch-dev-0002",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0002"
+    "nextPatchName": "patch-0003"
   },
-  "changelog": [],
+  "changelog": [
+    {
+      "patch": "patch-dev-0002",
+      "file": "dev/patches/cambios.patch",
+      "description": "Test1- Cambiar el color titulo (blanco)",
+      "date": "2025-12-07 03:04:53"
+    }
+  ],
   "metadata": {
     "description": "Versión inicial estable del Showroom IT/OT.",
     "environment": "production",
