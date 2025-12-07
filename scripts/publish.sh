@@ -107,3 +107,39 @@ jq \
   --arg snapshot "$SNAPSHOT_FILE" \
   --arg type "$TYPE" \
   '
+  .version = $newVersion
+  | .semver = $newSemver
+  | .status = "stable"
+  | .build.number += 1
+  | .build.date = (now | strftime("%Y-%m-%d"))
+  | .changelog += [{
+      type: $type,
+      snapshot: $snapshot,
+      version: $newVersion,
+      date: (now | strftime("%Y-%m-%d %H:%M:%S"))
+    }]
+  ' "$VERSION_FILE" > version.tmp && mv version.tmp "$VERSION_FILE"
+
+echo "📄 version.json actualizado:"
+echo "   - version       = $NEW_VERSION"
+echo "   - semver        = $NEW_SEMVER"
+echo "   - snapshot      = $SNAPSHOT_FILE"
+echo "   - tipo cambio   = $TYPE"
+echo ""
+
+# -------------------------------------------------------------
+# 6. Commit automático
+# -------------------------------------------------------------
+echo "¿Deseas hacer commit automático? (s/n)"
+read DO_COMMIT
+
+if [[ "$DO_COMMIT" == "s" ]]; then
+  git add "$STABLE_FILE" "$VERSION_FILE" "$SNAPSHOT_FILE"
+  git commit -m "Publicada versión estable ${NEW_VERSION} (tipo: ${TYPE})"
+  echo "✔ Commit realizado"
+else
+  echo "ℹ No se realizó commit. Recuerda hacerlo manualmente."
+fi
+
+echo ""
+echo "🎉 Publicación completada. Nueva versión estable: $NEW_VERSION"
