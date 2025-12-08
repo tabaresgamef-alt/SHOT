@@ -1,106 +1,14 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+(cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF'
 diff --git a/dev/dev.html b/dev/dev.html
-index fd7685d3bd433e43d537ef7f4734d707fc5c0425..c9bf1b59960107432890c194746600baa9eeb145 100644
+index fd7685d3bd433e43d537ef7f4734d707fc5c0425..8a01d88b6a04070b92c082441ff9b564d07f5892 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -714,51 +714,51 @@ body{
-         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
-         <textarea id="fallback-body" readonly></textarea>
-         <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
-       </div>
-     </div>
-   </div>
- 
- </div>
- 
- <div id="tooltip" class="tooltip"></div>
- 
- <script>
- const mailtoRecipient = 'showroom-itot@ejemplo.com';
- 
- // --- NUEVO: lógica de calendario y horarios con lectura de CSV ---
- const DISPLAY_HOURS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
- const RESERVABLE_HOURS = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
- let selectedDate = null;      // 'YYYY-MM-DD'
- let selectedTime = null;      // 'HH:MM'
- let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
- let availabilityByDate = {};
- let currentMonthDate = new Date();
- 
- async function reservasdb(){
+@@ -714,7 +714,7 @@ async function reservasdb(){
    try{
 -    const response = await fetch('/reservas.csv');
 +    const response = await fetch('/data/reservas.csv');
      if(!response.ok) throw new Error('No se pudo leer reservas.csv');
      const csvText = await response.text();
      const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
-     if(lines.length === 0) return [];
- 
-     const headers = lines[0].split(',').map(h=>h.trim());
-     return lines.slice(1).map(line=>{
-       const values = line.split(',').map(v=>v.trim());
-       const record = {};
-       headers.forEach((h,idx)=>{record[h]=values[idx]||'';});
-       const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
- 
-       return {
-         fecha: record.Fecha || record.fecha || record.date || '',
-         horaInicio: record.HoraInicio || record.Hora || record.hora || '',
-         horaFin: record.HoraFin || record.horafin || '',
-         estado: record.Estado || record.estado || '',
-         empresa: record.Empresa || record.empresa || '',
-         sector: record.Sector || record.sector || '',
-         numeroInvitados: record.NumeroInvitados || record.invitados || '',
-         comentarios: record.Comentarios || record.comentarios || '',
-         requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
-         invitadosDetalle: record.InvitadosJson || record.Invitados || '',
-         tecnologias: techList
-       };
-@@ -2527,43 +2527,43 @@ document.addEventListener('DOMContentLoaded',()=>{
-     const versionCandidate = safeData.version ?? safeData.semver ?? null;
-     const version =
-       typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
-         ? versionCandidate
-         : null;
- 
-     const patching = safeData.patching && typeof safeData.patching === 'object' ? safeData.patching : {};
-     const patchCounterRaw = patching.patchCounter;
-     const lastPatchRaw = patching.lastPatch;
- 
-     const patchCounter =
-       patchCounterRaw === 0 || patchCounterRaw
-         ? patchCounterRaw
-         : 'N/A';
-     const lastPatch =
-       typeof lastPatchRaw === 'string' || typeof lastPatchRaw === 'number'
-         ? lastPatchRaw
-         : 'N/A';
- 
-     document.title = version ? `SHOT DEV ${version}` : fallbackTitle;
-     badge.textContent = version
-       ? `DEV ${version} | Patch #${patchCounter} (${lastPatch})`
-       : fallbackBadge;
-   };
- 
--  fetch('../version.json')
-+  fetch('/version.json')
-     .then((response) => {
-       if (!response.ok) throw new Error('Network response was not ok');
-       return response.json();
-     })
-     .then((data) => {
-       applyVersionData(data);
-     })
-     .catch(() => {
-       document.title = fallbackTitle;
-       badge.textContent = fallbackBadge;
-     });
- })();
- </script>
- 
- </body>
- </html>
- 
- 
 EOF
 )
