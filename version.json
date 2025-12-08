@@ -9,10 +9,10 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 2,
-    "lastPatch": "patch-dev-0002",
+    "patchCounter": 3,
+    "lastPatch": "patch-dev-0003",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0003"
+    "nextPatchName": "patch-0004"
   },
   "changelog": [
     {
@@ -26,6 +26,12 @@
       "snapshot": "versions/dev_20251207_033738_snapshot.html",
       "version": "v2.0.0",
       "date": "2025-12-07 03:37:38"
+    },
+    {
+      "patch": "patch-dev-0003",
+      "file": "dev/patches/cambios.patch",
+      "description": "Test2- cambio de color del titulo (azul)",
+      "date": "2025-12-08 00:57:48"
     }
   ],
   "metadata": {
