@@ -29,8 +29,8 @@ index 2a41457422f6b1dbb8ff69a62248f9c83f161a03..fd7685d3bd433e43d537ef7f4734d707
    box-shadow:0 4px 15px rgba(0,0,0,.3);
  }
  .header h1{
--  color:#fff;
-+  color:#0000FF;
+-  color:#0000FF;
++  color:#fff;
    font-size:2.5em;
    text-shadow:2px 2px 4px rgba(0,0,0,.5);
  }
