@@ -9,10 +9,10 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 3,
-    "lastPatch": "patch-dev-0003",
+    "patchCounter": 1,
+    "lastPatch": "none",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0004"
+    "nextPatchName": "patch-0002"
   },
   "changelog": [
     {
