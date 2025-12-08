@@ -1,61 +1,106 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/dev/dev.html b/dev/dev.html
-index 2a41457422f6b1dbb8ff69a62248f9c83f161a03..fd7685d3bd433e43d537ef7f4734d707fc5c0425 100644
+index fd7685d3bd433e43d537ef7f4734d707fc5c0425..c9bf1b59960107432890c194746600baa9eeb145 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -9,51 +9,51 @@
- body{
-   font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-   background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
-   color:#e0e0e0;
-   min-height:100vh;
-   padding:20px;
- }
+@@ -714,51 +714,51 @@ body{
+         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+         <textarea id="fallback-body" readonly></textarea>
+         <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+       </div>
+     </div>
+   </div>
  
- /* Nuevo layout general */
- .page-container{
-   max-width:1800px;
-   margin:0 auto;
-   display:flex;
-   flex-direction:column;
-   gap:25px;
- }
+ </div>
  
- .header{
-   text-align:center;
-   padding:20px;
-   background:linear-gradient(135deg,#0f3460 0%,#16213e 100%);
-   border-radius:10px;
-   box-shadow:0 4px 15px rgba(0,0,0,.3);
- }
- .header h1{
--  color:#0000FF;
-+  color:#fff;
-   font-size:2.5em;
-   text-shadow:2px 2px 4px rgba(0,0,0,.5);
- }
+ <div id="tooltip" class="tooltip"></div>
  
- /* Panel formulario (ex Paso 1) */
- .form-panel{
-   background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
-   padding:30px;
-   border-radius:12px;
-   box-shadow:0 8px 25px rgba(0,0,0,.4);
-   border:1px solid #2d3e50;
- }
- .form-panel h2{
-   margin-bottom:20px;
- }
+ <script>
+ const mailtoRecipient = 'showroom-itot@ejemplo.com';
  
- /* Dos columnas: tecnologías (30%) + diagrama (70%) */
- .content-two-columns{
-   display:grid;
-   grid-template-columns:0.3fr 0.7fr;
-   gap:25px;
-   align-items:start;
- }
+ // --- NUEVO: lógica de calendario y horarios con lectura de CSV ---
+ const DISPLAY_HOURS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+ const RESERVABLE_HOURS = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
+ let selectedDate = null;      // 'YYYY-MM-DD'
+ let selectedTime = null;      // 'HH:MM'
+ let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
+ let availabilityByDate = {};
+ let currentMonthDate = new Date();
  
- /* Panel de opciones de tecnología */
+ async function reservasdb(){
+   try{
+-    const response = await fetch('/reservas.csv');
++    const response = await fetch('/data/reservas.csv');
+     if(!response.ok) throw new Error('No se pudo leer reservas.csv');
+     const csvText = await response.text();
+     const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
+     if(lines.length === 0) return [];
+ 
+     const headers = lines[0].split(',').map(h=>h.trim());
+     return lines.slice(1).map(line=>{
+       const values = line.split(',').map(v=>v.trim());
+       const record = {};
+       headers.forEach((h,idx)=>{record[h]=values[idx]||'';});
+       const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
+ 
+       return {
+         fecha: record.Fecha || record.fecha || record.date || '',
+         horaInicio: record.HoraInicio || record.Hora || record.hora || '',
+         horaFin: record.HoraFin || record.horafin || '',
+         estado: record.Estado || record.estado || '',
+         empresa: record.Empresa || record.empresa || '',
+         sector: record.Sector || record.sector || '',
+         numeroInvitados: record.NumeroInvitados || record.invitados || '',
+         comentarios: record.Comentarios || record.comentarios || '',
+         requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
+         invitadosDetalle: record.InvitadosJson || record.Invitados || '',
+         tecnologias: techList
+       };
+@@ -2527,43 +2527,43 @@ document.addEventListener('DOMContentLoaded',()=>{
+     const versionCandidate = safeData.version ?? safeData.semver ?? null;
+     const version =
+       typeof versionCandidate === 'string' || typeof versionCandidate === 'number'
+         ? versionCandidate
+         : null;
+ 
+     const patching = safeData.patching && typeof safeData.patching === 'object' ? safeData.patching : {};
+     const patchCounterRaw = patching.patchCounter;
+     const lastPatchRaw = patching.lastPatch;
+ 
+     const patchCounter =
+       patchCounterRaw === 0 || patchCounterRaw
+         ? patchCounterRaw
+         : 'N/A';
+     const lastPatch =
+       typeof lastPatchRaw === 'string' || typeof lastPatchRaw === 'number'
+         ? lastPatchRaw
+         : 'N/A';
+ 
+     document.title = version ? `SHOT DEV ${version}` : fallbackTitle;
+     badge.textContent = version
+       ? `DEV ${version} | Patch #${patchCounter} (${lastPatch})`
+       : fallbackBadge;
+   };
+ 
+-  fetch('../version.json')
++  fetch('/version.json')
+     .then((response) => {
+       if (!response.ok) throw new Error('Network response was not ok');
+       return response.json();
+     })
+     .then((data) => {
+       applyVersionData(data);
+     })
+     .catch(() => {
+       document.title = fallbackTitle;
+       badge.textContent = fallbackBadge;
+     });
+ })();
+ </script>
+ 
+ </body>
+ </html>
+ 
  
 EOF
 )
