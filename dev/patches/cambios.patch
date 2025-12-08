@@ -3,10 +3,10 @@ diff --git a/dev/dev.html b/dev/dev.html
 --- a/dev/dev.html
 +++ b/dev/dev.html
 @@ -737,7 +737,7 @@ async function reservasdb(){
-   try{
+  try{
 -    const response = await fetch('/reservas.csv');
 +    const response = await fetch('./data/reservas.csv');
-     if(!response.ok) throw new Error('No se pudo leer reservas.csv');
-     const csvText = await response.text();
+    if(!response.ok) throw new Error('No se pudo leer reservas.csv');
+    const csvText = await response.text();
  EOF
 )
