@@ -83,7 +83,9 @@ echo ""
 # 3. Crear snapshot histórico
 # -------------------------------------------------------------
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-SNAPSHOT_FILE="${VERSIONS_DIR}/dev_${TIMESTAMP}_snapshot.html"
+
+# 🔥 Snapshot corregido: ahora indica que es estable y muestra su versión
+SNAPSHOT_FILE="${VERSIONS_DIR}/stable_${NEW_SEMVER}_${TIMESTAMP}.html"
 
 cp "$DEV_FILE" "$SNAPSHOT_FILE"
 
