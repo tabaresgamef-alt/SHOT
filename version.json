@@ -1,10 +1,10 @@
 {
   "application": "SHOT",
-  "version": "v2.0.0",
-  "semver": "2.0.0",
+  "version": "v2.0.1",
+  "semver": "2.0.1",
   "status": "stable",
   "build": {
-    "number": 2,
+    "number": 3,
     "date": "2025-12-08",
     "author": "Felipe Tabares"
   },
@@ -26,6 +26,12 @@
       "file": "dev/patches/cambios.patch",
       "description": "Test3- Cambio de color titulo (blanco)",
       "date": "2025-12-08 02:18:36"
+    },
+    {
+      "type": "patch",
+      "snapshot": "versions/stable_2.0.1_20251208_022022.html",
+      "version": "v2.0.1",
+      "date": "2025-12-08 02:20:22"
     }
   ],
   "metadata": {
