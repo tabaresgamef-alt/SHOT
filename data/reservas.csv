@@ -1,21 +1,4 @@
-Fecha,HoraInicio,HoraFin,Estado
-2024-12-12,10:00,11:00,ocupado
-2024-12-12,11:00,12:00,ocupado
-2024-12-12,12:00,13:00,ocupado
-2024-12-12,13:00,14:00,ocupado
-2024-12-12,14:00,15:00,ocupado
-2024-12-12,15:00,16:00,ocupado
-2024-12-12,16:00,17:00,ocupado
-2025-01-15,10:00,11:00,ocupado
-2025-01-15,11:00,12:00,ocupado
-2025-01-15,12:00,13:00,ocupado
-2025-01-15,13:00,14:00,ocupado
-2025-01-15,14:00,15:00,ocupado
-2025-01-15,15:00,16:00,ocupado
-2025-01-15,16:00,17:00,ocupado
-2024-12-05,10:00,11:00,ocupado
-2024-12-05,11:00,12:00,bloqueado
-2024-12-10,14:00,15:00,ocupado
-2025-01-08,12:00,13:00,ocupado
-2025-01-08,13:00,14:00,bloqueado
-2025-01-20,16:00,17:00,ocupado
+Fecha,HoraInicio,HoraFin,Estado,Empresa,Sector,NumeroInvitados,Comentarios,RequiereEquipoLab,InvitadosJson,Tecnologias
+2025-01-20,10:00,11:00,confirmada,ACME Industries,Automotriz,4,"Requieren demo extendida",1,"[{""name"":""Juan Perez"",""role"":""Ingeniero""},{""name"":""Maria Lopez"",""role"":""Gerente""}]",FW OT (Fortinet);Visibilidad OT (Nozomi)
+2025-01-20,14:00,15:00,pending,Scitum,Laboratorio,2,"Sólo validación",0,"[{""name"":""Luis Gomez"",""role"":""Analista""}]",IPS (TXOne)
+2025-01-21,11:00,12:00,confirmada,CyberMex,Energía,3,"Llevar tablero de OT",1,"[{""name"":""Ana Ruiz"",""role"":""OT Manager""}]",Visibilidad OT (Tenable);ZTNA (Fortinet)
