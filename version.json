@@ -9,10 +9,10 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 0,
-    "lastPatch": "none",
+    "patchCounter": 1,
+    "lastPatch": "patch-dev-0001",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0001"
+    "nextPatchName": "patch-0002"
   },
   "changelog": [
     {
@@ -20,6 +20,12 @@
       "snapshot": "versions/stable_2.0.0_20251208_021509.html",
       "version": "v2.0.0",
       "date": "2025-12-08 02:15:09"
+    },
+    {
+      "patch": "patch-dev-0001",
+      "file": "dev/patches/cambios.patch",
+      "description": "Test3- Cambio de color titulo (blanco)",
+      "date": "2025-12-08 02:18:36"
     }
   ],
   "metadata": {
