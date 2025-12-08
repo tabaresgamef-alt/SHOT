@@ -1,14 +1,12 @@
 (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF'
 diff --git a/dev/dev.html b/dev/dev.html
-index 0000000..1111111 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -984,7 +984,7 @@ async function reservasdb(){
+@@ -737,7 +737,7 @@ async function reservasdb(){
    try{
 -    const response = await fetch('/reservas.csv');
 +    const response = await fetch('./data/reservas.csv');
      if(!response.ok) throw new Error('No se pudo leer reservas.csv');
      const csvText = await response.text();
-     const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
-EOF
+ EOF
 )
