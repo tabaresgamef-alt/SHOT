@@ -2,7 +2,7 @@
 
 # ========================================
 #  ROLLBACK DEV PATCH FOR SHOT (dev.html)
-#  Revierte el último parche aplicado en dev
+#  Revierte el último parche de DEV de forma segura
 #  Autor: ChatGPT + Felipe Tabares
 # ========================================
 
@@ -14,7 +14,7 @@ echo "=== 🔄 Iniciando rollback de parche en DEV ==="
 echo ""
 
 # -------------------------------------------------------------
-# 1. Validar archivos requeridos
+# 1. Validar archivos base
 # -------------------------------------------------------------
 if [[ ! -f "$VERSION_FILE" ]]; then
   echo "❌ ERROR: No existe version.json"
@@ -27,27 +27,27 @@ if [[ ! -f "$TARGET_FILE" ]]; then
 fi
 
 if [[ ! -d "$SNAPSHOT_DIR" ]]; then
-  echo "❌ ERROR: No existe el directorio snapshots/"
+  echo "❌ ERROR: No existe snapshots/"
   exit 1
 fi
 
 # -------------------------------------------------------------
-# 2. Leer patchCounter y último parche
+# 2. Extraer únicamente los patches del changelog
 # -------------------------------------------------------------
-PATCH_COUNTER=$(jq '.patching.patchCounter' "$VERSION_FILE")
-LAST_PATCH=$(jq -r '.patching.lastPatch' "$VERSION_FILE")
+PATCHES=($(jq -r '.changelog[] | select(has("patch")) | .patch' "$VERSION_FILE"))
 
-if (( PATCH_COUNTER == 0 )); then
+if (( ${#PATCHES[@]} == 0 )); then
   echo "⚠ No hay parches aplicados para revertir."
   exit 0
 fi
 
-echo "➡ PatchCounter actual : $PATCH_COUNTER"
-echo "➡ Último parche aplicado : $LAST_PATCH"
+LAST_PATCH="${PATCHES[-1]}"
+
+echo "➡ Último parche aplicado: $LAST_PATCH"
 echo ""
 
 # -------------------------------------------------------------
-# 3. Determinar snapshot para rollback
+# 3. Determinar snapshot asociado
 # -------------------------------------------------------------
 SNAPSHOT_FILE="${SNAPSHOT_DIR}/dev-before-${LAST_PATCH}.html"
 
@@ -61,40 +61,58 @@ echo "📸 Snapshot encontrado: $SNAPSHOT_FILE"
 echo ""
 
 # -------------------------------------------------------------
-# 4. Restaurar dev.html desde snapshot
+# 4. Restaurar dev/dev.html
 # -------------------------------------------------------------
 cp "$SNAPSHOT_FILE" "$TARGET_FILE"
 
-echo "✔ dev.html restaurado correctamente desde snapshot"
+echo "✔ dev.html restaurado desde snapshot"
 echo ""
 
 # -------------------------------------------------------------
-# 5. Actualizar version.json
+# 5. Recalcular contador y lastPatch REAL
 # -------------------------------------------------------------
-NEW_COUNTER=$((PATCH_COUNTER - 1))
+NEW_PATCH_LIST=("${PATCHES[@]::${#PATCHES[@]}-1}")  # quitar último
+NEW_COUNTER=${#NEW_PATCH_LIST[@]}
 
+if (( NEW_COUNTER == 0 )); then
+  NEW_LAST_PATCH="none"
+else
+  NEW_LAST_PATCH="${NEW_PATCH_LIST[-1]}"
+fi
+
+# Determinar el nextPatchName real
+NEXT_PATCH_NUM=$((NEW_COUNTER + 1))
+NEXT_PATCH_NAME=$(printf "patch-%04d" "$NEXT_PATCH_NUM")
+
+echo "➡ Nuevo patchCounter : $NEW_COUNTER"
+echo "➡ Nuevo lastPatch    : $NEW_LAST_PATCH"
+echo "➡ nextPatchName      : $NEXT_PATCH_NAME"
+echo ""
+
+# -------------------------------------------------------------
+# 6. Actualizar version.json correctamente
+# -------------------------------------------------------------
 jq \
-  --arg lastPatch "$LAST_PATCH" \
-  --argjson newCounter "$NEW_COUNTER" \
+  --arg last "$NEW_LAST_PATCH" \
+  --arg next "$NEXT_PATCH_NAME" \
+  --arg patchToRemove "$LAST_PATCH" \
+  --argjson newCount "$NEW_COUNTER" \
   '
-  .patching.patchCounter = $newCounter
-  | .patching.lastPatch = (
-        if $newCounter == 0 then "none"
-        else .changelog[] | select(.patch != $lastPatch) | .patch
-        end
-    )
-  | .patching.nextPatchName = "patch-" + ( ($newCounter + 1 | tostring | tonumber | 10000 + .) | tostring | .[1:] )
-  | .changelog |= map(select(.patch != $lastPatch))
+  .patching.patchCounter = $newCount
+  | .patching.lastPatch = $last
+  | .patching.nextPatchName = $next
+  | .changelog |= map(select(.patch != $patchToRemove))
   ' "$VERSION_FILE" > version.tmp && mv version.tmp "$VERSION_FILE"
 
-echo "📄 version.json actualizado:"
+echo "✔ version.json actualizado:"
 echo "   - patchCounter = $NEW_COUNTER"
-echo "   - lastPatch revertido"
-echo "   - entrada borrada del changelog"
+echo "   - lastPatch    = $NEW_LAST_PATCH"
+echo "   - nextPatch    = $NEXT_PATCH_NAME"
+echo "   - changelog    entrada eliminada"
 echo ""
 
 # -------------------------------------------------------------
-# 6. Commit automático
+# 7. Commit automático (opcional)
 # -------------------------------------------------------------
 echo "¿Deseas hacer commit automático del rollback? (s/n)"
 read DO_COMMIT
@@ -108,4 +126,4 @@ else
 fi
 
 echo ""
-echo "🎉 Rollback completado correctamente."
+echo "🎉 Rollback de parche completado correctamente."
