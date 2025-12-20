@@ -419,38 +419,6 @@ body{
   font-size:.8em;
   line-height:1.3;
 }
-.modal-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:1500;
-  padding:20px;
-}
-.modal-content{
-  background:#1e2a3a;
-  border:1px solid #2d3e50;
-  border-radius:10px;
-  padding:24px;
-  max-width:420px;
-  width:100%;
-  box-shadow:0 12px 30px rgba(0,0,0,.45);
-  text-align:center;
-}
-.modal-content h3{
-  margin-bottom:12px;
-  color:#a8dadc;
-}
-.modal-content p{
-  margin-bottom:16px;
-  color:#e0e0e0;
-}
-.modal-content .btn{
-  margin-top:4px;
-  width:100%;
-}
 
 .node-group{
   cursor:grab;
@@ -753,13 +721,6 @@ body{
 </div>
 
 <div id="tooltip" class="tooltip"></div>
-<div id="successModal" class="modal-overlay" style="display:none;">
-  <div class="modal-content">
-    <h3>Solicitud enviada</h3>
-    <p>Tu solicitud fue enviada. Revisa tu correo para la confirmación dentro de las próximas 24 horas.</p>
-    <button type="button" class="btn btn-primary" onclick="closeSuccessModal()">Cerrar</button>
-  </div>
-</div>
 
 <script>
 const mailtoRecipient = 'showroom-itot@ejemplo.com';
@@ -772,42 +733,35 @@ let selectedTime = null;      // 'HH:MM'
 let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
 let availabilityByDate = {};
 let currentMonthDate = new Date();
-let cachedCsvRows = null;     // Matriz con los datos de reservas.csv (incluye encabezados)
-const CSV_HEADERS = ['Fecha','HoraInicio','HoraFin','Estado','Empresa','Sector','NumeroInvitados','Comentarios','RequiereEquipoLab','InvitadosJson','Tecnologias'];
 
 async function reservasdb(){
   try{
-    let cachedText = null;
-    if(typeof localStorage !== 'undefined'){
-      try{
-        cachedText = localStorage.getItem('reservasCsvCache');
-      }catch(err){
-        console.warn('No se pudo leer la caché local de reservas.csv', err);
-      }
-    }
-    if(cachedText){
-      const cachedRows = parseCsv(cachedText);
-      if(cachedRows.length>0){
-        cachedCsvRows = cachedRows;
-        return csvRowsToReservations(cachedRows);
-      }
-    }
-
     const response = await fetch('../data/reservas.csv');
     if(!response.ok) throw new Error('No se pudo leer reservas.csv');
     const csvText = await response.text();
     const rows = parseCsv(csvText);
-    cachedCsvRows = rows;
-    if(typeof localStorage !== 'undefined'){
-      try{
-        localStorage.setItem('reservasCsvCache', csvText);
-      }catch(err){
-        console.warn('No se pudo guardar el CSV en localStorage', err);
-      }
-    }
     if(rows.length === 0) return [];
 
-    return csvRowsToReservations(rows);
+    const headers = rows[0].map(h=>h.trim());
+    return rows.slice(1).map(values=>{
+      const record = {};
+      headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
+      const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
+
+      return {
+        fecha: record.Fecha || record.fecha || record.date || '',
+        horaInicio: record.HoraInicio || record.Hora || record.hora || '',
+        horaFin: record.HoraFin || record.horafin || '',
+        estado: record.Estado || record.estado || '',
+        empresa: record.Empresa || record.empresa || '',
+        sector: record.Sector || record.sector || '',
+        numeroInvitados: record.NumeroInvitados || record.invitados || '',
+        comentarios: record.Comentarios || record.comentarios || '',
+        requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
+        invitadosDetalle: record.InvitadosJson || record.Invitados || '',
+        tecnologias: techList
+      };
+    });
   }catch(err){
     console.error('No se pudieron leer las reservas desde el CSV', err);
     return [];
@@ -852,30 +806,6 @@ function parseCsv(text){
   }
 
   return rows.filter(r=>r.some(v=>v.trim().length>0));
-}
-
-function csvRowsToReservations(rows){
-  if(!rows || rows.length === 0) return [];
-  const headers = rows[0].map(h=>h.trim());
-  return rows.slice(1).map(values=>{
-    const record = {};
-    headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
-    const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
-
-    return {
-      fecha: record.Fecha || record.fecha || record.date || '',
-      horaInicio: record.HoraInicio || record.Hora || record.hora || '',
-      horaFin: record.HoraFin || record.horafin || '',
-      estado: record.Estado || record.estado || '',
-      empresa: record.Empresa || record.empresa || '',
-      sector: record.Sector || record.sector || '',
-      numeroInvitados: record.NumeroInvitados || record.invitados || '',
-      comentarios: record.Comentarios || record.comentarios || '',
-      requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
-      invitadosDetalle: record.InvitadosJson || record.Invitados || '',
-      tecnologias: techList
-    };
-  });
 }
 
 function normalizeTimeSlot(timeStr){
@@ -1323,6 +1253,7 @@ function buildMailto(){
     alert('Por favor complete todos los campos obligatorios, seleccione al menos una solución y una marca para cada solución seleccionada.');
     return null;
   }
+  const date = document.getElementById('requestedDate').value;
   const comments = document.getElementById('comments').value.trim();
   const companyName = document.getElementById('companyName').value.trim();
   const guestCount = document.getElementById('guestCount').value.trim();
@@ -1396,15 +1327,6 @@ function openOutlook(){
   }
 }
 
-function addOneHour(timeStr){
-  if(!timeStr) return '';
-  const [hourStr, minuteStr='00'] = timeStr.split(':');
-  const hourNum = Number(hourStr);
-  if(Number.isNaN(hourNum)) return '';
-  const nextHour = Math.min(hourNum + 1, 23);
-  return `${String(nextHour).padStart(2,'0')}:${minuteStr.padStart(2,'0')}`;
-}
-
 function buildReservationRecord(){
   const companyName = document.getElementById('companyName').value.trim();
   const sector = document.getElementById('sector').value.trim();
@@ -1412,15 +1334,10 @@ function buildReservationRecord(){
   const comments = document.getElementById('comments').value.trim();
   const requiresLabTeam = document.getElementById('labTeamPresent').checked;
   const solutions = getSelectedSolutions();
-  const horaInicio = selectedTime;
-  const horaFin = addOneHour(selectedTime);
 
   return {
     fecha: selectedDate,
-    hora: horaInicio,
-    horaInicio,
-    horaFin,
-    estado: 'pendiente',
+    hora: selectedTime,
     empresa: companyName,
     sector,
     numeroInvitados: guestCount,
@@ -1431,118 +1348,15 @@ function buildReservationRecord(){
   };
 }
 
-function escapeCsvField(value){
-  const str = (value ?? '').toString();
-  if(/[",\n]/.test(str)){
-    return '"' + str.replace(/"/g,'""') + '"';
-  }
-  return str;
-}
-
-function reservationToCsvRow(record){
-  const invitadoJson = JSON.stringify(record.invitados || []);
-  const tecnologiasList = Array.isArray(record.tecnologias) ? record.tecnologias.join(';') : (record.tecnologias || '');
-  return [
-    record.fecha || '',
-    record.horaInicio || record.hora || '',
-    record.horaFin || '',
-    record.estado || 'pendiente',
-    record.empresa || '',
-    record.sector || '',
-    record.numeroInvitados || '',
-    record.comentarios || '',
-    record.requiereEquipoLab ? '1' : '0',
-    invitadoJson,
-    tecnologiasList
-  ];
-}
-
-function serializeCsv(rows){
-  return rows.map(r=>r.map(escapeCsvField).join(',')).join('\n');
-}
-
-async function appendReservationToCsv(record){
-  const csvUrl = '../data/reservas.csv';
-  let rows = cachedCsvRows && cachedCsvRows.length ? cachedCsvRows.map(r=>[...r]) : null;
-
-  if(!rows){
-    try{
-      const response = await fetch(csvUrl);
-      if(response.ok){
-        const text = await response.text();
-        const parsed = parseCsv(text);
-        if(parsed.length>0){
-          rows = parsed;
-        }
-      }
-    }catch(err){
-      console.warn('No se pudo leer reservas.csv; se iniciará uno nuevo en memoria.', err);
-    }
-  }
-
-  if(!rows || rows.length === 0){
-    rows = [CSV_HEADERS];
-  }else{
-    const hasHeader = CSV_HEADERS.every((h,idx)=> (rows[0][idx] || '').trim().toLowerCase() === h.toLowerCase());
-    if(!hasHeader){
-      rows = [CSV_HEADERS, ...rows];
-    }
-  }
-
-  rows.push(reservationToCsvRow(record));
-  cachedCsvRows = rows;
-  const csvContent = serializeCsv(rows);
-  if(typeof localStorage !== 'undefined'){
-    try{
-      localStorage.setItem('reservasCsvCache', csvContent);
-    }catch(err){
-      console.warn('No se pudo guardar el CSV en localStorage', err);
-    }
-  }
-  console.log('reservas.csv actualizado en memoria:', csvContent);
-}
-
-function addReservationToState(record){
-  const dateStr = record.fecha;
-  const timeStr = normalizeTimeSlot(record.hora || record.horaInicio || record.horaFin);
-  if(!dateStr || !timeStr) return;
-  if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
-  reservationsByDate[dateStr].push(timeStr);
-  buildAvailabilityMap();
-  renderCalendar(currentMonthDate);
-  if(selectedDate === dateStr){
-    renderTimeOptionsForSelectedDay();
-  }
-}
-
-function showSuccessModal(){
-  const modal = document.getElementById('successModal');
-  if(modal) modal.style.display = 'flex';
-}
-
-function closeSuccessModal(){
-  const modal = document.getElementById('successModal');
-  if(modal) modal.style.display = 'none';
-}
-
-async function handleSubmit(){
+ async function handleSubmit(){
   if(!validateForm()){
     alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
     return;
   }
 
-  const reservationData = buildReservationRecord();
   openOutlook();
 
-  try{
-    await appendReservationToCsv(reservationData);
-    addReservationToState(reservationData);
-  }catch(err){
-    console.error('No se pudo actualizar el CSV local', err);
-    alert('No se pudo actualizar el CSV localmente. Revisa la consola para más detalles.');
-  }
-
-  showSuccessModal();
+  const reservationData = buildReservationRecord();
   console.log('Datos listos para almacenar en reservasdb:', reservationData);
 }
 
