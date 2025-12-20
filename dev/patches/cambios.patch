@@ -1,12 +1,9 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/dev/dev.html b/dev/dev.html
-index fd7685d3bd433e43d537ef7f4734d707fc5c0425..16e4711edee6f3098cb0f836808147a29e8fb52e 100644
+index 67b3c164386ed23a5ffa09707e25bebef527d2d6..8aa67def8279a7038e616eddbe153326efd6b1f6 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -714,51 +714,51 @@ body{
-         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
-         <textarea id="fallback-body" readonly></textarea>
-         <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+@@ -717,80 +717,119 @@ body{
        </div>
      </div>
    </div>
@@ -29,18 +26,22 @@ index fd7685d3bd433e43d537ef7f4734d707fc5c0425..16e4711edee6f3098cb0f836808147a2
  
  async function reservasdb(){
    try{
--    const response = await fetch('./data/reservas.csv');
-+    const response = await fetch('../data/reservas.csv');
+     const response = await fetch('../data/reservas.csv');
      if(!response.ok) throw new Error('No se pudo leer reservas.csv');
      const csvText = await response.text();
-     const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
-     if(lines.length === 0) return [];
+-    const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
+-    if(lines.length === 0) return [];
++    const rows = parseCsv(csvText);
++    if(rows.length === 0) return [];
  
-     const headers = lines[0].split(',').map(h=>h.trim());
-     return lines.slice(1).map(line=>{
-       const values = line.split(',').map(v=>v.trim());
+-    const headers = lines[0].split(',').map(h=>h.trim());
+-    return lines.slice(1).map(line=>{
+-      const values = line.split(',').map(v=>v.trim());
++    const headers = rows[0].map(h=>h.trim());
++    return rows.slice(1).map(values=>{
        const record = {};
-       headers.forEach((h,idx)=>{record[h]=values[idx]||'';});
+-      headers.forEach((h,idx)=>{record[h]=values[idx]||'';});
++      headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
        const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
  
        return {
@@ -56,6 +57,105 @@ index fd7685d3bd433e43d537ef7f4734d707fc5c0425..16e4711edee6f3098cb0f836808147a2
          invitadosDetalle: record.InvitadosJson || record.Invitados || '',
          tecnologias: techList
        };
+     });
+   }catch(err){
+     console.error('No se pudieron leer las reservas desde el CSV', err);
+     return [];
+   }
+ }
+ 
++// Parser simple para CSV con comillas y comas embebidas
++function parseCsv(text){
++  const rows = [];
++  let row = [];
++  let field = '';
++  let inQuotes = false;
++
++  for(let i=0; i<text.length; i++){
++    const char = text[i];
++    if(char === '"'){
++      const next = text[i+1];
++      if(inQuotes && next === '"'){
++        field += '"';
++        i++;
++      }else{
++        inQuotes = !inQuotes;
++      }
++    }else if(char === ',' && !inQuotes){
++      row.push(field);
++      field = '';
++    }else if((char === '\n' || char === '\r') && !inQuotes){
++      if(field.length>0 || row.length>0){
++        row.push(field);
++        rows.push(row);
++        row = [];
++        field = '';
++      }
++    }else{
++      field += char;
++    }
++  }
++
++  if(field.length>0 || row.length>0){
++    row.push(field);
++    rows.push(row);
++  }
++
++  return rows.filter(r=>r.some(v=>v.trim().length>0));
++}
++
+ function normalizeTimeSlot(timeStr){
+   if(!timeStr) return null;
+   const parts = timeStr.toString().trim().split(':');
+   const hour = parts[0];
+   if(hour === undefined) return null;
+   const hourNum = Number(hour);
+   if(Number.isNaN(hourNum)) return null;
+   return `${String(hourNum).padStart(2,'0')}:00`;
+ }
+ 
+ function addBlockedSlot(blockedSet,timeStr){
+   const normalized = normalizeTimeSlot(timeStr);
+   if(!normalized) return;
+   const hour = parseInt(normalized.split(':')[0],10);
+   if(Number.isNaN(hour)) return;
+   [hour-1,hour,hour+1].forEach(h=>{
+     const slot = `${String(h).padStart(2,'0')}:00`;
+     if(DISPLAY_HOURS.includes(slot)){
+       blockedSet.add(slot);
+     }
+   });
+ }
+ 
+ function buildAvailabilityMap(){
+   availabilityByDate = {};
+@@ -2544,26 +2583,25 @@ document.addEventListener('DOMContentLoaded',()=>{
+         : 'N/A';
+ 
+     document.title = version ? `SHOT DEV ${version}` : fallbackTitle;
+     badge.textContent = version
+       ? `DEV ${version} | Patch #${patchCounter} (${lastPatch})`
+       : fallbackBadge;
+   };
+ 
+   fetch('../version.json')
+     .then((response) => {
+       if (!response.ok) throw new Error('Network response was not ok');
+       return response.json();
+     })
+     .then((data) => {
+       applyVersionData(data);
+     })
+     .catch(() => {
+       document.title = fallbackTitle;
+       badge.textContent = fallbackBadge;
+     });
+ })();
+ </script>
+ 
+ </body>
+ </html>
+-
  
 EOF
 )
