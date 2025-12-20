@@ -1,16 +1,77 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/dev/dev.html b/dev/dev.html
-index 67b3c164386ed23a5ffa09707e25bebef527d2d6..8aa67def8279a7038e616eddbe153326efd6b1f6 100644
+index e4ad9c71ca748df32e4c44138e738e52d3732a8b..2ec46ccc25f54e4dc8c3d4a7df0f44d1215c755b 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -717,80 +717,119 @@ body{
-       </div>
+@@ -429,50 +429,54 @@ body{
+   background:rgba(0,0,0,.6);
+   display:flex;
+   align-items:center;
+   justify-content:center;
+   z-index:1500;
+   padding:20px;
+ }
+ .modal-content{
+   background:#1e2a3a;
+   border:1px solid #2d3e50;
+   border-radius:10px;
+   padding:24px;
+   max-width:420px;
+   width:100%;
+   box-shadow:0 12px 30px rgba(0,0,0,.45);
+   text-align:center;
+ }
+ .modal-content h3{
+   margin-bottom:12px;
+   color:#a8dadc;
+ }
+ .modal-content p{
+   margin-bottom:16px;
+   color:#e0e0e0;
+ }
++.modal-content .btn{
++  margin-top:4px;
++  width:100%;
++}
+ 
+ .node-group{
+   cursor:grab;
+   transition:opacity .2s;
+ }
+ .node-group:active{cursor:grabbing}
+ .node-body{stroke-width:2;}
+ .node-label{
+   font-size:11px;
+   font-weight:600;
+   fill:#e0e0e0;
+ }
+ .link-path{
+   fill:none;
+   stroke-width:2;
+   opacity:.7;
+   transition:opacity .2s,stroke-width .15s;
+ }
+ .link-data{stroke:#ff6b35;}
+ .link-mgmt{stroke:#4ecca3;stroke-dasharray:6 4;}
+ .link-span{stroke:#a8dadc;stroke-dasharray:3 3;}
+ .link-api{stroke:#e63946;stroke-dasharray:4 4;}
+ .dim-node{opacity:.18;}
+ .dim-link{opacity:.18;}
+ .highlight-node{
+@@ -750,57 +754,86 @@ body{
      </div>
    </div>
  
  </div>
  
- <div id="tooltip" class="tooltip"></div>
+   <div id="tooltip" class="tooltip"></div>
+   <div id="successModal" class="modal-overlay" style="display:none;">
+     <div class="modal-content">
+       <h3>Solicitud enviada</h3>
+       <p>Tu solicitud fue enviada. Revisa tu correo para la confirmación dentro de las próximas 24 horas.</p>
+       <button type="button" class="btn btn-primary" onclick="closeSuccessModal()">Cerrar</button>
+     </div>
+   </div>
  
  <script>
  const mailtoRecipient = 'showroom-itot@ejemplo.com';
@@ -23,25 +84,48 @@ index 67b3c164386ed23a5ffa09707e25bebef527d2d6..8aa67def8279a7038e616eddbe153326
  let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
  let availabilityByDate = {};
  let currentMonthDate = new Date();
++let cachedCsvRows = null;     // Matriz con los datos de reservas.csv (incluye encabezados)
  
  async function reservasdb(){
    try{
++    const cachedText = localStorage.getItem('reservasCsvCache');
++    if(cachedText){
++      const cachedRows = parseCsv(cachedText);
++      if(cachedRows.length>0){
++        cachedCsvRows = cachedRows;
++        const headers = cachedRows[0].map(h=>h.trim());
++        return cachedRows.slice(1).map(values=>{
++          const record = {};
++          headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
++          const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
++          return {
++            fecha: record.Fecha || record.fecha || record.date || '',
++            horaInicio: record.HoraInicio || record.Hora || record.hora || '',
++            horaFin: record.HoraFin || record.horafin || '',
++            estado: record.Estado || record.estado || '',
++            empresa: record.Empresa || record.empresa || '',
++            sector: record.Sector || record.sector || '',
++            numeroInvitados: record.NumeroInvitados || record.invitados || '',
++            comentarios: record.Comentarios || record.comentarios || '',
++            requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
++            invitadosDetalle: record.InvitadosJson || record.Invitados || '',
++            tecnologias: techList
++          };
++        });
++      }
++    }
++
      const response = await fetch('../data/reservas.csv');
      if(!response.ok) throw new Error('No se pudo leer reservas.csv');
      const csvText = await response.text();
--    const lines = csvText.trim().split(/\r?\n/).filter(l=>l.trim().length>0);
--    if(lines.length === 0) return [];
-+    const rows = parseCsv(csvText);
-+    if(rows.length === 0) return [];
+     const rows = parseCsv(csvText);
++    cachedCsvRows = rows;
+     if(rows.length === 0) return [];
  
--    const headers = lines[0].split(',').map(h=>h.trim());
--    return lines.slice(1).map(line=>{
--      const values = line.split(',').map(v=>v.trim());
-+    const headers = rows[0].map(h=>h.trim());
-+    return rows.slice(1).map(values=>{
+     const headers = rows[0].map(h=>h.trim());
+     return rows.slice(1).map(values=>{
        const record = {};
--      headers.forEach((h,idx)=>{record[h]=values[idx]||'';});
-+      headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
+       headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
        const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
  
        return {
@@ -61,101 +145,114 @@ index 67b3c164386ed23a5ffa09707e25bebef527d2d6..8aa67def8279a7038e616eddbe153326
    }catch(err){
      console.error('No se pudieron leer las reservas desde el CSV', err);
      return [];
-   }
+@@ -1398,78 +1431,85 @@ function reservationToCsvRow(record){
+     record.empresa || '',
+     record.sector || '',
+     record.numeroInvitados || '',
+     record.comentarios || '',
+     record.requiereEquipoLab ? '1' : '0',
+     invitadoJson,
+     tecnologiasList
+   ];
  }
  
-+// Parser simple para CSV con comillas y comas embebidas
-+function parseCsv(text){
-+  const rows = [];
-+  let row = [];
-+  let field = '';
-+  let inQuotes = false;
+ function escapeCsvField(value){
+   const str = (value ?? '').toString();
+   if(/[",\n]/.test(str)){
+     return '"' + str.replace(/"/g,'""') + '"';
+   }
+   return str;
+ }
+ 
+ function serializeCsv(rows){
+   return rows.map(r=>r.map(escapeCsvField).join(',')).join('\n');
+ }
+ 
+ async function appendReservationToCsv(record){
+   const headers = ['Fecha','HoraInicio','HoraFin','Estado','Empresa','Sector','NumeroInvitados','Comentarios','RequiereEquipoLab','InvitadosJson','Tecnologias'];
+   const csvUrl = '../data/reservas.csv';
+-  let rows = [headers];
+-
+-  try{
+-    const response = await fetch(csvUrl);
+-    if(response.ok){
+-      const text = await response.text();
+-      const parsed = parseCsv(text);
+-      if(parsed.length>0){
+-        const hasHeader = headers.every((h,idx)=> (parsed[0][idx] || '').trim().toLowerCase() === h.toLowerCase());
+-        rows = hasHeader ? parsed : [headers, ...parsed];
++  let rows = cachedCsvRows && cachedCsvRows.length ? cachedCsvRows.map(r=>[...r]) : null;
 +
-+  for(let i=0; i<text.length; i++){
-+    const char = text[i];
-+    if(char === '"'){
-+      const next = text[i+1];
-+      if(inQuotes && next === '"'){
-+        field += '"';
-+        i++;
-+      }else{
-+        inQuotes = !inQuotes;
-+      }
-+    }else if(char === ',' && !inQuotes){
-+      row.push(field);
-+      field = '';
-+    }else if((char === '\n' || char === '\r') && !inQuotes){
-+      if(field.length>0 || row.length>0){
-+        row.push(field);
-+        rows.push(row);
-+        row = [];
-+        field = '';
-+      }
-+    }else{
-+      field += char;
++  if(!rows){
++    try{
++      const response = await fetch(csvUrl);
++      if(response.ok){
++        const text = await response.text();
++        const parsed = parseCsv(text);
++        if(parsed.length>0){
++          rows = parsed;
++        }
+       }
++    }catch(err){
++      console.warn('No se pudo leer reservas.csv; se iniciará uno nuevo en memoria.', err);
 +    }
 +  }
 +
-+  if(field.length>0 || row.length>0){
-+    row.push(field);
-+    rows.push(row);
-+  }
-+
-+  return rows.filter(r=>r.some(v=>v.trim().length>0));
-+}
-+
- function normalizeTimeSlot(timeStr){
-   if(!timeStr) return null;
-   const parts = timeStr.toString().trim().split(':');
-   const hour = parts[0];
-   if(hour === undefined) return null;
-   const hourNum = Number(hour);
-   if(Number.isNaN(hourNum)) return null;
-   return `${String(hourNum).padStart(2,'0')}:00`;
- }
- 
- function addBlockedSlot(blockedSet,timeStr){
-   const normalized = normalizeTimeSlot(timeStr);
-   if(!normalized) return;
-   const hour = parseInt(normalized.split(':')[0],10);
-   if(Number.isNaN(hour)) return;
-   [hour-1,hour,hour+1].forEach(h=>{
-     const slot = `${String(h).padStart(2,'0')}:00`;
-     if(DISPLAY_HOURS.includes(slot)){
-       blockedSet.add(slot);
++  if(!rows || rows.length === 0){
++    rows = [headers];
++  }else{
++    const hasHeader = headers.every((h,idx)=> (rows[0][idx] || '').trim().toLowerCase() === h.toLowerCase());
++    if(!hasHeader){
++      rows = [headers, ...rows];
      }
-   });
+-  }catch(err){
+-    console.warn('No se pudo leer reservas.csv para anexar, se generará uno nuevo.', err);
+   }
+ 
+   rows.push(reservationToCsvRow(record));
++  cachedCsvRows = rows;
+   const csvContent = serializeCsv(rows);
+-  const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
+-  const url = URL.createObjectURL(blob);
+-  const link = document.createElement('a');
+-  link.href = url;
+-  link.download = 'reservas.csv';
+-  document.body.appendChild(link);
+-  link.click();
+-  document.body.removeChild(link);
+-  setTimeout(()=>URL.revokeObjectURL(url), 500);
+-  alert('Archivo reservas.csv actualizado. Sustituye el archivo en data/ para conservar el registro.');
++  try{
++    localStorage.setItem('reservasCsvCache', csvContent);
++  }catch(err){
++    console.warn('No se pudo guardar el CSV en localStorage', err);
++  }
++  console.log('reservas.csv actualizado en memoria:', csvContent);
  }
  
- function buildAvailabilityMap(){
-   availabilityByDate = {};
-@@ -2544,26 +2583,25 @@ document.addEventListener('DOMContentLoaded',()=>{
-         : 'N/A';
+ function addReservationToState(record){
+   const dateStr = record.fecha;
+   const timeStr = normalizeTimeSlot(record.hora || record.horaInicio || record.horaFin);
+   if(!dateStr || !timeStr) return;
+   if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
+   reservationsByDate[dateStr].push(timeStr);
+   buildAvailabilityMap();
+   renderCalendar(currentMonthDate);
+   if(selectedDate === dateStr){
+     renderTimeOptionsForSelectedDay();
+   }
+ }
  
-     document.title = version ? `SHOT DEV ${version}` : fallbackTitle;
-     badge.textContent = version
-       ? `DEV ${version} | Patch #${patchCounter} (${lastPatch})`
-       : fallbackBadge;
-   };
+ function showSuccessModal(){
+   const modal = document.getElementById('successModal');
+   if(modal) modal.style.display = 'flex';
+ }
  
-   fetch('../version.json')
-     .then((response) => {
-       if (!response.ok) throw new Error('Network response was not ok');
-       return response.json();
-     })
-     .then((data) => {
-       applyVersionData(data);
-     })
-     .catch(() => {
-       document.title = fallbackTitle;
-       badge.textContent = fallbackBadge;
-     });
- })();
- </script>
+ function closeSuccessModal(){
+   const modal = document.getElementById('successModal');
+   if(modal) modal.style.display = 'none';
+ }
  
- </body>
- </html>
--
  
 EOF
 )
