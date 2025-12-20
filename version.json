@@ -9,10 +9,10 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 5,
-    "lastPatch": "patch-dev-0005",
+    "patchCounter": 6,
+    "lastPatch": "patch-dev-0006",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0006"
+    "nextPatchName": "patch-0007"
   },
   "changelog": [
     {
@@ -56,6 +56,12 @@
       "file": "dev/patches/cambios.patch",
       "description": "Actualizacion ruta reservas.scv",
       "date": "2025-12-08 17:06:34"
+    },
+    {
+      "patch": "patch-dev-0006",
+      "file": "dev/patches/cambios.patch",
+      "description": "Se sustituyó el lector simple por uno que usa parseCsv para manejar comillas y comas embebidas al importar reservas.csv, manteniendo alineadas las columnas esperadas por el calendario.",
+      "date": "2025-12-20 06:49:09"
     }
   ],
   "metadata": {
