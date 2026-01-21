@@ -13,9 +13,6 @@ body{
   min-height:100vh;
   padding:20px;
 }
-:root{
-  --step2-panel-height: calc(100vh - 260px);
-}
 
 /* Nuevo layout general */
 .page-container{
@@ -56,7 +53,7 @@ body{
   display:grid;
   grid-template-columns:minmax(320px, 380px) 1fr;
   gap:16px;
-  align-items:stretch;
+  align-items:start;
 }
 
 /* Panel de opciones de tecnología */
@@ -66,13 +63,9 @@ body{
   border-radius:12px;
   box-shadow:0 8px 25px rgba(0,0,0,.4);
   border:1px solid #2d3e50;
-  min-height:0;
-}
-.tech-options-panel{
-  height:var(--step2-panel-height);
+  max-height:calc(100vh - 260px);
   overflow:auto;
-  min-height:520px;
-  max-height:980px;
+  min-height:0;
 }
 
 .form-group{margin-bottom:20px}
@@ -105,11 +98,6 @@ body{
 .form-group textarea{
   resize:vertical;
   min-height:80px;
-}
-.form-note{
-  margin-top:8px;
-  font-size:.85em;
-  color:#cfd8dc;
 }
 .step-panel{display:none;}
 .step-panel.active{display:block;}
@@ -461,7 +449,7 @@ body{
 }
 #diagram-container{
   width:100%;
-  height:var(--step2-panel-height);
+  height:calc(100vh - 260px);
   min-height:520px;
   max-height:980px;
   position:relative;
@@ -630,21 +618,13 @@ body{
       </select>
     </div>
     <div class="form-group">
-      <label for="foodOption">Alimentos *</label>
-      <select id="foodOption" required>
+      <label for="coffeeBreak">Receso de café *</label>
+      <select id="coffeeBreak" required>
         <option value="">Selecciona una opción</option>
-        <option value="Coffee break">Coffee break</option>
-        <option value="Box lunch">Box lunch</option>
-        <option value="Nada">Nada</option>
-        <option value="Personalizada">Personalizada</option>
+        <option value="Yes">Sí</option>
+        <option value="No">No</option>
       </select>
-      <span class="error-message" id="error-foodOption"></span>
-      <p class="form-note">Nota: Considerar 4 personas por parte del showroom.</p>
-    </div>
-    <div class="form-group" id="foodDetailGroup" style="display:none;">
-      <label for="foodDetail">Detalle (opción personalizada) *</label>
-      <input type="text" id="foodDetail" placeholder="Especifica la opción de alimentos…" disabled>
-      <span class="error-message" id="error-foodDetail"></span>
+      <span class="error-message" id="error-coffeeBreak"></span>
     </div>
     <div class="form-group" id="costCenterGroup">
       <label for="costCenter">Centro de costos *</label>
@@ -703,8 +683,7 @@ body{
       <input type="text" id="topNumber">
     </div>
 
-    <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Asistentes</h3>
-    <p class="form-note" style="margin-bottom:12px;">Aforo máximo: 12 personas.</p>
+    <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Asistentes (cliente + Scitum/Telmex)</h3>
     <div class="form-group">
       <label>Asistentes del cliente</label>
       <div id="clientAttendeesList"></div>
@@ -754,7 +733,7 @@ body{
     <div class="content-two-columns">
 
     <!-- OPCIONES DE TECNOLOGÍA -->
-    <div class="tech-options tech-options-panel">
+    <div class="tech-options">
       <form id="reservationForm">
         <div class="solutions-section">
           <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a demostrar *</h3>
@@ -943,7 +922,7 @@ const REQUIRED_FIELDS = [
   {id:'visitDate', label:'Fecha de visita'},
   {id:'visitTime', label:'Hora de visita'},
   {id:'companyName', label:'Empresa (cliente)'},
-  {id:'foodOption', label:'Alimentos'},
+  {id:'coffeeBreak', label:'Receso de café'},
   {id:'salesManager', label:'Gerente comercial'},
   {id:'accountExecutive', label:'Ejecutivo comercial'}
 ];
@@ -952,6 +931,7 @@ const EMPTY_VALUE = '—';
 const DISPLAY_MAPS = {
   visitType: {Physical:'Presencial', Virtual:'Virtual'},
   presentationLanguage: {Spanish:'Español', English:'Inglés'},
+  coffeeBreak: {Yes:'Sí', No:'No'},
   maturityLevel: {Low:'Bajo', Medium:'Medio', High:'Alto', Unknown:'Desconocido'}
 };
 
@@ -977,13 +957,10 @@ function showStep(stepId){
 }
 
 function toggleCostCenter(){
-  const foodOption = document.getElementById('foodOption');
+  const coffeeBreak = document.getElementById('coffeeBreak');
   const costCenterGroup = document.getElementById('costCenterGroup');
   const costCenter = document.getElementById('costCenter');
-  const foodDetailGroup = document.getElementById('foodDetailGroup');
-  const foodDetail = document.getElementById('foodDetail');
-  const needsCostCenter = foodOption && foodOption.value && foodOption.value !== 'Nada';
-  const needsFoodDetail = foodOption && foodOption.value === 'Personalizada';
+  const needsCostCenter = coffeeBreak && coffeeBreak.value === 'Yes';
   if(costCenterGroup){
     costCenterGroup.style.display = needsCostCenter ? 'block' : 'none';
   }
@@ -992,16 +969,6 @@ function toggleCostCenter(){
     costCenter.required = needsCostCenter;
     if(!needsCostCenter){
       costCenter.value = '';
-    }
-  }
-  if(foodDetailGroup){
-    foodDetailGroup.style.display = needsFoodDetail ? 'block' : 'none';
-  }
-  if(foodDetail){
-    foodDetail.disabled = !needsFoodDetail;
-    foodDetail.required = needsFoodDetail;
-    if(!needsFoodDetail){
-      foodDetail.value = '';
     }
   }
 }
@@ -1030,18 +997,11 @@ function validateStep1(){
     }
   });
 
-  const foodOption = document.getElementById('foodOption');
-  const foodDetail = document.getElementById('foodDetail');
+  const coffeeBreak = document.getElementById('coffeeBreak');
   const costCenter = document.getElementById('costCenter');
-  if(foodOption && foodOption.value === 'Personalizada'){
-    if(!foodDetail || !foodDetail.value.trim()){
-      setError('foodDetail', 'Este campo es obligatorio.');
-      isValid = false;
-    }
-  }
-  if(foodOption && foodOption.value && foodOption.value !== 'Nada'){
+  if(coffeeBreak && coffeeBreak.value === 'Yes'){
     if(!costCenter || !costCenter.value.trim()){
-      setError('costCenter', 'El centro de costos es obligatorio cuando hay alimentos.');
+      setError('costCenter', 'El centro de costos es obligatorio cuando hay coffee break.');
       isValid = false;
     }
   }
@@ -1108,8 +1068,7 @@ function getFormData(){
     visitDate: document.getElementById('visitDate')?.value || '',
     visitTime: document.getElementById('visitTime')?.value || '',
     presentationLanguage: document.getElementById('presentationLanguage')?.value || '',
-    foodOption: document.getElementById('foodOption')?.value || '',
-    foodDetail: document.getElementById('foodDetail')?.value || '',
+    coffeeBreak: document.getElementById('coffeeBreak')?.value || '',
     costCenter: document.getElementById('costCenter')?.value || '',
     companyName: document.getElementById('companyName')?.value || '',
     sector: document.getElementById('sector')?.value || '',
@@ -1170,11 +1129,8 @@ function populateSummary(){
       {label:'Fecha de visita', value: formatValue(data.visitDate)},
       {label:'Hora de visita', value: formatValue(data.visitTime)},
       {label:'Idioma de presentación', value: formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))},
-      {label:'Alimentos', value: formatValue(data.foodOption)},
-      ...(data.foodOption === 'Personalizada'
-        ? [{label:'Detalle', value: formatValue(data.foodDetail)}]
-        : []),
-      {label:'Centro de costos', value: formatValue(data.foodOption && data.foodOption !== 'Nada' ? data.costCenter : '')}
+      {label:'Receso de café', value: formatValue(formatChoice(data.coffeeBreak, DISPLAY_MAPS.coffeeBreak))},
+      {label:'Centro de costos', value: formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}
     ]),
     renderSummarySection('B) Datos del cliente', [
       {label:'Empresa (cliente)', value: formatValue(data.companyName)},
@@ -1193,7 +1149,7 @@ function populateSummary(){
     ]),
     `
       <div class="summary-section">
-        <h3>D) Asistentes</h3>
+        <h3>D) Asistentes (cliente + Scitum/Telmex)</h3>
         <strong>Asistentes del cliente</strong>
         <ul class="summary-list">${formatAttendees(data.clientAttendees, true)}</ul>
         <strong>Asistentes de Scitum/Telmex</strong>
@@ -1239,11 +1195,8 @@ function buildMailto(){
   body += `- Fecha de visita: ${formatValue(data.visitDate)}\n`;
   body += `- Hora de visita: ${formatValue(data.visitTime)}\n`;
   body += `- Idioma de presentación: ${formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))}\n`;
-  body += `- Alimentos: ${formatValue(data.foodOption)}\n`;
-  if(data.foodOption === 'Personalizada'){
-    body += `- Detalle: ${formatValue(data.foodDetail)}\n`;
-  }
-  body += `- Centro de costos: ${formatValue(data.foodOption && data.foodOption !== 'Nada' ? data.costCenter : '')}\n\n`;
+  body += `- Receso de café: ${formatValue(formatChoice(data.coffeeBreak, DISPLAY_MAPS.coffeeBreak))}\n`;
+  body += `- Centro de costos: ${formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}\n\n`;
 
   body += `B) Datos del cliente\n`;
   body += `- Empresa (cliente): ${formatValue(data.companyName)}\n`;
@@ -2641,9 +2594,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   addAttendee('clientAttendeesList', true);
   addAttendee('internalAttendeesList', false);
 
-  const foodOption = document.getElementById('foodOption');
-  if(foodOption){
-    foodOption.addEventListener('change', toggleCostCenter);
+  const coffeeBreak = document.getElementById('coffeeBreak');
+  if(coffeeBreak){
+    coffeeBreak.addEventListener('change', toggleCostCenter);
   }
 
   const addClient = document.getElementById('addClientAttendee');
