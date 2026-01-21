@@ -9,10 +9,10 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 8,
-    "lastPatch": "patch-dev-0008",
+    "patchCounter": 9,
+    "lastPatch": "patch-dev-0009",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0009"
+    "nextPatchName": "patch-0010"
   },
   "changelog": [
     {
@@ -74,6 +74,12 @@
       "file": "dev/patches/cambios.patch",
       "description": "nuevo formulario",
       "date": "2026-01-21 19:14:11"
+    },
+    {
+      "patch": "patch-dev-0009",
+      "file": "dev/patches/cambios.patch",
+      "description": "se modificio la UI a español, se bloqueron las tecnologias aun no disponibles, y la direccion de correo",
+      "date": "2026-01-21 20:23:09"
     }
   ],
   "metadata": {

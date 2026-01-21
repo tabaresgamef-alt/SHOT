@@ -343,17 +343,6 @@ body{
   color:#a8dadc;
   font-size:.9em;
 }
-.disabled-option{
-  opacity:.45;
-  filter:grayscale(0.7);
-  pointer-events:none;
-}
-.disabled-option label{
-  cursor:not-allowed;
-}
-.disabled-option input{
-  cursor:not-allowed;
-}
 
 /* Botones generales */
 .btn{
@@ -438,11 +427,6 @@ body{
   font-size:.85em;
   color:#a8dadc;
   margin-bottom:10px;
-}
-.diagram-note{
-  margin-top:12px;
-  font-size:.85em;
-  color:#cfd8dc;
 }
 #diagram-container{
   width:100%;
@@ -588,56 +572,56 @@ body{
   <div class="form-panel step-panel active" id="step-1">
     <h2>Paso 1 de 3 · Formulario de visita</h2>
 
-    <h3 style="margin-bottom:12px;color:#ff6b35;">A) Logística de la visita</h3>
+    <h3 style="margin-bottom:12px;color:#ff6b35;">A) Visit logistics</h3>
     <div class="form-group">
-      <label for="visitType">Tipo de visita (Presencial / Virtual)</label>
+      <label for="visitType">Visit type (Physical / Virtual)</label>
       <select id="visitType">
         <option value="">Selecciona una opción</option>
-        <option value="Physical">Presencial</option>
+        <option value="Physical">Physical</option>
         <option value="Virtual">Virtual</option>
       </select>
     </div>
     <div class="form-group">
-      <label for="visitDate">Fecha de visita *</label>
+      <label for="visitDate">Visit date *</label>
       <input type="date" id="visitDate" required>
       <span class="error-message" id="error-visitDate"></span>
     </div>
     <div class="form-group">
-      <label for="visitTime">Hora de visita *</label>
+      <label for="visitTime">Visit time *</label>
       <input type="time" id="visitTime" required>
       <span class="error-message" id="error-visitTime"></span>
     </div>
     <div class="form-group">
-      <label for="presentationLanguage">Idioma de presentación (Español / Inglés)</label>
+      <label for="presentationLanguage">Presentation language (Spanish / English)</label>
       <select id="presentationLanguage">
         <option value="">Selecciona una opción</option>
-        <option value="Spanish">Español</option>
-        <option value="English">Inglés</option>
+        <option value="Spanish">Spanish</option>
+        <option value="English">English</option>
       </select>
     </div>
     <div class="form-group">
-      <label for="coffeeBreak">Receso de café *</label>
+      <label for="coffeeBreak">Coffee break *</label>
       <select id="coffeeBreak" required>
         <option value="">Selecciona una opción</option>
-        <option value="Yes">Sí</option>
+        <option value="Yes">Yes</option>
         <option value="No">No</option>
       </select>
       <span class="error-message" id="error-coffeeBreak"></span>
     </div>
     <div class="form-group" id="costCenterGroup">
-      <label for="costCenter">Centro de costos *</label>
+      <label for="costCenter">Cost center *</label>
       <input type="text" id="costCenter" placeholder="Centro de costos" disabled>
       <span class="error-message" id="error-costCenter"></span>
     </div>
 
-    <h3 style="margin:20px 0 12px;color:#ff6b35;">B) Datos del cliente</h3>
+    <h3 style="margin:20px 0 12px;color:#ff6b35;">B) Customer data</h3>
     <div class="form-group">
-      <label for="companyName">Empresa (cliente) *</label>
+      <label for="companyName">Customer company name *</label>
       <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing" required>
       <span class="error-message" id="error-companyName"></span>
     </div>
     <div class="form-group">
-      <label for="sector">Sector / Industria</label>
+      <label for="sector">Sector/Industry</label>
       <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
     </div>
     <div class="form-group">
@@ -645,75 +629,75 @@ body{
       <input type="text" id="subsector" placeholder="Ej: Componentes, Alimentos, Retail">
     </div>
     <div class="form-group">
-      <label for="sitesCount">Número de sitios / plantas</label>
+      <label for="sitesCount">Number of sites/plants</label>
       <input type="text" id="sitesCount" placeholder="Ej: 3 plantas, 12 sitios">
     </div>
     <div class="form-group">
-      <label for="annualRevenue">Facturación anual (MXN)</label>
+      <label for="annualRevenue">Annual revenue (MXN)</label>
       <input type="text" id="annualRevenue" placeholder="MXN">
     </div>
 
-    <h3 style="margin:20px 0 12px;color:#ff6b35;">C) Datos comerciales internos</h3>
+    <h3 style="margin:20px 0 12px;color:#ff6b35;">C) Commercial internal data</h3>
     <div class="form-group">
-      <label for="salesManager">Gerente comercial *</label>
+      <label for="salesManager">Sales manager *</label>
       <input type="text" id="salesManager" required>
       <span class="error-message" id="error-salesManager"></span>
     </div>
     <div class="form-group">
-      <label for="accountExecutive">Ejecutivo comercial *</label>
+      <label for="accountExecutive">Account executive *</label>
       <input type="text" id="accountExecutive" required>
       <span class="error-message" id="error-accountExecutive"></span>
     </div>
     <div class="form-group">
-      <label for="corporateCuc">CUC corporativo</label>
+      <label for="corporateCuc">Corporate CUC</label>
       <input type="text" id="corporateCuc">
     </div>
     <div class="form-group">
-      <label for="opportunityStatus">Estatus de la oportunidad</label>
+      <label for="opportunityStatus">Opportunity status</label>
       <input type="text" id="opportunityStatus">
     </div>
     <div class="form-group">
-      <label for="opportunityProject">Nombre o ID de oportunidad / proyecto</label>
+      <label for="opportunityProject">Opportunity/Project name or ID</label>
       <input type="text" id="opportunityProject">
     </div>
     <div class="form-group">
-      <label for="topNumber">Número TOP</label>
+      <label for="topNumber">TOP number</label>
       <input type="text" id="topNumber">
     </div>
 
-    <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Asistentes (cliente + Scitum/Telmex)</h3>
+    <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Attendees (client + Scitum/Telmex)</h3>
     <div class="form-group">
-      <label>Asistentes del cliente</label>
+      <label>Client attendees</label>
       <div id="clientAttendeesList"></div>
       <button type="button" class="btn-guest-add" id="addClientAttendee">Agregar invitado</button>
     </div>
     <div class="form-group">
-      <label>Asistentes de Scitum/Telmex</label>
+      <label>Scitum/Telmex attendees</label>
       <div id="internalAttendeesList"></div>
       <button type="button" class="btn-guest-add" id="addInternalAttendee">Agregar invitado</button>
     </div>
 
-    <h3 style="margin:20px 0 12px;color:#ff6b35;">E) Contexto estratégico</h3>
+    <h3 style="margin:20px 0 12px;color:#ff6b35;">E) Strategic context</h3>
     <div class="form-group">
-      <label for="visitObjective">Objetivo de la visita</label>
+      <label for="visitObjective">Visit objective</label>
       <textarea id="visitObjective"></textarea>
     </div>
     <div class="form-group">
-      <label for="customerDescription">Descripción del cliente, procesos críticos y operación</label>
+      <label for="customerDescription">Customer description, critical processes, and operation</label>
       <textarea id="customerDescription"></textarea>
     </div>
     <div class="form-group">
-      <label for="mainProblem">Problema principal a resolver</label>
+      <label for="mainProblem">Main problem to solve</label>
       <textarea id="mainProblem"></textarea>
     </div>
     <div class="form-group">
-      <label for="maturityLevel">Nivel de madurez en ciberseguridad</label>
+      <label for="maturityLevel">Cybersecurity maturity level</label>
       <select id="maturityLevel">
         <option value="">Selecciona una opción</option>
-        <option value="Low">Bajo</option>
-        <option value="Medium">Medio</option>
-        <option value="High">Alto</option>
-        <option value="Unknown">Desconocido</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+        <option value="Unknown">Unknown</option>
       </select>
     </div>
 
@@ -726,7 +710,7 @@ body{
 
   <!-- STEP 2: DIAGRAMA + SOLUCIONES -->
   <div class="step-panel" id="step-2">
-    <h2 style="margin-bottom:20px;">Paso 2 de 3 · Diagrama y selección de soluciones</h2>
+    <h2 style="margin-bottom:20px;">Paso 2 de 3 · Diagrama y soluciones</h2>
     <!-- DOS COLUMNAS: TECNOLOGÍAS + DIAGRAMA -->
     <div class="content-two-columns">
 
@@ -734,7 +718,7 @@ body{
     <div class="tech-options">
       <form id="reservationForm">
         <div class="solutions-section">
-          <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a demostrar *</h3>
+          <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a Demostrar *</h3>
 
           <div class="solution-item">
             <div class="solution-checkbox">
@@ -746,16 +730,16 @@ body{
                 <input type="radio" id="fw-fortinet" name="fw-ot-brand" value="Fortinet">
                 <label for="fw-fortinet">Fortinet</label>
               </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point" disabled>
+              <div class="brand-option">
+                <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point">
                 <label for="fw-checkpoint">Check Point</label>
               </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks" disabled>
+              <div class="brand-option">
+                <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks">
                 <label for="fw-txone">TXOne Networks</label>
               </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="fw-paloalto" name="fw-ot-brand" value="Palo Alto Networks" disabled>
+              <div class="brand-option">
+                <input type="radio" id="fw-paloalto" name="fw-ot-brand" value="Palo Alto Networks">
                 <label for="fw-paloalto">Palo Alto Networks</label>
               </div>
             </div>
@@ -768,15 +752,15 @@ body{
             </div>
             <div class="brands-group" id="brands-visibility">
               <div class="brand-option">
+                <input type="radio" id="vis-nozomi" name="visibility-brand" value="Nozomi">
+                <label for="vis-nozomi">Nozomi Networks</label>
+              </div>
+              <div class="brand-option">
                 <input type="radio" id="vis-tenable" name="visibility-brand" value="Tenable OT">
                 <label for="vis-tenable">Tenable OT</label>
               </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="vis-nozomi" name="visibility-brand" value="Nozomi" disabled>
-                <label for="vis-nozomi">Nozomi Networks</label>
-              </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="vis-claroty" name="visibility-brand" value="Claroty" disabled>
+              <div class="brand-option">
+                <input type="radio" id="vis-claroty" name="visibility-brand" value="Claroty">
                 <label for="vis-claroty">Claroty</label>
               </div>
             </div>
@@ -785,19 +769,19 @@ body{
           <div class="solution-item">
             <div class="solution-checkbox">
               <input type="checkbox" id="sol-vuln" onchange="toggleBrands('vuln')">
-              <label for="sol-vuln">Gestión de Vulnerabilidades OT</label>
+              <label for="sol-vuln">Gestión de vulnerabilidades OT</label>
             </div>
             <div class="brands-group" id="brands-vuln">
+              <div class="brand-option">
+                <input type="radio" id="vuln-nozomi" name="vuln-brand" value="Nozomi">
+                <label for="vuln-nozomi">Nozomi Networks</label>
+              </div>
               <div class="brand-option">
                 <input type="radio" id="vuln-tenable" name="vuln-brand" value="Tenable OT">
                 <label for="vuln-tenable">Tenable OT</label>
               </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="vuln-nozomi" name="vuln-brand" value="Nozomi" disabled>
-                <label for="vuln-nozomi">Nozomi Networks</label>
-              </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="vuln-claroty" name="vuln-brand" value="Claroty" disabled>
+              <div class="brand-option">
+                <input type="radio" id="vuln-claroty" name="vuln-brand" value="Claroty">
                 <label for="vuln-claroty">Claroty</label>
               </div>
             </div>
@@ -806,7 +790,7 @@ body{
           <div class="solution-item">
             <div class="solution-checkbox">
               <input type="checkbox" id="sol-ips" onchange="toggleBrands('ips')">
-              <label for="sol-ips">IPS (Sistema de Prevención de Intrusiones)</label>
+              <label for="sol-ips">IPS (Intrusion Prevention System)</label>
             </div>
             <div class="brands-group" id="brands-ips">
               <div class="brand-option">
@@ -817,21 +801,21 @@ body{
           </div>
 
           <div class="solution-item">
-            <div class="solution-checkbox disabled-option" aria-disabled="true">
-              <input type="checkbox" id="sol-access" onchange="toggleBrands('access')" disabled>
+            <div class="solution-checkbox">
+              <input type="checkbox" id="sol-access" onchange="toggleBrands('access')">
               <label for="sol-access">Acceso Seguro / ZTNA</label>
             </div>
-            <div class="brands-group active disabled-option" id="brands-access" aria-disabled="true">
+            <div class="brands-group" id="brands-access">
               <div class="brand-option">
-                <input type="radio" id="access-cyolo" name="access-brand" value="Cyolo" disabled>
+                <input type="radio" id="access-cyolo" name="access-brand" value="Cyolo">
                 <label for="access-cyolo">Cyolo</label>
               </div>
               <div class="brand-option">
-                <input type="radio" id="access-claroty" name="access-brand" value="Claroty" disabled>
+                <input type="radio" id="access-claroty" name="access-brand" value="Claroty">
                 <label for="access-claroty">Claroty</label>
               </div>
               <div class="brand-option">
-                <input type="radio" id="access-fortinet" name="access-brand" value="Fortinet" disabled>
+                <input type="radio" id="access-fortinet" name="access-brand" value="Fortinet">
                 <label for="access-fortinet">Fortinet</label>
               </div>
             </div>
@@ -844,12 +828,12 @@ body{
             </div>
             <div class="brands-group" id="brands-deception">
               <div class="brand-option">
+                <input type="radio" id="dec-fortinet" name="deception-brand" value="Fortinet">
+                <label for="dec-fortinet">Fortinet</label>
+              </div>
+              <div class="brand-option">
                 <input type="radio" id="dec-zscaler" name="deception-brand" value="Zscaler">
                 <label for="dec-zscaler">Zscaler</label>
-              </div>
-              <div class="brand-option disabled-option" aria-disabled="true">
-                <input type="radio" id="dec-fortinet" name="deception-brand" value="Fortinet" disabled>
-                <label for="dec-fortinet">Fortinet</label>
               </div>
             </div>
           </div>
@@ -876,7 +860,6 @@ body{
       <h2>Diagrama de la arquitectura de la maqueta</h2>
       <p>Pasa el cursor sobre los componentes o líneas para ver detalles. Los componentes conectados se resaltan automáticamente.</p>
       <div id="diagram-container"></div>
-      <p class="diagram-note">Nota: Las tecnologías actualmente deshabilitadas se irán habilitando progresivamente conforme se avance en su implementación dentro de la maqueta del showroom.</p>
     </div>
 
     </div>
@@ -895,9 +878,9 @@ body{
 
     <div class="footer-actions">
       <div class="footer-actions-inner" style="flex-direction:row;justify-content:space-between;">
-        <button type="button" class="btn" id="backToStep1FromSummary">Volver a editar el formulario</button>
-        <button type="button" class="btn" id="backToStep2FromSummary">Volver al diagrama</button>
-        <button type="button" class="btn btn-primary" id="sendEmail">Enviar solicitud</button>
+        <button type="button" class="btn" id="backToStep1FromSummary">Back to Edit Form</button>
+        <button type="button" class="btn" id="backToStep2FromSummary">Back to Diagram</button>
+        <button type="button" class="btn btn-primary" id="sendEmail">Send Email</button>
       </div>
     </div>
 
@@ -914,33 +897,22 @@ body{
 
 <div id="tooltip" class="tooltip"></div>
 <script>
-const mailtoRecipient = 'Visitas_Showroom_OT@scitum.com.mx';
+const mailtoRecipient = 'showroom-itot@ejemplo.com';
 const STEP_IDS = ['step-1','step-2','step-3'];
 const REQUIRED_FIELDS = [
-  {id:'visitDate', label:'Fecha de visita'},
-  {id:'visitTime', label:'Hora de visita'},
-  {id:'companyName', label:'Empresa (cliente)'},
-  {id:'coffeeBreak', label:'Receso de café'},
-  {id:'salesManager', label:'Gerente comercial'},
-  {id:'accountExecutive', label:'Ejecutivo comercial'}
+  {id:'visitDate', label:'Visit date'},
+  {id:'visitTime', label:'Visit time'},
+  {id:'companyName', label:'Customer company name'},
+  {id:'coffeeBreak', label:'Coffee break'},
+  {id:'salesManager', label:'Sales manager'},
+  {id:'accountExecutive', label:'Account executive'}
 ];
 
 const EMPTY_VALUE = '—';
-const DISPLAY_MAPS = {
-  visitType: {Physical:'Presencial', Virtual:'Virtual'},
-  presentationLanguage: {Spanish:'Español', English:'Inglés'},
-  coffeeBreak: {Yes:'Sí', No:'No'},
-  maturityLevel: {Low:'Bajo', Medium:'Medio', High:'Alto', Unknown:'Desconocido'}
-};
 
 function formatValue(value){
   const trimmed = value ? value.toString().trim() : '';
   return trimmed.length ? trimmed : EMPTY_VALUE;
-}
-
-function formatChoice(value, map){
-  if(!value) return '';
-  return map && map[value] ? map[value] : value;
 }
 
 function showStep(stepId){
@@ -1026,7 +998,7 @@ function createAttendeeRow({withEmail = false} = {}){
   if(withEmail){
     emailInput = document.createElement('input');
     emailInput.type = 'email';
-    emailInput.placeholder = 'Correo electrónico';
+    emailInput.placeholder = 'Email';
     row.appendChild(emailInput);
   }
 
@@ -1122,47 +1094,47 @@ function populateSummary(){
   if(!summary) return;
 
   const sectionsHtml = [
-    renderSummarySection('A) Logística de la visita', [
-      {label:'Tipo de visita', value: formatValue(formatChoice(data.visitType, DISPLAY_MAPS.visitType))},
-      {label:'Fecha de visita', value: formatValue(data.visitDate)},
-      {label:'Hora de visita', value: formatValue(data.visitTime)},
-      {label:'Idioma de presentación', value: formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))},
-      {label:'Receso de café', value: formatValue(formatChoice(data.coffeeBreak, DISPLAY_MAPS.coffeeBreak))},
-      {label:'Centro de costos', value: formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}
+    renderSummarySection('A) Visit logistics', [
+      {label:'Visit type', value: formatValue(data.visitType)},
+      {label:'Visit date', value: formatValue(data.visitDate)},
+      {label:'Visit time', value: formatValue(data.visitTime)},
+      {label:'Presentation language', value: formatValue(data.presentationLanguage)},
+      {label:'Coffee break', value: formatValue(data.coffeeBreak)},
+      {label:'Cost center', value: formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}
     ]),
-    renderSummarySection('B) Datos del cliente', [
-      {label:'Empresa (cliente)', value: formatValue(data.companyName)},
-      {label:'Sector / Industria', value: formatValue(data.sector)},
+    renderSummarySection('B) Customer data', [
+      {label:'Customer company name', value: formatValue(data.companyName)},
+      {label:'Sector/Industry', value: formatValue(data.sector)},
       {label:'Subsector', value: formatValue(data.subsector)},
-      {label:'Número de sitios / plantas', value: formatValue(data.sitesCount)},
-      {label:'Facturación anual (MXN)', value: formatValue(data.annualRevenue)}
+      {label:'Number of sites/plants', value: formatValue(data.sitesCount)},
+      {label:'Annual revenue (MXN)', value: formatValue(data.annualRevenue)}
     ]),
-    renderSummarySection('C) Datos comerciales internos', [
-      {label:'Gerente comercial', value: formatValue(data.salesManager)},
-      {label:'Ejecutivo comercial', value: formatValue(data.accountExecutive)},
-      {label:'CUC corporativo', value: formatValue(data.corporateCuc)},
-      {label:'Estatus de la oportunidad', value: formatValue(data.opportunityStatus)},
-      {label:'Nombre o ID de oportunidad / proyecto', value: formatValue(data.opportunityProject)},
-      {label:'Número TOP', value: formatValue(data.topNumber)}
+    renderSummarySection('C) Commercial internal data', [
+      {label:'Sales manager', value: formatValue(data.salesManager)},
+      {label:'Account executive', value: formatValue(data.accountExecutive)},
+      {label:'Corporate CUC', value: formatValue(data.corporateCuc)},
+      {label:'Opportunity status', value: formatValue(data.opportunityStatus)},
+      {label:'Opportunity/Project name or ID', value: formatValue(data.opportunityProject)},
+      {label:'TOP number', value: formatValue(data.topNumber)}
     ]),
     `
       <div class="summary-section">
-        <h3>D) Asistentes (cliente + Scitum/Telmex)</h3>
-        <strong>Asistentes del cliente</strong>
+        <h3>D) Attendees (client + Scitum/Telmex)</h3>
+        <strong>Client attendees</strong>
         <ul class="summary-list">${formatAttendees(data.clientAttendees, true)}</ul>
-        <strong>Asistentes de Scitum/Telmex</strong>
+        <strong>Scitum/Telmex attendees</strong>
         <ul class="summary-list">${formatAttendees(data.internalAttendees, false)}</ul>
       </div>
     `,
-    renderSummarySection('E) Contexto estratégico', [
-      {label:'Objetivo de la visita', value: formatValue(data.visitObjective)},
-      {label:'Descripción del cliente, procesos críticos y operación', value: formatValue(data.customerDescription)},
-      {label:'Problema principal a resolver', value: formatValue(data.mainProblem)},
-      {label:'Nivel de madurez en ciberseguridad', value: formatValue(formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel))}
+    renderSummarySection('E) Strategic context', [
+      {label:'Visit objective', value: formatValue(data.visitObjective)},
+      {label:'Customer description, critical processes, and operation', value: formatValue(data.customerDescription)},
+      {label:'Main problem to solve', value: formatValue(data.mainProblem)},
+      {label:'Cybersecurity maturity level', value: formatValue(data.maturityLevel)}
     ]),
     `
       <div class="summary-section">
-        <h3>F) Diagrama / Soluciones seleccionadas</h3>
+        <h3>F) Diagram / Selected solutions</h3>
         <ul class="summary-list">
           ${solutions.length ? solutions.map((s, idx)=>`<li>${idx+1}. ${s.name} — ${formatValue(s.brand)}</li>`).join('') : `<li>${EMPTY_VALUE}</li>`}
         </ul>
@@ -1186,33 +1158,33 @@ function buildMailto(){
   const subjectDate = formatValue(data.visitDate);
   const subjectTime = formatValue(data.visitTime);
 
-  const subject = `Solicitud de Visita Showroom OT – ${subjectCompany} – ${subjectDate} ${subjectTime}`;
+  const subject = `Showroom Visit Request - ${subjectCompany} - ${subjectDate} ${subjectTime}`;
 
-  let body = `A) Logística de la visita\n`;
-  body += `- Tipo de visita: ${formatValue(formatChoice(data.visitType, DISPLAY_MAPS.visitType))}\n`;
-  body += `- Fecha de visita: ${formatValue(data.visitDate)}\n`;
-  body += `- Hora de visita: ${formatValue(data.visitTime)}\n`;
-  body += `- Idioma de presentación: ${formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))}\n`;
-  body += `- Receso de café: ${formatValue(formatChoice(data.coffeeBreak, DISPLAY_MAPS.coffeeBreak))}\n`;
-  body += `- Centro de costos: ${formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}\n\n`;
+  let body = `A) Visit logistics\n`;
+  body += `- Visit type: ${formatValue(data.visitType)}\n`;
+  body += `- Visit date: ${formatValue(data.visitDate)}\n`;
+  body += `- Visit time: ${formatValue(data.visitTime)}\n`;
+  body += `- Presentation language: ${formatValue(data.presentationLanguage)}\n`;
+  body += `- Coffee break: ${formatValue(data.coffeeBreak)}\n`;
+  body += `- Cost center: ${formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}\n\n`;
 
-  body += `B) Datos del cliente\n`;
-  body += `- Empresa (cliente): ${formatValue(data.companyName)}\n`;
-  body += `- Sector / Industria: ${formatValue(data.sector)}\n`;
+  body += `B) Customer data\n`;
+  body += `- Customer company name: ${formatValue(data.companyName)}\n`;
+  body += `- Sector/Industry: ${formatValue(data.sector)}\n`;
   body += `- Subsector: ${formatValue(data.subsector)}\n`;
-  body += `- Número de sitios / plantas: ${formatValue(data.sitesCount)}\n`;
-  body += `- Facturación anual (MXN): ${formatValue(data.annualRevenue)}\n\n`;
+  body += `- Number of sites/plants: ${formatValue(data.sitesCount)}\n`;
+  body += `- Annual revenue (MXN): ${formatValue(data.annualRevenue)}\n\n`;
 
-  body += `C) Datos comerciales internos\n`;
-  body += `- Gerente comercial: ${formatValue(data.salesManager)}\n`;
-  body += `- Ejecutivo comercial: ${formatValue(data.accountExecutive)}\n`;
-  body += `- CUC corporativo: ${formatValue(data.corporateCuc)}\n`;
-  body += `- Estatus de la oportunidad: ${formatValue(data.opportunityStatus)}\n`;
-  body += `- Nombre o ID de oportunidad / proyecto: ${formatValue(data.opportunityProject)}\n`;
-  body += `- Número TOP: ${formatValue(data.topNumber)}\n\n`;
+  body += `C) Commercial internal data\n`;
+  body += `- Sales manager: ${formatValue(data.salesManager)}\n`;
+  body += `- Account executive: ${formatValue(data.accountExecutive)}\n`;
+  body += `- Corporate CUC: ${formatValue(data.corporateCuc)}\n`;
+  body += `- Opportunity status: ${formatValue(data.opportunityStatus)}\n`;
+  body += `- Opportunity/Project name or ID: ${formatValue(data.opportunityProject)}\n`;
+  body += `- TOP number: ${formatValue(data.topNumber)}\n\n`;
 
-  body += `D) Asistentes (cliente + Scitum/Telmex)\n`;
-  body += `Asistentes del cliente:\n`;
+  body += `D) Attendees (client + Scitum/Telmex)\n`;
+  body += `Client attendees:\n`;
   if(data.clientAttendees.length){
     data.clientAttendees.forEach((attendee, idx)=>{
       body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)} / ${formatValue(attendee.email)}\n`;
@@ -1220,7 +1192,7 @@ function buildMailto(){
   }else{
     body += `- ${EMPTY_VALUE}\n`;
   }
-  body += `Asistentes de Scitum/Telmex:\n`;
+  body += `Scitum/Telmex attendees:\n`;
   if(data.internalAttendees.length){
     data.internalAttendees.forEach((attendee, idx)=>{
       body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)}\n`;
@@ -1230,13 +1202,13 @@ function buildMailto(){
   }
   body += `\n`;
 
-  body += `E) Contexto estratégico\n`;
-  body += `- Objetivo de la visita: ${formatValue(data.visitObjective)}\n`;
-  body += `- Descripción del cliente, procesos críticos y operación: ${formatValue(data.customerDescription)}\n`;
-  body += `- Problema principal a resolver: ${formatValue(data.mainProblem)}\n`;
-  body += `- Nivel de madurez en ciberseguridad: ${formatValue(formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel))}\n\n`;
+  body += `E) Strategic context\n`;
+  body += `- Visit objective: ${formatValue(data.visitObjective)}\n`;
+  body += `- Customer description, critical processes, and operation: ${formatValue(data.customerDescription)}\n`;
+  body += `- Main problem to solve: ${formatValue(data.mainProblem)}\n`;
+  body += `- Cybersecurity maturity level: ${formatValue(data.maturityLevel)}\n\n`;
 
-  body += `F) Diagrama / Soluciones seleccionadas\n`;
+  body += `F) Diagram / Selected solutions\n`;
   if(solutions.length){
     solutions.forEach((solution, idx)=>{
       body += `- ${idx+1}. ${solution.name} — ${formatValue(solution.brand)}\n`;
@@ -1266,12 +1238,12 @@ function sendEmail(){
 const LAYER_HEIGHT = 130;
 const purdueLayers = [
   {level:5, label:'', height:Math.round(LAYER_HEIGHT*1.3)},
-  {level:4, label:'Nivel 4 – Red Empresarial', height:LAYER_HEIGHT},
-  {level:3.5, label:'Nivel 3.5 – DMZ IT/OT', height:LAYER_HEIGHT},
-  {level:3, label:'Nivel 3 – Operaciones del Sitio', height:LAYER_HEIGHT},
-  {level:2, label:'Nivel 2 – Control de Supervisión', height:LAYER_HEIGHT},
-  {level:1, label:'Nivel 1 – Control Básico', height:LAYER_HEIGHT},
-  {level:0, label:'Nivel 0 – Proceso Físico', height:LAYER_HEIGHT}
+  {level:4, label:'Nivel 4 – Enterprise Network', height:LAYER_HEIGHT},
+  {level:3.5, label:'Nivel 3.5 – IT/OT DMZ', height:LAYER_HEIGHT},
+  {level:3, label:'Nivel 3 – Site Operations', height:LAYER_HEIGHT},
+  {level:2, label:'Nivel 2 – Area Supervisory Control', height:LAYER_HEIGHT},
+  {level:1, label:'Nivel 1 – Basic Control', height:LAYER_HEIGHT},
+  {level:0, label:'Nivel 0 – Physical Process', height:LAYER_HEIGHT}
 ];
 let currentY = 0;
 purdueLayers.forEach(l=>{
@@ -1424,10 +1396,10 @@ function getSelectedSolutions(){
   }
   pick('sol-fw-ot','FW OT','fw-ot-brand');
   pick('sol-visibility','Visibilidad de Red OT','visibility-brand');
-  pick('sol-vuln','Gestión de Vulnerabilidades OT','vuln-brand');
+  pick('sol-vuln','Gestión de vulnerabilidades OT','vuln-brand');
   pick('sol-ips','IPS','ips-brand');
   pick('sol-access','Acceso Seguro / ZTNA','access-brand');
-  pick('sol-deception','Deception (Señuelos OT)','deception-brand');
+  pick('sol-deception','Deception OT','deception-brand');
   pick('sol-soc','SOC','soc-brand');
   return solutions;
 }
