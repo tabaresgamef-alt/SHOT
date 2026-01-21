@@ -394,7 +394,7 @@ body{
   cursor:not-allowed;
 }
 
-/* Footer con botón Enviar */
+/* Footer con botón Enviar y fallback */
 .footer-actions{
   display:flex;
   justify-content:center;
@@ -409,26 +409,29 @@ body{
   gap:15px;
 }
 
-/* Toast */
-.toast{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#0f3460;
-  color:#fff;
-  padding:10px 14px;
+/* Fallback mailto */
+.fallback-section{
+  width:100%;
+  margin-top:5px;
+  padding:20px;
+  background:#1a2332;
   border-radius:8px;
-  box-shadow:0 6px 15px rgba(0,0,0,.35);
-  font-size:.85em;
-  opacity:0;
-  pointer-events:none;
-  transform:translateY(6px);
-  transition:opacity .3s ease, transform .3s ease;
-  z-index:999;
+  border:2px solid #ff6b35;
 }
-.toast.show{
-  opacity:1;
-  transform:translateY(0);
+.fallback-section h3{
+  color:#ff6b35;
+  margin-bottom:15px;
+}
+.fallback-section textarea{
+  width:100%;
+  min-height:200px;
+  padding:12px;
+  background:#0f1923;
+  color:#e0e0e0;
+  border:1px solid #2d3e50;
+  border-radius:6px;
+  font-family:monospace;
+  font-size:.9em;
 }
 
 /* Panel diagrama */
@@ -657,6 +660,7 @@ body{
         <option value="Personalizada">Personalizada</option>
       </select>
       <span class="error-message" id="error-foodOption"></span>
+      <p class="form-note">Nota: Considerar 4 personas por parte del showroom.</p>
     </div>
     <div class="form-group" id="foodDetailGroup" style="display:none;">
       <label for="foodDetail">Detalle (opción personalizada) *</label>
@@ -721,6 +725,7 @@ body{
     </div>
 
     <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Asistentes</h3>
+    <p class="form-note" style="margin-bottom:12px;">Aforo máximo: 12 personas.</p>
     <div class="form-group">
       <label>Asistentes del cliente</label>
       <div id="clientAttendeesList"></div>
@@ -940,12 +945,18 @@ body{
       </div>
     </div>
 
+    <div id="fallback" style="display:none" class="fallback-section">
+      <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
+      <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
+      <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+      <textarea id="fallback-body" readonly></textarea>
+      <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+    </div>
   </div>
 
 </div>
 
 <div id="tooltip" class="tooltip"></div>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>
 const mailtoRecipient = 'Visitas_Showroom_OT@scitum.com.mx';
 const STEP_IDS = ['step-1','step-2','step-3'];
@@ -970,67 +981,9 @@ function formatValue(value){
   return trimmed.length ? trimmed : EMPTY_VALUE;
 }
 
-function normalizeValue(value){
-  const trimmed = value ? value.toString().trim() : '';
-  if(!trimmed) return '';
-  return trimmed.replace(/\s+/g,' ');
-}
-
 function formatChoice(value, map){
   if(!value) return '';
   return map && map[value] ? map[value] : value;
-}
-
-function addLine(lines, label, value){
-  const normalized = normalizeValue(value);
-  if(normalized){
-    lines.push(`${label}: ${normalized}`);
-  }
-}
-
-function formatAttendeesInline(attendees, withEmail){
-  if(!attendees.length) return '';
-  return attendees.map(attendee=>{
-    const parts = [];
-    const name = normalizeValue(attendee.name);
-    const role = normalizeValue(attendee.role);
-    const email = withEmail ? normalizeValue(attendee.email) : '';
-    if(name) parts.push(name);
-    if(role) parts.push(role);
-    if(email) parts.push(email);
-    return parts.length ? parts.join(' / ') : '';
-  }).filter(Boolean).join('; ');
-}
-
-function shortenBrand(brand){
-  const normalized = normalizeValue(brand);
-  if(!normalized) return '';
-  if(normalized.toLowerCase() === 'sin marca seleccionada') return '';
-  const map = {
-    'TXOne Networks':'TXOne',
-    'Palo Alto Networks':'Palo Alto',
-    'Nozomi Networks':'Nozomi'
-  };
-  return map[normalized] || normalized;
-}
-
-function formatTechLine(solutions){
-  if(!solutions.length) return '';
-  const keyMap = {
-    'FW OT':'FW',
-    'Visibilidad de Red OT':'VIS',
-    'Gestión de Vulnerabilidades OT':'VULN',
-    'IPS':'IPS',
-    'Acceso Seguro / ZTNA':'ZTNA',
-    'Deception (Señuelos OT)':'DEC',
-    'SOC':'SIEM'
-  };
-  const parts = solutions.map(solution=>{
-    const key = keyMap[solution.name] || solution.name;
-    const brand = shortenBrand(solution.brand);
-    return brand ? `${key}=${brand}` : key;
-  }).filter(Boolean);
-  return parts.length ? parts.join('; ') : '';
 }
 
 function showStep(stepId){
@@ -1326,76 +1279,75 @@ function buildMailto(){
 
   const subject = `Solicitud de Visita Showroom OT – ${subjectCompany} – ${subjectDate} ${subjectTime}`;
 
-  const lines = [];
-  addLine(lines, 'Tipo de visita', formatChoice(data.visitType, DISPLAY_MAPS.visitType));
-  addLine(lines, 'Fecha de visita', data.visitDate);
-  addLine(lines, 'Hora de visita', data.visitTime);
-  addLine(lines, 'Idioma de presentación', formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage));
-  addLine(lines, 'Alimentos', data.foodOption);
+  let body = `A) Logística de la visita\n`;
+  body += `- Tipo de visita: ${formatValue(formatChoice(data.visitType, DISPLAY_MAPS.visitType))}\n`;
+  body += `- Fecha de visita: ${formatValue(data.visitDate)}\n`;
+  body += `- Hora de visita: ${formatValue(data.visitTime)}\n`;
+  body += `- Idioma de presentación: ${formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))}\n`;
+  body += `- Alimentos: ${formatValue(data.foodOption)}\n`;
   if(data.foodOption === 'Personalizada'){
-    addLine(lines, 'Detalle', data.foodDetail);
+    body += `- Detalle: ${formatValue(data.foodDetail)}\n`;
   }
-  if(data.foodOption && data.foodOption !== 'Nada'){
-    addLine(lines, 'Centro de costos', data.costCenter);
-  }
-  addLine(lines, 'Empresa (cliente)', data.companyName);
-  addLine(lines, 'Sector / Industria', data.sector);
-  addLine(lines, 'Subsector', data.subsector);
-  addLine(lines, 'Número de sitios / plantas', data.sitesCount);
-  addLine(lines, 'Facturación anual (MXN)', data.annualRevenue);
-  addLine(lines, 'Gerente comercial', data.salesManager);
-  addLine(lines, 'Ejecutivo comercial', data.accountExecutive);
-  addLine(lines, 'CUC corporativo', data.corporateCuc);
-  addLine(lines, 'Estatus de la oportunidad', data.opportunityStatus);
-  addLine(lines, 'Nombre o ID de oportunidad / proyecto', data.opportunityProject);
-  addLine(lines, 'Número TOP', data.topNumber);
-  addLine(lines, 'Asistentes cliente', formatAttendeesInline(data.clientAttendees, true));
-  addLine(lines, 'Asistentes Scitum/Telmex', formatAttendeesInline(data.internalAttendees, false));
-  addLine(lines, 'Objetivo de la visita', data.visitObjective);
-  addLine(lines, 'Descripción del cliente, procesos críticos y operación', data.customerDescription);
-  addLine(lines, 'Problema principal a resolver', data.mainProblem);
-  addLine(lines, 'Nivel de madurez en ciberseguridad', formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel));
-  addLine(lines, 'Tech', formatTechLine(solutions));
+  body += `- Centro de costos: ${formatValue(data.foodOption && data.foodOption !== 'Nada' ? data.costCenter : '')}\n\n`;
 
-  const body = lines.join('\n');
+  body += `B) Datos del cliente\n`;
+  body += `- Empresa (cliente): ${formatValue(data.companyName)}\n`;
+  body += `- Sector / Industria: ${formatValue(data.sector)}\n`;
+  body += `- Subsector: ${formatValue(data.subsector)}\n`;
+  body += `- Número de sitios / plantas: ${formatValue(data.sitesCount)}\n`;
+  body += `- Facturación anual (MXN): ${formatValue(data.annualRevenue)}\n\n`;
+
+  body += `C) Datos comerciales internos\n`;
+  body += `- Gerente comercial: ${formatValue(data.salesManager)}\n`;
+  body += `- Ejecutivo comercial: ${formatValue(data.accountExecutive)}\n`;
+  body += `- CUC corporativo: ${formatValue(data.corporateCuc)}\n`;
+  body += `- Estatus de la oportunidad: ${formatValue(data.opportunityStatus)}\n`;
+  body += `- Nombre o ID de oportunidad / proyecto: ${formatValue(data.opportunityProject)}\n`;
+  body += `- Número TOP: ${formatValue(data.topNumber)}\n\n`;
+
+  body += `D) Asistentes (cliente + Scitum/Telmex)\n`;
+  body += `Asistentes del cliente:\n`;
+  if(data.clientAttendees.length){
+    data.clientAttendees.forEach((attendee, idx)=>{
+      body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)} / ${formatValue(attendee.email)}\n`;
+    });
+  }else{
+    body += `- ${EMPTY_VALUE}\n`;
+  }
+  body += `Asistentes de Scitum/Telmex:\n`;
+  if(data.internalAttendees.length){
+    data.internalAttendees.forEach((attendee, idx)=>{
+      body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)}\n`;
+    });
+  }else{
+    body += `- ${EMPTY_VALUE}\n`;
+  }
+  body += `\n`;
+
+  body += `E) Contexto estratégico\n`;
+  body += `- Objetivo de la visita: ${formatValue(data.visitObjective)}\n`;
+  body += `- Descripción del cliente, procesos críticos y operación: ${formatValue(data.customerDescription)}\n`;
+  body += `- Problema principal a resolver: ${formatValue(data.mainProblem)}\n`;
+  body += `- Nivel de madurez en ciberseguridad: ${formatValue(formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel))}\n\n`;
+
+  body += `F) Diagrama / Soluciones seleccionadas\n`;
+  if(solutions.length){
+    solutions.forEach((solution, idx)=>{
+      body += `- ${idx+1}. ${solution.name} — ${formatValue(solution.brand)}\n`;
+    });
+  }else{
+    body += `- ${EMPTY_VALUE}\n`;
+  }
+
+  body += `\nNotas operativas\n`;
+  body += `- Aforo máximo: 12 personas.\n`;
+  body += `- Alimentos: Considerar 4 personas por parte del showroom.\n`;
+  body += `- Horario operativo: Reservar 2 horas adicionales previas al evento para la preparación de la maqueta y 30 minutos posteriores para limpieza y restablecer la maqueta.\n`;
+  if(data.foodOption && data.foodOption !== 'Nada'){
+    body += `- Nota de alimentos: Considerar comida en caja / Coffee break / opción personalizada para el equipo del showroom, según corresponda.\n`;
+  }
 
   return {to: mailtoRecipient, subject, body};
-}
-
-let toastTimer = null;
-function showToast(message){
-  const toast = document.getElementById('toast');
-  if(!toast) return;
-  toast.textContent = message;
-  toast.classList.add('show');
-  if(toastTimer){
-    clearTimeout(toastTimer);
-  }
-  toastTimer = setTimeout(()=>{
-    toast.classList.remove('show');
-  }, 2800);
-}
-
-function copyTextToClipboard(text){
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    return navigator.clipboard.writeText(text);
-  }
-  return new Promise((resolve, reject)=>{
-    const temp = document.createElement('textarea');
-    temp.value = text;
-    temp.setAttribute('readonly', '');
-    temp.style.position = 'absolute';
-    temp.style.left = '-9999px';
-    document.body.appendChild(temp);
-    temp.select();
-    const ok = document.execCommand('copy');
-    document.body.removeChild(temp);
-    if(ok){
-      resolve();
-    }else{
-      reject(new Error('copy failed'));
-    }
-  });
 }
 
 function sendEmail(){
@@ -1403,16 +1355,12 @@ function sendEmail(){
   if(!mailData) return;
   const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
   if(mailtoLink.length>1900){
-    const placeholderBody = 'El contenido completo fue copiado al portapapeles. Pega (Ctrl+V) aquí.';
-    const shortMailto = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(placeholderBody)}`;
-    copyTextToClipboard(mailData.body).then(()=>{
-      showToast('Contenido copiado al portapapeles. Solo pega (Ctrl+V) en el correo.');
-      window.location.href = shortMailto;
-    }).catch(()=>{
-      showToast('No se pudo copiar al portapapeles. Solo pega (Ctrl+V) en el correo.');
-      window.location.href = shortMailto;
-    });
+    document.getElementById('fallback-to').textContent = mailData.to;
+    document.getElementById('fallback-subject').textContent = mailData.subject;
+    document.getElementById('fallback-body').value = mailData.body;
+    document.getElementById('fallback').style.display='block';
   }else{
+    document.getElementById('fallback').style.display='none';
     window.location.href = mailtoLink;
   }
 }
@@ -1584,6 +1532,20 @@ function getSelectedSolutions(){
   pick('sol-deception','Deception (Señuelos OT)','deception-brand');
   pick('sol-soc','SOC','soc-brand');
   return solutions;
+}
+
+function copyToClipboard(){
+  const textarea = document.getElementById('fallback-body');
+  const to = document.getElementById('fallback-to').textContent;
+  const subject = document.getElementById('fallback-subject').textContent;
+  const fullText = `Para: ${to}\n\nAsunto: ${subject}\n\n${textarea.value}`;
+  navigator.clipboard.writeText(fullText).then(()=>{
+    alert('Contenido copiado al portapapeles');
+  }).catch(()=>{
+    textarea.select();
+    document.execCommand('copy');
+    alert('Contenido copiado al portapapeles');
+  });
 }
 
 /* Purdue helpers */
