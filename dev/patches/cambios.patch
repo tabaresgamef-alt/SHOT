@@ -1,58 +1,121 @@
 diff --git a/dev/dev.html b/dev/dev.html
-index 17538a42eb1e9b1d2d88766a80e05b88a9478105..4125c758fecedbe1283296d3eabdc9c0c25a2d93 100644
+index 4125c758fecedbe1283296d3eabdc9c0c25a2d93..23eccf85865ffcbdf92caccc13bde6530afd20dd 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -595,68 +595,89 @@ body{
+@@ -372,88 +372,85 @@ body{
  
-   <!-- ENCABEZADO -->
-   <div class="header">
-     <h1>🏭 Showroom IT/OT</h1>
-   </div>
+ /* Botones generales */
+ .btn{
+   padding:15px 25px;
+   border:none;
+   border-radius:8px;
+   font-size:1em;
+   font-weight:600;
+   cursor:pointer;
+   transition:all .3s;
+   box-shadow:0 4px 10px rgba(0,0,0,.3);
+ }
+ .btn-primary{
+   background:linear-gradient(135deg,#ff6b35 0%,#e85d2a 100%);
+   color:#fff;
+ }
+ .btn-primary:hover:not(:disabled){
+   transform:translateY(-2px);
+   box-shadow:0 6px 15px rgba(255,107,53,.4);
+ }
+ .btn:disabled{
+   opacity:.5;
+   cursor:not-allowed;
+ }
  
-   <!-- STEP 1: FORMULARIO -->
-   <div class="form-panel step-panel active" id="step-1">
-     <h2>Paso 1 de 3 · Formulario de visita</h2>
+-/* Footer con botón Enviar y fallback */
++/* Footer con botón Enviar */
+ .footer-actions{
+   display:flex;
+   justify-content:center;
+   padding:20px;
+ }
+ .footer-actions-inner{
+   max-width:800px;
+   width:100%;
+   display:flex;
+   flex-direction:column;
+   align-items:center;
+   gap:15px;
+ }
  
-     <h3 style="margin-bottom:12px;color:#ff6b35;">A) Logística de la visita</h3>
-     <div class="form-group">
-       <label for="visitType">Tipo de visita (Presencial / Virtual)</label>
-       <select id="visitType">
-         <option value="">Selecciona una opción</option>
-         <option value="Physical">Presencial</option>
-         <option value="Virtual">Virtual</option>
+-/* Fallback mailto */
+-.fallback-section{
+-  width:100%;
+-  margin-top:5px;
+-  padding:20px;
+-  background:#1a2332;
++/* Toast */
++.toast{
++  position:fixed;
++  bottom:20px;
++  right:20px;
++  background:#0f3460;
++  color:#fff;
++  padding:10px 14px;
+   border-radius:8px;
+-  border:2px solid #ff6b35;
+-}
+-.fallback-section h3{
+-  color:#ff6b35;
+-  margin-bottom:15px;
++  box-shadow:0 6px 15px rgba(0,0,0,.35);
++  font-size:.85em;
++  opacity:0;
++  pointer-events:none;
++  transform:translateY(6px);
++  transition:opacity .3s ease, transform .3s ease;
++  z-index:999;
+ }
+-.fallback-section textarea{
+-  width:100%;
+-  min-height:200px;
+-  padding:12px;
+-  background:#0f1923;
+-  color:#e0e0e0;
+-  border:1px solid #2d3e50;
+-  border-radius:6px;
+-  font-family:monospace;
+-  font-size:.9em;
++.toast.show{
++  opacity:1;
++  transform:translateY(0);
+ }
+ 
+ /* Panel diagrama */
+ .diagram-panel{
+   background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
+   padding:25px;
+   border-radius:12px;
+   box-shadow:0 8px 25px rgba(0,0,0,.4);
+   border:1px solid #2d3e50;
+   position:relative;
+   min-height:0;
+ }
+ .diagram-panel h2{
+   color:#ff6b35;
+   margin-bottom:10px;
+   font-size:1.4em;
+ }
+ .diagram-panel p{
+   font-size:.85em;
+   color:#a8dadc;
+   margin-bottom:10px;
+ }
+ .diagram-note{
+   margin-top:12px;
+   font-size:.85em;
+@@ -638,51 +635,50 @@ body{
+         <option value="4:30 PM">4:30 PM</option>
+         <option value="5:00 PM">5:00 PM</option>
+         <option value="5:30 PM">5:30 PM</option>
+         <option value="6:00 PM">6:00 PM</option>
        </select>
-     </div>
-     <div class="form-group">
-       <label for="visitDate">Fecha de visita *</label>
-       <input type="date" id="visitDate" required>
-       <span class="error-message" id="error-visitDate"></span>
-     </div>
-     <div class="form-group">
--      <label for="visitTime">Hora de visita *</label>
--      <input type="time" id="visitTime" required>
-+      <label for="visitTime">Hora (intervalos de 30 min) *</label>
-+      <select id="visitTime" required>
-+        <option value="">Selecciona una hora</option>
-+        <option value="9:00 AM">9:00 AM</option>
-+        <option value="9:30 AM">9:30 AM</option>
-+        <option value="10:00 AM">10:00 AM</option>
-+        <option value="10:30 AM">10:30 AM</option>
-+        <option value="11:00 AM">11:00 AM</option>
-+        <option value="11:30 AM">11:30 AM</option>
-+        <option value="12:00 PM">12:00 PM</option>
-+        <option value="12:30 PM">12:30 PM</option>
-+        <option value="1:00 PM">1:00 PM</option>
-+        <option value="1:30 PM">1:30 PM</option>
-+        <option value="2:00 PM">2:00 PM</option>
-+        <option value="2:30 PM">2:30 PM</option>
-+        <option value="3:00 PM">3:00 PM</option>
-+        <option value="3:30 PM">3:30 PM</option>
-+        <option value="4:00 PM">4:00 PM</option>
-+        <option value="4:30 PM">4:30 PM</option>
-+        <option value="5:00 PM">5:00 PM</option>
-+        <option value="5:30 PM">5:30 PM</option>
-+        <option value="6:00 PM">6:00 PM</option>
-+      </select>
        <span class="error-message" id="error-visitTime"></span>
      </div>
      <div class="form-group">
@@ -68,13 +131,12 @@ index 17538a42eb1e9b1d2d88766a80e05b88a9478105..4125c758fecedbe1283296d3eabdc9c0
        <select id="foodOption" required>
          <option value="">Selecciona una opción</option>
          <option value="Coffee break">Coffee break</option>
--        <option value="Box lunch">Box lunch</option>
-+        <option value="Comida en caja">Comida en caja</option>
+         <option value="Comida en caja">Comida en caja</option>
          <option value="Nada">Nada</option>
          <option value="Personalizada">Personalizada</option>
        </select>
        <span class="error-message" id="error-foodOption"></span>
-       <p class="form-note">Nota: Considerar 4 personas por parte del showroom.</p>
+-      <p class="form-note">Nota: Considerar 4 personas por parte del showroom.</p>
      </div>
      <div class="form-group" id="foodDetailGroup" style="display:none;">
        <label for="foodDetail">Detalle (opción personalizada) *</label>
@@ -95,148 +157,396 @@ index 17538a42eb1e9b1d2d88766a80e05b88a9478105..4125c758fecedbe1283296d3eabdc9c0
      </div>
      <div class="form-group">
        <label for="sector">Sector / Industria</label>
-@@ -1008,69 +1029,93 @@ function toggleCostCenter(){
+       <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
+     </div>
+     <div class="form-group">
+       <label for="subsector">Subsector</label>
+       <input type="text" id="subsector" placeholder="Ej: Componentes, Alimentos, Retail">
+@@ -703,51 +699,50 @@ body{
+       <span class="error-message" id="error-salesManager"></span>
+     </div>
+     <div class="form-group">
+       <label for="accountExecutive">Ejecutivo comercial *</label>
+       <input type="text" id="accountExecutive" required>
+       <span class="error-message" id="error-accountExecutive"></span>
+     </div>
+     <div class="form-group">
+       <label for="corporateCuc">CUC corporativo</label>
+       <input type="text" id="corporateCuc">
+     </div>
+     <div class="form-group">
+       <label for="opportunityStatus">Estatus de la oportunidad</label>
+       <input type="text" id="opportunityStatus">
+     </div>
+     <div class="form-group">
+       <label for="opportunityProject">Nombre o ID de oportunidad / proyecto</label>
+       <input type="text" id="opportunityProject">
+     </div>
+     <div class="form-group">
+       <label for="topNumber">Número TOP</label>
+       <input type="text" id="topNumber">
+     </div>
  
- function setError(fieldId, message){
-   const error = document.getElementById(`error-${fieldId}`);
-   if(error){
-     error.textContent = message;
-   }
+     <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Asistentes</h3>
+-    <p class="form-note" style="margin-bottom:12px;">Aforo máximo: 12 personas.</p>
+     <div class="form-group">
+       <label>Asistentes del cliente</label>
+       <div id="clientAttendeesList"></div>
+       <button type="button" class="btn-guest-add" id="addClientAttendee">Agregar invitado</button>
+     </div>
+     <div class="form-group">
+       <label>Asistentes de Scitum/Telmex</label>
+       <div id="internalAttendeesList"></div>
+       <button type="button" class="btn-guest-add" id="addInternalAttendee">Agregar invitado</button>
+     </div>
+ 
+     <h3 style="margin:20px 0 12px;color:#ff6b35;">E) Contexto estratégico</h3>
+     <div class="form-group">
+       <label for="visitObjective">Objetivo de la visita</label>
+       <textarea id="visitObjective"></textarea>
+     </div>
+     <div class="form-group">
+       <label for="customerDescription">Descripción del cliente, procesos críticos y operación</label>
+       <textarea id="customerDescription"></textarea>
+     </div>
+     <div class="form-group">
+       <label for="mainProblem">Problema principal a resolver</label>
+       <textarea id="mainProblem"></textarea>
+     </div>
+     <div class="form-group">
+@@ -923,91 +918,143 @@ body{
+       <p class="diagram-note">Nota: Las tecnologías actualmente deshabilitadas se irán habilitando progresivamente conforme se avance en su implementación dentro de la maqueta del showroom.</p>
+     </div>
+ 
+     </div>
+     <div class="footer-actions">
+       <div class="footer-actions-inner" style="flex-direction:row;justify-content:space-between;">
+         <button type="button" class="btn" id="backToStep1">Volver al formulario</button>
+         <button type="button" class="btn btn-primary" id="toStep3">Siguiente: Confirmación</button>
+       </div>
+     </div>
+   </div>
+ 
+   <!-- STEP 3: CONFIRMACIÓN -->
+   <div class="form-panel step-panel" id="step-3">
+     <h2>Paso 3 de 3 · Confirmación</h2>
+     <div id="confirmationSummary"></div>
+ 
+     <div class="footer-actions">
+       <div class="footer-actions-inner" style="flex-direction:row;justify-content:space-between;">
+         <button type="button" class="btn" id="backToStep1FromSummary">Volver a editar el formulario</button>
+         <button type="button" class="btn" id="backToStep2FromSummary">Volver al diagrama</button>
+         <button type="button" class="btn btn-primary" id="sendEmail">Enviar solicitud</button>
+       </div>
+     </div>
+ 
+-    <div id="fallback" style="display:none" class="fallback-section">
+-      <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
+-      <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
+-      <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+-      <textarea id="fallback-body" readonly></textarea>
+-      <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+-    </div>
+   </div>
+ 
+ </div>
+ 
+ <div id="tooltip" class="tooltip"></div>
++<div id="toast" class="toast" role="status" aria-live="polite"></div>
+ <script>
+ const mailtoRecipient = 'Visitas_Showroom_OT@scitum.com.mx';
+ const STEP_IDS = ['step-1','step-2','step-3'];
+ const REQUIRED_FIELDS = [
+   {id:'visitDate', label:'Fecha de visita'},
+   {id:'visitTime', label:'Hora de visita'},
+   {id:'companyName', label:'Empresa (cliente)'},
+   {id:'foodOption', label:'Alimentos'},
+   {id:'salesManager', label:'Gerente comercial'},
+   {id:'accountExecutive', label:'Ejecutivo comercial'}
+ ];
+ 
+ const EMPTY_VALUE = '—';
+ const DISPLAY_MAPS = {
+   visitType: {Physical:'Presencial', Virtual:'Virtual'},
+   presentationLanguage: {Spanish:'Español', English:'Inglés'},
+   maturityLevel: {Low:'Bajo', Medium:'Medio', High:'Alto', Unknown:'Desconocido'}
+ };
+ 
+ function formatValue(value){
+   const trimmed = value ? value.toString().trim() : '';
+   return trimmed.length ? trimmed : EMPTY_VALUE;
  }
  
- function clearErrors(){
-   document.querySelectorAll('.error-message').forEach(el=>{el.textContent='';});
++function normalizeValue(value){
++  const trimmed = value ? value.toString().trim() : '';
++  if(!trimmed) return '';
++  return trimmed.replace(/\s+/g,' ');
++}
++
+ function formatChoice(value, map){
+   if(!value) return '';
+   return map && map[value] ? map[value] : value;
  }
  
- function validateStep1(){
-   clearErrors();
-   let isValid = true;
- 
-   REQUIRED_FIELDS.forEach(field=>{
-     const input = document.getElementById(field.id);
-     if(!input) return;
-     if(!input.value || !input.value.toString().trim()){
-       setError(field.id, 'Este campo es obligatorio.');
-       isValid = false;
-     }
++function addLine(lines, label, value){
++  const normalized = normalizeValue(value);
++  if(normalized){
++    lines.push(`${label}: ${normalized}`);
++  }
++}
++
++function formatAttendeesInline(attendees, withEmail){
++  if(!attendees.length) return '';
++  return attendees.map(attendee=>{
++    const parts = [];
++    const name = normalizeValue(attendee.name);
++    const role = normalizeValue(attendee.role);
++    const email = withEmail ? normalizeValue(attendee.email) : '';
++    if(name) parts.push(name);
++    if(role) parts.push(role);
++    if(email) parts.push(email);
++    return parts.length ? parts.join(' / ') : '';
++  }).filter(Boolean).join('; ');
++}
++
++function shortenBrand(brand){
++  const normalized = normalizeValue(brand);
++  if(!normalized) return '';
++  if(normalized.toLowerCase() === 'sin marca seleccionada') return '';
++  const map = {
++    'TXOne Networks':'TXOne',
++    'Palo Alto Networks':'Palo Alto',
++    'Nozomi Networks':'Nozomi'
++  };
++  return map[normalized] || normalized;
++}
++
++function formatTechLine(solutions){
++  if(!solutions.length) return '';
++  const keyMap = {
++    'FW OT':'FW',
++    'Visibilidad de Red OT':'VIS',
++    'Gestión de Vulnerabilidades OT':'VULN',
++    'IPS':'IPS',
++    'Acceso Seguro / ZTNA':'ZTNA',
++    'Deception (Señuelos OT)':'DEC',
++    'SOC':'SIEM'
++  };
++  const parts = solutions.map(solution=>{
++    const key = keyMap[solution.name] || solution.name;
++    const brand = shortenBrand(solution.brand);
++    return brand ? `${key}=${brand}` : key;
++  }).filter(Boolean);
++  return parts.length ? parts.join('; ') : '';
++}
++
+ function showStep(stepId){
+   STEP_IDS.forEach(id=>{
+     const step = document.getElementById(id);
+     if(step) step.classList.toggle('active', id === stepId);
    });
- 
-+  if(!validateVisitDate({resetIfInvalid:true})){
-+    isValid = false;
-+  }
-+
-   const foodOption = document.getElementById('foodOption');
-   const foodDetail = document.getElementById('foodDetail');
-   const costCenter = document.getElementById('costCenter');
-   if(foodOption && foodOption.value === 'Personalizada'){
-     if(!foodDetail || !foodDetail.value.trim()){
-       setError('foodDetail', 'Este campo es obligatorio.');
-       isValid = false;
-     }
+   if(stepId === 'step-3'){
+     populateSummary();
    }
-   if(foodOption && foodOption.value && foodOption.value !== 'Nada'){
-     if(!costCenter || !costCenter.value.trim()){
-       setError('costCenter', 'El centro de costos es obligatorio cuando hay alimentos.');
-       isValid = false;
-     }
-   }
- 
-   return isValid;
+   window.scrollTo({top:0, behavior:'smooth'});
  }
  
-+function isWeekend(dateString){
-+  const date = new Date(`${dateString}T00:00:00`);
-+  if(Number.isNaN(date.getTime())) return false;
-+  const day = date.getDay();
-+  return day === 0 || day === 6;
-+}
-+
-+function validateVisitDate({resetIfInvalid = false} = {}){
-+  const visitDate = document.getElementById('visitDate');
-+  if(!visitDate || !visitDate.value) return true;
-+  if(isWeekend(visitDate.value)){
-+    setError('visitDate','Selecciona un día hábil (lunes a viernes).');
-+    if(resetIfInvalid){
-+      visitDate.value = '';
-+    }
-+    return false;
+ function toggleCostCenter(){
+   const foodOption = document.getElementById('foodOption');
+   const costCenterGroup = document.getElementById('costCenterGroup');
+   const costCenter = document.getElementById('costCenter');
+   const foodDetailGroup = document.getElementById('foodDetailGroup');
+   const foodDetail = document.getElementById('foodDetail');
+   const needsCostCenter = foodOption && foodOption.value && foodOption.value !== 'Nada';
+   const needsFoodDetail = foodOption && foodOption.value === 'Personalizada';
+   if(costCenterGroup){
+     costCenterGroup.style.display = needsCostCenter ? 'block' : 'none';
+   }
+   if(costCenter){
+     costCenter.disabled = !needsCostCenter;
+     costCenter.required = needsCostCenter;
+@@ -1257,132 +1304,137 @@ function populateSummary(){
+         <ul class="summary-list">
+           ${solutions.length ? solutions.map((s, idx)=>`<li>${idx+1}. ${s.name} — ${formatValue(s.brand)}</li>`).join('') : `<li>${EMPTY_VALUE}</li>`}
+         </ul>
+       </div>
+     `
+   ];
+ 
+   summary.innerHTML = sectionsHtml.join('');
+ }
+ 
+ function buildMailto(){
+   if(!validateStep1()){
+     showStep('step-1');
+     alert('Por favor completa los campos obligatorios.');
+     return null;
+   }
+ 
+   const data = getFormData();
+   const solutions = getSelectedSolutions();
+   const subjectCompany = formatValue(data.companyName);
+   const subjectDate = formatValue(data.visitDate);
+   const subjectTime = formatValue(data.visitTime);
+ 
+   const subject = `Solicitud de Visita Showroom OT – ${subjectCompany} – ${subjectDate} ${subjectTime}`;
+ 
+-  let body = `A) Logística de la visita\n`;
+-  body += `- Tipo de visita: ${formatValue(formatChoice(data.visitType, DISPLAY_MAPS.visitType))}\n`;
+-  body += `- Fecha de visita: ${formatValue(data.visitDate)}\n`;
+-  body += `- Hora de visita: ${formatValue(data.visitTime)}\n`;
+-  body += `- Idioma de presentación: ${formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))}\n`;
+-  body += `- Alimentos: ${formatValue(data.foodOption)}\n`;
++  const lines = [];
++  addLine(lines, 'Tipo de visita', formatChoice(data.visitType, DISPLAY_MAPS.visitType));
++  addLine(lines, 'Fecha de visita', data.visitDate);
++  addLine(lines, 'Hora de visita', data.visitTime);
++  addLine(lines, 'Idioma de presentación', formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage));
++  addLine(lines, 'Alimentos', data.foodOption);
+   if(data.foodOption === 'Personalizada'){
+-    body += `- Detalle: ${formatValue(data.foodDetail)}\n`;
+-  }
+-  body += `- Centro de costos: ${formatValue(data.foodOption && data.foodOption !== 'Nada' ? data.costCenter : '')}\n\n`;
+-
+-  body += `B) Datos del cliente\n`;
+-  body += `- Empresa (cliente): ${formatValue(data.companyName)}\n`;
+-  body += `- Sector / Industria: ${formatValue(data.sector)}\n`;
+-  body += `- Subsector: ${formatValue(data.subsector)}\n`;
+-  body += `- Número de sitios / plantas: ${formatValue(data.sitesCount)}\n`;
+-  body += `- Facturación anual (MXN): ${formatValue(data.annualRevenue)}\n\n`;
+-
+-  body += `C) Datos comerciales internos\n`;
+-  body += `- Gerente comercial: ${formatValue(data.salesManager)}\n`;
+-  body += `- Ejecutivo comercial: ${formatValue(data.accountExecutive)}\n`;
+-  body += `- CUC corporativo: ${formatValue(data.corporateCuc)}\n`;
+-  body += `- Estatus de la oportunidad: ${formatValue(data.opportunityStatus)}\n`;
+-  body += `- Nombre o ID de oportunidad / proyecto: ${formatValue(data.opportunityProject)}\n`;
+-  body += `- Número TOP: ${formatValue(data.topNumber)}\n\n`;
+-
+-  body += `D) Asistentes (cliente + Scitum/Telmex)\n`;
+-  body += `Asistentes del cliente:\n`;
+-  if(data.clientAttendees.length){
+-    data.clientAttendees.forEach((attendee, idx)=>{
+-      body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)} / ${formatValue(attendee.email)}\n`;
+-    });
+-  }else{
+-    body += `- ${EMPTY_VALUE}\n`;
+-  }
+-  body += `Asistentes de Scitum/Telmex:\n`;
+-  if(data.internalAttendees.length){
+-    data.internalAttendees.forEach((attendee, idx)=>{
+-      body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)}\n`;
+-    });
+-  }else{
+-    body += `- ${EMPTY_VALUE}\n`;
++    addLine(lines, 'Detalle', data.foodDetail);
+   }
+-  body += `\n`;
+-
+-  body += `E) Contexto estratégico\n`;
+-  body += `- Objetivo de la visita: ${formatValue(data.visitObjective)}\n`;
+-  body += `- Descripción del cliente, procesos críticos y operación: ${formatValue(data.customerDescription)}\n`;
+-  body += `- Problema principal a resolver: ${formatValue(data.mainProblem)}\n`;
+-  body += `- Nivel de madurez en ciberseguridad: ${formatValue(formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel))}\n\n`;
+-
+-  body += `F) Diagrama / Soluciones seleccionadas\n`;
+-  if(solutions.length){
+-    solutions.forEach((solution, idx)=>{
+-      body += `- ${idx+1}. ${solution.name} — ${formatValue(solution.brand)}\n`;
+-    });
+-  }else{
+-    body += `- ${EMPTY_VALUE}\n`;
+-  }
+-
+-  body += `\nNotas operativas\n`;
+-  body += `- Aforo máximo: 12 personas.\n`;
+-  body += `- Alimentos: Considerar 4 personas por parte del showroom.\n`;
+-  body += `- Horario operativo: Reservar 2 horas adicionales previas al evento para la preparación de la maqueta y 30 minutos posteriores para limpieza y restablecer la maqueta.\n`;
+   if(data.foodOption && data.foodOption !== 'Nada'){
+-    body += `- Nota de alimentos: Considerar comida en caja / Coffee break / opción personalizada para el equipo del showroom, según corresponda.\n`;
+-  }
++    addLine(lines, 'Centro de costos', data.costCenter);
 +  }
-+  return true;
-+}
++  addLine(lines, 'Empresa (cliente)', data.companyName);
++  addLine(lines, 'Sector / Industria', data.sector);
++  addLine(lines, 'Subsector', data.subsector);
++  addLine(lines, 'Número de sitios / plantas', data.sitesCount);
++  addLine(lines, 'Facturación anual (MXN)', data.annualRevenue);
++  addLine(lines, 'Gerente comercial', data.salesManager);
++  addLine(lines, 'Ejecutivo comercial', data.accountExecutive);
++  addLine(lines, 'CUC corporativo', data.corporateCuc);
++  addLine(lines, 'Estatus de la oportunidad', data.opportunityStatus);
++  addLine(lines, 'Nombre o ID de oportunidad / proyecto', data.opportunityProject);
++  addLine(lines, 'Número TOP', data.topNumber);
++  addLine(lines, 'Asistentes cliente', formatAttendeesInline(data.clientAttendees, true));
++  addLine(lines, 'Asistentes Scitum/Telmex', formatAttendeesInline(data.internalAttendees, false));
++  addLine(lines, 'Objetivo de la visita', data.visitObjective);
++  addLine(lines, 'Descripción del cliente, procesos críticos y operación', data.customerDescription);
++  addLine(lines, 'Problema principal a resolver', data.mainProblem);
++  addLine(lines, 'Nivel de madurez en ciberseguridad', formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel));
++  addLine(lines, 'Tech', formatTechLine(solutions));
 +
- function createAttendeeRow({withEmail = false} = {}){
-   const row = document.createElement('div');
-   row.className = 'attendee-row';
++  const body = lines.join('\n');
  
-   const nameInput = document.createElement('input');
-   nameInput.type = 'text';
-   nameInput.placeholder = 'Nombre';
- 
-   const roleInput = document.createElement('input');
-   roleInput.type = 'text';
-   roleInput.placeholder = 'Rol / Puesto';
- 
-   row.appendChild(nameInput);
-   row.appendChild(roleInput);
- 
-   let emailInput = null;
-   if(withEmail){
-     emailInput = document.createElement('input');
-     emailInput.type = 'email';
-     emailInput.placeholder = 'Correo electrónico';
-     row.appendChild(emailInput);
-   }
- 
-   const removeBtn = document.createElement('button');
-   removeBtn.type = 'button';
-@@ -1272,50 +1317,58 @@ function buildMailto(){
-   body += `Asistentes de Scitum/Telmex:\n`;
-   if(data.internalAttendees.length){
-     data.internalAttendees.forEach((attendee, idx)=>{
-       body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)}\n`;
-     });
-   }else{
-     body += `- ${EMPTY_VALUE}\n`;
-   }
-   body += `\n`;
- 
-   body += `E) Contexto estratégico\n`;
-   body += `- Objetivo de la visita: ${formatValue(data.visitObjective)}\n`;
-   body += `- Descripción del cliente, procesos críticos y operación: ${formatValue(data.customerDescription)}\n`;
-   body += `- Problema principal a resolver: ${formatValue(data.mainProblem)}\n`;
-   body += `- Nivel de madurez en ciberseguridad: ${formatValue(formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel))}\n\n`;
- 
-   body += `F) Diagrama / Soluciones seleccionadas\n`;
-   if(solutions.length){
-     solutions.forEach((solution, idx)=>{
-       body += `- ${idx+1}. ${solution.name} — ${formatValue(solution.brand)}\n`;
-     });
-   }else{
-     body += `- ${EMPTY_VALUE}\n`;
-   }
- 
-+  body += `\nNotas operativas\n`;
-+  body += `- Aforo máximo: 12 personas.\n`;
-+  body += `- Alimentos: Considerar 4 personas por parte del showroom.\n`;
-+  body += `- Horario operativo: Reservar 2 horas adicionales previas al evento para la preparación de la maqueta y 30 minutos posteriores para limpieza y restablecer la maqueta.\n`;
-+  if(data.foodOption && data.foodOption !== 'Nada'){
-+    body += `- Nota de alimentos: Considerar comida en caja / Coffee break / opción personalizada para el equipo del showroom, según corresponda.\n`;
-+  }
-+
    return {to: mailtoRecipient, subject, body};
  }
  
++let toastTimer = null;
++function showToast(message){
++  const toast = document.getElementById('toast');
++  if(!toast) return;
++  toast.textContent = message;
++  toast.classList.add('show');
++  if(toastTimer){
++    clearTimeout(toastTimer);
++  }
++  toastTimer = setTimeout(()=>{
++    toast.classList.remove('show');
++  }, 2800);
++}
++
++function copyTextToClipboard(text){
++  if(navigator.clipboard && navigator.clipboard.writeText){
++    return navigator.clipboard.writeText(text);
++  }
++  return new Promise((resolve, reject)=>{
++    const temp = document.createElement('textarea');
++    temp.value = text;
++    temp.setAttribute('readonly', '');
++    temp.style.position = 'absolute';
++    temp.style.left = '-9999px';
++    document.body.appendChild(temp);
++    temp.select();
++    const ok = document.execCommand('copy');
++    document.body.removeChild(temp);
++    if(ok){
++      resolve();
++    }else{
++      reject(new Error('copy failed'));
++    }
++  });
++}
++
  function sendEmail(){
    const mailData = buildMailto();
    if(!mailData) return;
    const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
    if(mailtoLink.length>1900){
-     document.getElementById('fallback-to').textContent = mailData.to;
-     document.getElementById('fallback-subject').textContent = mailData.subject;
-     document.getElementById('fallback-body').value = mailData.body;
-     document.getElementById('fallback').style.display='block';
+-    document.getElementById('fallback-to').textContent = mailData.to;
+-    document.getElementById('fallback-subject').textContent = mailData.subject;
+-    document.getElementById('fallback-body').value = mailData.body;
+-    document.getElementById('fallback').style.display='block';
++    const placeholderBody = 'El contenido completo fue copiado al portapapeles. Pega (Ctrl+V) aquí.';
++    const shortMailto = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(placeholderBody)}`;
++    copyTextToClipboard(mailData.body).then(()=>{
++      showToast('Contenido copiado al portapapeles. Solo pega (Ctrl+V) en el correo.');
++      window.location.href = shortMailto;
++    }).catch(()=>{
++      showToast('No se pudo copiar al portapapeles. Solo pega (Ctrl+V) en el correo.');
++      window.location.href = shortMailto;
++    });
    }else{
-     document.getElementById('fallback').style.display='none';
+-    document.getElementById('fallback').style.display='none';
      window.location.href = mailtoLink;
    }
  }
@@ -248,67 +558,82 @@ index 17538a42eb1e9b1d2d88766a80e05b88a9478105..4125c758fecedbe1283296d3eabdc9c0
    {level:3.5, label:'Nivel 3.5 – DMZ IT/OT', height:LAYER_HEIGHT},
    {level:3, label:'Nivel 3 – Operaciones del Sitio', height:LAYER_HEIGHT},
    {level:2, label:'Nivel 2 – Control de Supervisión', height:LAYER_HEIGHT},
-@@ -2624,50 +2677,63 @@ function toggleBrands(solutionId){
-     if(radios.length > 0){
-       const anyChecked = Array.from(radios).some(r => r.checked);
-       if(!anyChecked){
-         radios[0].checked = true;
-       }
-     }
-   }else{
-     if(brandsGroup) brandsGroup.classList.remove('active');
-     radios.forEach(r=>r.checked=false);
-   }
-   updateDiagram();
+   {level:1, label:'Nivel 1 – Control Básico', height:LAYER_HEIGHT},
+   {level:0, label:'Nivel 0 – Proceso Físico', height:LAYER_HEIGHT}
+ ];
+ let currentY = 0;
+ purdueLayers.forEach(l=>{
+   l.height = l.height || LAYER_HEIGHT;
+   l.y = currentY;
+   currentY += l.height;
+ });
+ 
+ let currentNodes = {};
+ let currentLinks = [];
+ let adjacency = {};
+ let currentSvg = null;
+@@ -1512,64 +1564,50 @@ function getSelectedBrand(groupName) {
+   return null;
  }
  
- /* Init */
- document.addEventListener('DOMContentLoaded',()=>{
-   updateDiagram();
-   toggleCostCenter();
-   addAttendee('clientAttendeesList', true);
-   addAttendee('internalAttendeesList', false);
- 
-   const foodOption = document.getElementById('foodOption');
-   if(foodOption){
-     foodOption.addEventListener('change', toggleCostCenter);
-   }
- 
-+  const visitDate = document.getElementById('visitDate');
-+  if(visitDate){
-+    visitDate.addEventListener('change',()=>{
-+      if(!visitDate.value){
-+        setError('visitDate','');
-+        return;
-+      }
-+      if(validateVisitDate({resetIfInvalid:true})){
-+        setError('visitDate','');
-+      }
-+    });
-+  }
-+
-   const addClient = document.getElementById('addClientAttendee');
-   if(addClient){
-     addClient.addEventListener('click',()=>addAttendee('clientAttendeesList', true));
-   }
-   const addInternal = document.getElementById('addInternalAttendee');
-   if(addInternal){
-     addInternal.addEventListener('click',()=>addAttendee('internalAttendeesList', false));
-   }
- 
-   const toStep2 = document.getElementById('toStep2');
-   if(toStep2){
-     toStep2.addEventListener('click',()=>{
-       if(validateStep1()){
-         showStep('step-2');
-       }else{
-         alert('Por favor completa los campos obligatorios.');
+ function getSelectedSolutions(){
+   const solutions = [];
+   function pick(id,name,group){
+     if(document.getElementById(id).checked){
+       let brandText = null;
+       if(group){
+         const r = document.querySelector('input[name="'+group+'"]:checked');
+         brandText = r ? r.value : null;
        }
-     });
+       solutions.push({name,brand:brandText || 'Sin marca seleccionada'});
+     }
    }
-   const backToStep1 = document.getElementById('backToStep1');
-   if(backToStep1){
-     backToStep1.addEventListener('click',()=>showStep('step-1'));
-   }
-   const toStep3 = document.getElementById('toStep3');
-   if(toStep3){
+   pick('sol-fw-ot','FW OT','fw-ot-brand');
+   pick('sol-visibility','Visibilidad de Red OT','visibility-brand');
+   pick('sol-vuln','Gestión de Vulnerabilidades OT','vuln-brand');
+   pick('sol-ips','IPS','ips-brand');
+   pick('sol-access','Acceso Seguro / ZTNA','access-brand');
+   pick('sol-deception','Deception (Señuelos OT)','deception-brand');
+   pick('sol-soc','SOC','soc-brand');
+   return solutions;
+ }
+ 
+-function copyToClipboard(){
+-  const textarea = document.getElementById('fallback-body');
+-  const to = document.getElementById('fallback-to').textContent;
+-  const subject = document.getElementById('fallback-subject').textContent;
+-  const fullText = `Para: ${to}\n\nAsunto: ${subject}\n\n${textarea.value}`;
+-  navigator.clipboard.writeText(fullText).then(()=>{
+-    alert('Contenido copiado al portapapeles');
+-  }).catch(()=>{
+-    textarea.select();
+-    document.execCommand('copy');
+-    alert('Contenido copiado al portapapeles');
+-  });
+-}
+-
+ /* Purdue helpers */
+ function getLayerInfo(level){
+   return purdueLayers.find(l=>l.level===level);
+ }
+ function getLayerCenterY(level){
+   const layer = getLayerInfo(level);
+   return layer ? layer.y + layer.height/2 : 0;
+ }
+ 
+ /* Arquitectura IT/OT */
+ function buildArchitecture(){
+   const hasFwOt      = document.getElementById('sol-fw-ot').checked;
+   const hasVis       = document.getElementById('sol-visibility').checked;
+   const hasVuln      = document.getElementById('sol-vuln').checked;
+   const hasIps       = document.getElementById('sol-ips').checked;
+   const hasAccess    = document.getElementById('sol-access').checked;
+   const hasDeception = document.getElementById('sol-deception').checked;
+   const hasSoc       = document.getElementById('sol-soc').checked;
+ 
+   const fwOtBrand = getSelectedBrand('fw-ot-brand');
+   const visBrand = getSelectedBrand('visibility-brand');
+   const vulnBrand = getSelectedBrand('vuln-brand');
+   const ipsBrand = getSelectedBrand('ips-brand');
+   const accessBrand = getSelectedBrand('access-brand');
+   const deceptionBrand = getSelectedBrand('deception-brand');
