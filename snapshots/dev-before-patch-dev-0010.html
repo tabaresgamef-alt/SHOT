@@ -51,8 +51,8 @@ body{
 /* Dos columnas: tecnologías (30%) + diagrama (70%) */
 .content-two-columns{
   display:grid;
-  grid-template-columns:minmax(320px, 380px) 1fr;
-  gap:16px;
+  grid-template-columns:0.3fr 0.7fr;
+  gap:25px;
   align-items:start;
 }
 
@@ -63,9 +63,6 @@ body{
   border-radius:12px;
   box-shadow:0 8px 25px rgba(0,0,0,.4);
   border:1px solid #2d3e50;
-  max-height:calc(100vh - 260px);
-  overflow:auto;
-  min-height:0;
 }
 
 .form-group{margin-bottom:20px}
@@ -429,8 +426,8 @@ body{
   border-radius:12px;
   box-shadow:0 8px 25px rgba(0,0,0,.4);
   border:1px solid #2d3e50;
+  min-height:600px;
   position:relative;
-  min-height:0;
 }
 .diagram-panel h2{
   color:#ff6b35;
@@ -449,13 +446,11 @@ body{
 }
 #diagram-container{
   width:100%;
-  height:calc(100vh - 260px);
-  min-height:520px;
-  max-height:980px;
+  height:980px;
   position:relative;
   background:#0f1923;
   border-radius:8px;
-  overflow:auto;
+  overflow:hidden;
 }
 
 /* Tooltip y estilos de nodos/enlaces */
@@ -568,9 +563,12 @@ body{
   fill:#e0e0e0;
 }
 
-@media(max-width:1000px){
+@media(max-width:1400px){
   .content-two-columns{
     grid-template-columns:1fr;
+  }
+  #diagram-container{
+    height:700px;
   }
 }
 </style>

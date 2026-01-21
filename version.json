@@ -9,10 +9,10 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 9,
-    "lastPatch": "patch-dev-0009",
+    "patchCounter": 10,
+    "lastPatch": "patch-dev-0010",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0010"
+    "nextPatchName": "patch-0011"
   },
   "changelog": [
     {
@@ -80,6 +80,12 @@
       "file": "dev/patches/cambios.patch",
       "description": "se modificio la UI a español, se bloqueron las tecnologias aun no disponibles, y la direccion de correo",
       "date": "2026-01-21 20:23:09"
+    },
+    {
+      "patch": "patch-dev-0010",
+      "file": "dev/patches/cambios.patch",
+      "description": "Se ajusto la resolución",
+      "date": "2026-01-21 21:04:48"
     }
   ],
   "metadata": {
