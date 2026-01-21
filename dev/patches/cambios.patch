@@ -1,288 +1,1202 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/dev/dev.html b/dev/dev.html
-index 8aa67def8279a7038e616eddbe153326efd6b1f6..ffeca984df55e874683a9c2908c62fad65cb4423 100644
+ diff --git a/dev/dev.html b/dev/dev.html
+index ffeca984df55e874683a9c2908c62fad65cb4423..edc9c6fafcd805cbdddee236059f71e633ea37d1 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -397,50 +397,82 @@ body{
-   border:2px solid #ff6b35;
-   pointer-events:none;
-   z-index:1000;
-   box-shadow:0 4px 15px rgba(0,0,0,.5);
-   display:none;
-   max-width:320px;
-   font-size:.85em;
+@@ -52,70 +52,120 @@ body{
+ .content-two-columns{
+   display:grid;
+   grid-template-columns:0.3fr 0.7fr;
+   gap:25px;
+   align-items:start;
  }
- .tooltip.active{display:block}
- .tooltip strong{
-   color:#ff6b35;
-   display:block;
-   margin-bottom:4px;
-   font-size:1em;
- }
- .tooltip .layer{
-   color:#a8dadc;
-   font-size:.8em;
-   margin-bottom:4px;
- }
- .tooltip .description{
-   color:#c0c0c0;
-   font-size:.8em;
-   line-height:1.3;
- }
-+.modal-overlay{
-+  position:fixed;
-+  inset:0;
-+  background:rgba(0,0,0,.6);
-+  display:flex;
-+  align-items:center;
-+  justify-content:center;
-+  z-index:1500;
-+  padding:20px;
-+}
-+.modal-content{
-+  background:#1e2a3a;
-+  border:1px solid #2d3e50;
-+  border-radius:10px;
-+  padding:24px;
-+  max-width:420px;
-+  width:100%;
-+  box-shadow:0 12px 30px rgba(0,0,0,.45);
-+  text-align:center;
-+}
-+.modal-content h3{
-+  margin-bottom:12px;
-+  color:#a8dadc;
-+}
-+.modal-content p{
-+  margin-bottom:16px;
-+  color:#e0e0e0;
-+}
-+.modal-content .btn{
-+  margin-top:4px;
-+  width:100%;
-+}
  
- .node-group{
-   cursor:grab;
-   transition:opacity .2s;
+ /* Panel de opciones de tecnología */
+ .tech-options{
+   background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
+   padding:20px;
+   border-radius:12px;
+   box-shadow:0 8px 25px rgba(0,0,0,.4);
+   border:1px solid #2d3e50;
  }
- .node-group:active{cursor:grabbing}
- .node-body{stroke-width:2;}
- .node-label{
-   font-size:11px;
+ 
+ .form-group{margin-bottom:20px}
+ .form-group label{
+   display:block;
+   margin-bottom:8px;
+   color:#a8dadc;
    font-weight:600;
+   font-size:.95em;
+ }
+ .form-group input,
+-.form-group textarea{
++.form-group textarea,
++.form-group select{
+   width:100%;
+   padding:12px;
+   border:2px solid #2d3e50;
+   border-radius:6px;
+   background:#1a2332;
+   color:#e0e0e0;
+   font-size:1em;
+   transition:all .3s;
+ }
+ .form-group input:focus,
+-.form-group textarea:focus{
++.form-group textarea:focus,
++.form-group select:focus{
+   outline:none;
+   border-color:#ff6b35;
+   box-shadow:0 0 10px rgba(255,107,53,.3);
+ }
+ .form-group textarea{
+   resize:vertical;
+   min-height:80px;
+ }
++.step-panel{display:none;}
++.step-panel.active{display:block;}
++.error-message{
++  color:#e63946;
++  font-size:.8em;
++  margin-top:6px;
++  display:block;
++}
++.attendee-row{
++  display:flex;
++  gap:10px;
++  flex-wrap:wrap;
++  margin-bottom:10px;
++}
++.attendee-row input{
++  flex:1;
++  min-width:160px;
++}
++.attendee-remove{
++  padding:10px 12px;
++  border:none;
++  border-radius:6px;
++  background:#e63946;
++  color:#fff;
++  font-size:.8em;
++  cursor:pointer;
++}
++.summary-section{
++  margin-top:20px;
++  background:#1a2332;
++  border:1px solid #2d3e50;
++  border-radius:8px;
++  padding:15px;
++}
++.summary-section h3{
++  color:#ff6b35;
++  margin-bottom:10px;
++}
++.summary-list{
++  list-style:none;
++  padding-left:0;
++  margin:0;
++}
++.summary-list li{
++  margin-bottom:6px;
++  color:#cfd8dc;
++  font-size:.9em;
++}
+ .guest-form{
+   display:flex;
+   gap:10px;
+   margin-bottom:10px;
+   flex-wrap:wrap;
+ }
+ .guest-form input{
+   flex:1;
+   min-width:140px;
+ }
+ .btn-guest-add{
+   padding:10px 16px;
+   border:none;
+   border-radius:6px;
+   background:#457b9d;
+   color:#fff;
+   font-size:.85em;
+   font-weight:600;
+   cursor:pointer;
+   transition:all .3s;
+   white-space:nowrap;
+ }
+ .btn-guest-add:hover{
+   transform:translateY(-1px);
+   box-shadow:0 3px 8px rgba(0,0,0,.3);
+@@ -496,116 +546,195 @@ body{
+   font-size:10px;
    fill:#e0e0e0;
  }
- .link-path{
-   fill:none;
-   stroke-width:2;
-   opacity:.7;
-   transition:opacity .2s,stroke-width .15s;
+ 
+ @media(max-width:1400px){
+   .content-two-columns{
+     grid-template-columns:1fr;
+   }
+   #diagram-container{
+     height:700px;
+   }
  }
- .link-data{stroke:#ff6b35;}
- .link-mgmt{stroke:#4ecca3;stroke-dasharray:6 4;}
- .link-span{stroke:#a8dadc;stroke-dasharray:3 3;}
- .link-api{stroke:#e63946;stroke-dasharray:4 4;}
- .dim-node{opacity:.18;}
- .dim-link{opacity:.18;}
- .highlight-node{
-@@ -699,137 +731,175 @@ body{
+ </style>
+ </head>
+ <body>
+ 
+ <div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.6);color:white;padding:6px 12px;border-radius:6px;font-size:11px;z-index:9999;">DEV | versión no disponible</div>
+ 
+ <div class="page-container">
+ 
+   <!-- ENCABEZADO -->
+   <div class="header">
+     <h1>🏭 Showroom IT/OT</h1>
+   </div>
+ 
+-  <!-- FORMULARIO DATOS DE LA SOLICITUD (igual que tu Paso 1) -->
+-  <div class="form-panel">
+-    <h2>Datos de la solicitud</h2>
++  <!-- STEP 1: FORMULARIO -->
++  <div class="form-panel step-panel active" id="step-1">
++    <h2>Paso 1 de 3 · Formulario de visita</h2>
+ 
++    <h3 style="margin-bottom:12px;color:#ff6b35;">A) Visit logistics</h3>
++    <div class="form-group">
++      <label for="visitType">Visit type (Physical / Virtual)</label>
++      <select id="visitType">
++        <option value="">Selecciona una opción</option>
++        <option value="Physical">Physical</option>
++        <option value="Virtual">Virtual</option>
++      </select>
++    </div>
++    <div class="form-group">
++      <label for="visitDate">Visit date *</label>
++      <input type="date" id="visitDate" required>
++      <span class="error-message" id="error-visitDate"></span>
++    </div>
++    <div class="form-group">
++      <label for="visitTime">Visit time *</label>
++      <input type="time" id="visitTime" required>
++      <span class="error-message" id="error-visitTime"></span>
++    </div>
+     <div class="form-group">
+-          <label for="companyName">Nombre de la empresa</label>
+-      <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing">
++      <label for="presentationLanguage">Presentation language (Spanish / English)</label>
++      <select id="presentationLanguage">
++        <option value="">Selecciona una opción</option>
++        <option value="Spanish">Spanish</option>
++        <option value="English">English</option>
++      </select>
++    </div>
++    <div class="form-group">
++      <label for="coffeeBreak">Coffee break *</label>
++      <select id="coffeeBreak" required>
++        <option value="">Selecciona una opción</option>
++        <option value="Yes">Yes</option>
++        <option value="No">No</option>
++      </select>
++      <span class="error-message" id="error-coffeeBreak"></span>
++    </div>
++    <div class="form-group" id="costCenterGroup">
++      <label for="costCenter">Cost center *</label>
++      <input type="text" id="costCenter" placeholder="Centro de costos" disabled>
++      <span class="error-message" id="error-costCenter"></span>
+     </div>
+ 
++    <h3 style="margin:20px 0 12px;color:#ff6b35;">B) Customer data</h3>
+     <div class="form-group">
+-      <label for="sector">Sector de la empresa</label>
++      <label for="companyName">Customer company name *</label>
++      <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing" required>
++      <span class="error-message" id="error-companyName"></span>
++    </div>
++    <div class="form-group">
++      <label for="sector">Sector/Industry</label>
+       <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
+     </div>
+-
+     <div class="form-group">
+-      <label for="guestCount">Cantidad de invitados por parte del cliente</label>
+-      <input type="number" id="guestCount" min="0" placeholder="Ej: 5">
++      <label for="subsector">Subsector</label>
++      <input type="text" id="subsector" placeholder="Ej: Componentes, Alimentos, Retail">
++    </div>
++    <div class="form-group">
++      <label for="sitesCount">Number of sites/plants</label>
++      <input type="text" id="sitesCount" placeholder="Ej: 3 plantas, 12 sitios">
++    </div>
++    <div class="form-group">
++      <label for="annualRevenue">Annual revenue (MXN)</label>
++      <input type="text" id="annualRevenue" placeholder="MXN">
+     </div>
+ 
++    <h3 style="margin:20px 0 12px;color:#ff6b35;">C) Commercial internal data</h3>
+     <div class="form-group">
+-      <label>Invitados del cliente (nombre y puesto)</label>
+-      <div class="guest-form">
+-        <input type="text" id="guestNameInput" placeholder="Nombre del invitado">
+-        <input type="text" id="guestRoleInput" placeholder="Puesto">
+-        <button type="button" class="btn-guest-add" onclick="addGuest()">Agregar invitado</button>
+-      </div>
+-      <div id="guestList"></div>
++      <label for="salesManager">Sales manager *</label>
++      <input type="text" id="salesManager" required>
++      <span class="error-message" id="error-salesManager"></span>
++    </div>
++    <div class="form-group">
++      <label for="accountExecutive">Account executive *</label>
++      <input type="text" id="accountExecutive" required>
++      <span class="error-message" id="error-accountExecutive"></span>
++    </div>
++    <div class="form-group">
++      <label for="corporateCuc">Corporate CUC</label>
++      <input type="text" id="corporateCuc">
++    </div>
++    <div class="form-group">
++      <label for="opportunityStatus">Opportunity status</label>
++      <input type="text" id="opportunityStatus">
++    </div>
++    <div class="form-group">
++      <label for="opportunityProject">Opportunity/Project name or ID</label>
++      <input type="text" id="opportunityProject">
++    </div>
++    <div class="form-group">
++      <label for="topNumber">TOP number</label>
++      <input type="text" id="topNumber">
+     </div>
+ 
++    <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Attendees (client + Scitum/Telmex)</h3>
+     <div class="form-group">
+-      <label for="calendar">Fecha solicitada *</label>
+-      <div class="calendar-time-wrapper" id="calendar">
+-        <div class="calendar-wrapper">
+-          <div class="calendar-header">
+-            <button type="button" class="calendar-nav" onclick="changeMonth(-1)">&#8249;</button>
+-            <div id="calendarMonthLabel" class="calendar-month"></div>
+-            <button type="button" class="calendar-nav" onclick="changeMonth(1)">&#8250;</button>
+-          </div>
+-          <div class="calendar-weekdays">
+-            <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+-          </div>
+-          <div id="calendarGrid" class="calendar-grid"></div>
+-        </div>
+-        <div class="time-selector">
+-          <label for="requestedTime">Horario *</label>
+-          <select id="requestedTime"></select>
+-          <p class="time-helper">Los horarios válidos son de 10:00 a 16:00. Las horas adyacentes a una reserva se bloquean automáticamente.</p>
+-        </div>
+-      </div>
++      <label>Client attendees</label>
++      <div id="clientAttendeesList"></div>
++      <button type="button" class="btn-guest-add" id="addClientAttendee">Agregar invitado</button>
++    </div>
++    <div class="form-group">
++      <label>Scitum/Telmex attendees</label>
++      <div id="internalAttendeesList"></div>
++      <button type="button" class="btn-guest-add" id="addInternalAttendee">Agregar invitado</button>
+     </div>
+ 
++    <h3 style="margin:20px 0 12px;color:#ff6b35;">E) Strategic context</h3>
+     <div class="form-group">
+-      <label for="comments">Comentarios (opcional)</label>
+-      <textarea id="comments"></textarea>
++      <label for="visitObjective">Visit objective</label>
++      <textarea id="visitObjective"></textarea>
++    </div>
++    <div class="form-group">
++      <label for="customerDescription">Customer description, critical processes, and operation</label>
++      <textarea id="customerDescription"></textarea>
++    </div>
++    <div class="form-group">
++      <label for="mainProblem">Main problem to solve</label>
++      <textarea id="mainProblem"></textarea>
++    </div>
++    <div class="form-group">
++      <label for="maturityLevel">Cybersecurity maturity level</label>
++      <select id="maturityLevel">
++        <option value="">Selecciona una opción</option>
++        <option value="Low">Low</option>
++        <option value="Medium">Medium</option>
++        <option value="High">High</option>
++        <option value="Unknown">Unknown</option>
++      </select>
+     </div>
+ 
+-    <div class="form-group" style="margin-top:10px;">
+-      <label>
+-        <input type="checkbox" id="labTeamPresent" style="width:16px;height:16px;margin-right:6px;">
+-        Requieren que la presentación la dé el equipo de laboratorio
+-      </label>
++    <div class="footer-actions">
++      <div class="footer-actions-inner">
++        <button type="button" class="btn btn-primary" id="toStep2">Siguiente: Diagrama</button>
++      </div>
+     </div>
+   </div>
+ 
+-  <!-- DOS COLUMNAS: TECNOLOGÍAS + DIAGRAMA -->
+-  <div class="content-two-columns">
++  <!-- STEP 2: DIAGRAMA + SOLUCIONES -->
++  <div class="step-panel" id="step-2">
++    <h2 style="margin-bottom:20px;">Paso 2 de 3 · Diagrama y soluciones</h2>
++    <!-- DOS COLUMNAS: TECNOLOGÍAS + DIAGRAMA -->
++    <div class="content-two-columns">
+ 
+     <!-- OPCIONES DE TECNOLOGÍA -->
+     <div class="tech-options">
+       <form id="reservationForm">
+         <div class="solutions-section">
+           <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a Demostrar *</h3>
+ 
+           <div class="solution-item">
+             <div class="solution-checkbox">
+               <input type="checkbox" id="sol-fw-ot" onchange="toggleBrands('fw-ot')">
+               <label for="sol-fw-ot">FW OT (Firewall OT)</label>
+             </div>
+             <div class="brands-group" id="brands-fw-ot">
+               <div class="brand-option">
+                 <input type="radio" id="fw-fortinet" name="fw-ot-brand" value="Fortinet">
+                 <label for="fw-fortinet">Fortinet</label>
+               </div>
+               <div class="brand-option">
+                 <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point">
+                 <label for="fw-checkpoint">Check Point</label>
+               </div>
+               <div class="brand-option">
+                 <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks">
+                 <label for="fw-txone">TXOne Networks</label>
+               </div>
+@@ -711,395 +840,445 @@ body{
+ 
+           <div class="solution-item">
+             <div class="solution-checkbox">
+               <input type="checkbox" id="sol-soc" onchange="toggleBrands('soc')">
+               <label for="sol-soc">SOC (SIEM / Monitoreo)</label>
+             </div>
+             <div class="brands-group" id="brands-soc">
+               <div class="brand-option">
+                 <input type="radio" id="soc-splunk" name="soc-brand" value="Splunk">
+                 <label for="soc-splunk">Splunk</label>
+               </div>
+             </div>
+           </div>
+ 
+         </div>
+       </form>
+     </div>
+ 
+     <!-- DIAGRAMA -->
+     <div class="diagram-panel">
        <h2>Diagrama de la arquitectura de la maqueta</h2>
        <p>Pasa el cursor sobre los componentes o líneas para ver detalles. Los componentes conectados se resaltan automáticamente.</p>
        <div id="diagram-container"></div>
      </div>
  
++    </div>
++    <div class="footer-actions">
++      <div class="footer-actions-inner" style="flex-direction:row;justify-content:space-between;">
++        <button type="button" class="btn" id="backToStep1">Volver al formulario</button>
++        <button type="button" class="btn btn-primary" id="toStep3">Siguiente: Confirmación</button>
++      </div>
++    </div>
    </div>
  
-   <!-- BOTÓN ENVIAR + FALLBACK -->
-   <div class="footer-actions">
-     <div class="footer-actions-inner">
-       <button type="button" class="btn btn-primary" onclick="handleSubmit()">Enviar</button>
- 
-       <div id="fallback" style="display:none" class="fallback-section">
-         <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
-         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
-         <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
-         <textarea id="fallback-body" readonly></textarea>
-         <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+-  <!-- BOTÓN ENVIAR + FALLBACK -->
+-  <div class="footer-actions">
+-    <div class="footer-actions-inner">
+-      <button type="button" class="btn btn-primary" onclick="handleSubmit()">Enviar</button>
+-
+-      <div id="fallback" style="display:none" class="fallback-section">
+-        <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
+-        <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
+-        <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+-        <textarea id="fallback-body" readonly></textarea>
+-        <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
++  <!-- STEP 3: CONFIRMACIÓN -->
++  <div class="form-panel step-panel" id="step-3">
++    <h2>Paso 3 de 3 · Confirmación</h2>
++    <div id="confirmationSummary"></div>
++
++    <div class="footer-actions">
++      <div class="footer-actions-inner" style="flex-direction:row;justify-content:space-between;">
++        <button type="button" class="btn" id="backToStep1FromSummary">Back to Edit Form</button>
++        <button type="button" class="btn" id="backToStep2FromSummary">Back to Diagram</button>
++        <button type="button" class="btn btn-primary" id="sendEmail">Send Email</button>
        </div>
      </div>
++
++    <div id="fallback" style="display:none" class="fallback-section">
++      <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
++      <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
++      <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
++      <textarea id="fallback-body" readonly></textarea>
++      <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
++    </div>
    </div>
  
  </div>
  
  <div id="tooltip" class="tooltip"></div>
-+<div id="successModal" class="modal-overlay" style="display:none;">
-+  <div class="modal-content">
-+    <h3>Solicitud enviada</h3>
-+    <p>Tu solicitud fue enviada. Revisa tu correo para la confirmación dentro de las próximas 24 horas.</p>
-+    <button type="button" class="btn btn-primary" onclick="closeSuccessModal()">Cerrar</button>
-+  </div>
-+</div>
- 
+-<div id="successModal" class="modal-overlay" style="display:none;">
+-  <div class="modal-content">
+-    <h3>Solicitud enviada</h3>
+-    <p>Tu solicitud fue enviada. Revisa tu correo para la confirmación dentro de las próximas 24 horas.</p>
+-    <button type="button" class="btn btn-primary" onclick="closeSuccessModal()">Cerrar</button>
+-  </div>
+-</div>
+-
  <script>
  const mailtoRecipient = 'showroom-itot@ejemplo.com';
++const STEP_IDS = ['step-1','step-2','step-3'];
++const REQUIRED_FIELDS = [
++  {id:'visitDate', label:'Visit date'},
++  {id:'visitTime', label:'Visit time'},
++  {id:'companyName', label:'Customer company name'},
++  {id:'coffeeBreak', label:'Coffee break'},
++  {id:'salesManager', label:'Sales manager'},
++  {id:'accountExecutive', label:'Account executive'}
++];
  
- // --- NUEVO: lógica de calendario y horarios con lectura de CSV ---
- const DISPLAY_HOURS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
- const RESERVABLE_HOURS = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
- let selectedDate = null;      // 'YYYY-MM-DD'
- let selectedTime = null;      // 'HH:MM'
- let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
- let availabilityByDate = {};
- let currentMonthDate = new Date();
-+let cachedCsvRows = null;     // Matriz con los datos de reservas.csv (incluye encabezados)
-+const CSV_HEADERS = ['Fecha','HoraInicio','HoraFin','Estado','Empresa','Sector','NumeroInvitados','Comentarios','RequiereEquipoLab','InvitadosJson','Tecnologias'];
- 
- async function reservasdb(){
-   try{
-+    let cachedText = null;
-+    if(typeof localStorage !== 'undefined'){
-+      try{
-+        cachedText = localStorage.getItem('reservasCsvCache');
-+      }catch(err){
-+        console.warn('No se pudo leer la caché local de reservas.csv', err);
-+      }
-+    }
-+    if(cachedText){
-+      const cachedRows = parseCsv(cachedText);
-+      if(cachedRows.length>0){
-+        cachedCsvRows = cachedRows;
-+        return csvRowsToReservations(cachedRows);
-+      }
-+    }
-+
-     const response = await fetch('../data/reservas.csv');
-     if(!response.ok) throw new Error('No se pudo leer reservas.csv');
-     const csvText = await response.text();
-     const rows = parseCsv(csvText);
-+    cachedCsvRows = rows;
-+    if(typeof localStorage !== 'undefined'){
-+      try{
-+        localStorage.setItem('reservasCsvCache', csvText);
-+      }catch(err){
-+        console.warn('No se pudo guardar el CSV en localStorage', err);
-+      }
-+    }
-     if(rows.length === 0) return [];
- 
--    const headers = rows[0].map(h=>h.trim());
--    return rows.slice(1).map(values=>{
--      const record = {};
--      headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
--      const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
+-// --- NUEVO: lógica de calendario y horarios con lectura de CSV ---
+-const DISPLAY_HOURS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+-const RESERVABLE_HOURS = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
+-let selectedDate = null;      // 'YYYY-MM-DD'
+-let selectedTime = null;      // 'HH:MM'
+-let reservationsByDate = {};  // { 'YYYY-MM-DD': ['11:00', '14:00'] }
+-let availabilityByDate = {};
+-let currentMonthDate = new Date();
+-let cachedCsvRows = null;     // Matriz con los datos de reservas.csv (incluye encabezados)
+-const CSV_HEADERS = ['Fecha','HoraInicio','HoraFin','Estado','Empresa','Sector','NumeroInvitados','Comentarios','RequiereEquipoLab','InvitadosJson','Tecnologias'];
 -
--      return {
--        fecha: record.Fecha || record.fecha || record.date || '',
--        horaInicio: record.HoraInicio || record.Hora || record.hora || '',
--        horaFin: record.HoraFin || record.horafin || '',
--        estado: record.Estado || record.estado || '',
--        empresa: record.Empresa || record.empresa || '',
--        sector: record.Sector || record.sector || '',
--        numeroInvitados: record.NumeroInvitados || record.invitados || '',
--        comentarios: record.Comentarios || record.comentarios || '',
--        requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
--        invitadosDetalle: record.InvitadosJson || record.Invitados || '',
--        tecnologias: techList
--      };
--    });
-+    return csvRowsToReservations(rows);
-   }catch(err){
-     console.error('No se pudieron leer las reservas desde el CSV', err);
-     return [];
-   }
- }
+-async function reservasdb(){
+-  try{
+-    let cachedText = null;
+-    if(typeof localStorage !== 'undefined'){
+-      try{
+-        cachedText = localStorage.getItem('reservasCsvCache');
+-      }catch(err){
+-        console.warn('No se pudo leer la caché local de reservas.csv', err);
+-      }
+-    }
+-    if(cachedText){
+-      const cachedRows = parseCsv(cachedText);
+-      if(cachedRows.length>0){
+-        cachedCsvRows = cachedRows;
+-        return csvRowsToReservations(cachedRows);
+-      }
+-    }
++const EMPTY_VALUE = '—';
  
- // Parser simple para CSV con comillas y comas embebidas
- function parseCsv(text){
-   const rows = [];
-   let row = [];
-   let field = '';
-   let inQuotes = false;
- 
-   for(let i=0; i<text.length; i++){
-     const char = text[i];
-     if(char === '"'){
-       const next = text[i+1];
-       if(inQuotes && next === '"'){
-         field += '"';
-         i++;
-       }else{
-         inQuotes = !inQuotes;
-       }
-     }else if(char === ',' && !inQuotes){
-       row.push(field);
-       field = '';
-     }else if((char === '\n' || char === '\r') && !inQuotes){
-       if(field.length>0 || row.length>0){
-         row.push(field);
-         rows.push(row);
-         row = [];
-         field = '';
-       }
-     }else{
-       field += char;
-     }
-   }
- 
-   if(field.length>0 || row.length>0){
-     row.push(field);
-     rows.push(row);
-   }
- 
-   return rows.filter(r=>r.some(v=>v.trim().length>0));
- }
- 
-+function csvRowsToReservations(rows){
-+  if(!rows || rows.length === 0) return [];
-+  const headers = rows[0].map(h=>h.trim());
-+  return rows.slice(1).map(values=>{
-+    const record = {};
-+    headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
-+    const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
-+
-+    return {
-+      fecha: record.Fecha || record.fecha || record.date || '',
-+      horaInicio: record.HoraInicio || record.Hora || record.hora || '',
-+      horaFin: record.HoraFin || record.horafin || '',
-+      estado: record.Estado || record.estado || '',
-+      empresa: record.Empresa || record.empresa || '',
-+      sector: record.Sector || record.sector || '',
-+      numeroInvitados: record.NumeroInvitados || record.invitados || '',
-+      comentarios: record.Comentarios || record.comentarios || '',
-+      requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
-+      invitadosDetalle: record.InvitadosJson || record.Invitados || '',
-+      tecnologias: techList
-+    };
-+  });
+-    const response = await fetch('../data/reservas.csv');
+-    if(!response.ok) throw new Error('No se pudo leer reservas.csv');
+-    const csvText = await response.text();
+-    const rows = parseCsv(csvText);
+-    cachedCsvRows = rows;
+-    if(typeof localStorage !== 'undefined'){
+-      try{
+-        localStorage.setItem('reservasCsvCache', csvText);
+-      }catch(err){
+-        console.warn('No se pudo guardar el CSV en localStorage', err);
+-      }
+-    }
+-    if(rows.length === 0) return [];
++function formatValue(value){
++  const trimmed = value ? value.toString().trim() : '';
++  return trimmed.length ? trimmed : EMPTY_VALUE;
 +}
-+
- function normalizeTimeSlot(timeStr){
-   if(!timeStr) return null;
-   const parts = timeStr.toString().trim().split(':');
-   const hour = parts[0];
-   if(hour === undefined) return null;
-   const hourNum = Number(hour);
-   if(Number.isNaN(hourNum)) return null;
-   return `${String(hourNum).padStart(2,'0')}:00`;
+ 
+-    return csvRowsToReservations(rows);
+-  }catch(err){
+-    console.error('No se pudieron leer las reservas desde el CSV', err);
+-    return [];
++function showStep(stepId){
++  STEP_IDS.forEach(id=>{
++    const step = document.getElementById(id);
++    if(step) step.classList.toggle('active', id === stepId);
++  });
++  if(stepId === 'step-3'){
++    populateSummary();
+   }
++  window.scrollTo({top:0, behavior:'smooth'});
  }
  
- function addBlockedSlot(blockedSet,timeStr){
-   const normalized = normalizeTimeSlot(timeStr);
-   if(!normalized) return;
-   const hour = parseInt(normalized.split(':')[0],10);
-   if(Number.isNaN(hour)) return;
-   [hour-1,hour,hour+1].forEach(h=>{
-     const slot = `${String(h).padStart(2,'0')}:00`;
-     if(DISPLAY_HOURS.includes(slot)){
-       blockedSet.add(slot);
+-// Parser simple para CSV con comillas y comas embebidas
+-function parseCsv(text){
+-  const rows = [];
+-  let row = [];
+-  let field = '';
+-  let inQuotes = false;
+-
+-  for(let i=0; i<text.length; i++){
+-    const char = text[i];
+-    if(char === '"'){
+-      const next = text[i+1];
+-      if(inQuotes && next === '"'){
+-        field += '"';
+-        i++;
+-      }else{
+-        inQuotes = !inQuotes;
+-      }
+-    }else if(char === ',' && !inQuotes){
+-      row.push(field);
+-      field = '';
+-    }else if((char === '\n' || char === '\r') && !inQuotes){
+-      if(field.length>0 || row.length>0){
+-        row.push(field);
+-        rows.push(row);
+-        row = [];
+-        field = '';
+-      }
+-    }else{
+-      field += char;
++function toggleCostCenter(){
++  const coffeeBreak = document.getElementById('coffeeBreak');
++  const costCenterGroup = document.getElementById('costCenterGroup');
++  const costCenter = document.getElementById('costCenter');
++  const needsCostCenter = coffeeBreak && coffeeBreak.value === 'Yes';
++  if(costCenterGroup){
++    costCenterGroup.style.display = needsCostCenter ? 'block' : 'none';
++  }
++  if(costCenter){
++    costCenter.disabled = !needsCostCenter;
++    costCenter.required = needsCostCenter;
++    if(!needsCostCenter){
++      costCenter.value = '';
      }
-   });
+   }
++}
+ 
+-  if(field.length>0 || row.length>0){
+-    row.push(field);
+-    rows.push(row);
++function setError(fieldId, message){
++  const error = document.getElementById(`error-${fieldId}`);
++  if(error){
++    error.textContent = message;
+   }
++}
+ 
+-  return rows.filter(r=>r.some(v=>v.trim().length>0));
++function clearErrors(){
++  document.querySelectorAll('.error-message').forEach(el=>{el.textContent='';});
  }
  
- function buildAvailabilityMap(){
-   availabilityByDate = {};
-@@ -1231,51 +1301,50 @@ function getSelectedSolutions(){
+-function csvRowsToReservations(rows){
+-  if(!rows || rows.length === 0) return [];
+-  const headers = rows[0].map(h=>h.trim());
+-  return rows.slice(1).map(values=>{
+-    const record = {};
+-    headers.forEach((h,idx)=>{record[h]=values[idx]?.trim()||'';});
+-    const techList = (record.Tecnologias || record.Soluciones || '').split(';').map(t=>t.trim()).filter(Boolean);
++function validateStep1(){
++  clearErrors();
++  let isValid = true;
+ 
+-    return {
+-      fecha: record.Fecha || record.fecha || record.date || '',
+-      horaInicio: record.HoraInicio || record.Hora || record.hora || '',
+-      horaFin: record.HoraFin || record.horafin || '',
+-      estado: record.Estado || record.estado || '',
+-      empresa: record.Empresa || record.empresa || '',
+-      sector: record.Sector || record.sector || '',
+-      numeroInvitados: record.NumeroInvitados || record.invitados || '',
+-      comentarios: record.Comentarios || record.comentarios || '',
+-      requiereEquipoLab: record.RequiereEquipoLab === true || record.RequiereEquipoLab === 'true' || record.RequiereEquipoLab === '1',
+-      invitadosDetalle: record.InvitadosJson || record.Invitados || '',
+-      tecnologias: techList
+-    };
++  REQUIRED_FIELDS.forEach(field=>{
++    const input = document.getElementById(field.id);
++    if(!input) return;
++    if(!input.value || !input.value.toString().trim()){
++      setError(field.id, 'Este campo es obligatorio.');
++      isValid = false;
++    }
+   });
+-}
+ 
+-function normalizeTimeSlot(timeStr){
+-  if(!timeStr) return null;
+-  const parts = timeStr.toString().trim().split(':');
+-  const hour = parts[0];
+-  if(hour === undefined) return null;
+-  const hourNum = Number(hour);
+-  if(Number.isNaN(hourNum)) return null;
+-  return `${String(hourNum).padStart(2,'0')}:00`;
+-}
+-
+-function addBlockedSlot(blockedSet,timeStr){
+-  const normalized = normalizeTimeSlot(timeStr);
+-  if(!normalized) return;
+-  const hour = parseInt(normalized.split(':')[0],10);
+-  if(Number.isNaN(hour)) return;
+-  [hour-1,hour,hour+1].forEach(h=>{
+-    const slot = `${String(h).padStart(2,'0')}:00`;
+-    if(DISPLAY_HOURS.includes(slot)){
+-      blockedSet.add(slot);
++  const coffeeBreak = document.getElementById('coffeeBreak');
++  const costCenter = document.getElementById('costCenter');
++  if(coffeeBreak && coffeeBreak.value === 'Yes'){
++    if(!costCenter || !costCenter.value.trim()){
++      setError('costCenter', 'El centro de costos es obligatorio cuando hay coffee break.');
++      isValid = false;
+     }
+-  });
+-}
++  }
+ 
+-function buildAvailabilityMap(){
+-  availabilityByDate = {};
+-  Object.keys(reservationsByDate).forEach(dateStr=>{
+-    const blocked = new Set();
+-    (reservationsByDate[dateStr] || []).forEach(time=>addBlockedSlot(blocked,time));
+-    const hasAvailableSlots = RESERVABLE_HOURS.some(h=>!blocked.has(h));
+-    availabilityByDate[dateStr] = {blockedTimes:blocked, hasAvailableSlots};
+-  });
++  return isValid;
+ }
+ 
+-async function loadReservationsFromCsv(){
+-  try{
+-    const data = await reservasdb();
+-    reservationsByDate = {};
++function createAttendeeRow({withEmail = false} = {}){
++  const row = document.createElement('div');
++  row.className = 'attendee-row';
+ 
+-    data.forEach(item=>{
+-      const dateStr = item.fecha ? item.fecha.split('T')[0] : null;
+-      const timeStr = normalizeTimeSlot(item.horaInicio || item.horaFin || item.hora || item.Hora);
+-      if(dateStr && timeStr){
+-        if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
+-        reservationsByDate[dateStr].push(timeStr);
+-      }
+-    });
++  const nameInput = document.createElement('input');
++  nameInput.type = 'text';
++  nameInput.placeholder = 'Nombre';
+ 
+-    buildAvailabilityMap();
+-    renderCalendar(currentMonthDate);
+-    if(selectedDate){
+-      renderTimeOptionsForSelectedDay();
+-    }
+-  }catch(err){
+-    console.error('No se pudieron cargar las reservas desde el CSV',err);
++  const roleInput = document.createElement('input');
++  roleInput.type = 'text';
++  roleInput.placeholder = 'Rol / Puesto';
++
++  row.appendChild(nameInput);
++  row.appendChild(roleInput);
++
++  let emailInput = null;
++  if(withEmail){
++    emailInput = document.createElement('input');
++    emailInput.type = 'email';
++    emailInput.placeholder = 'Email';
++    row.appendChild(emailInput);
+   }
++
++  const removeBtn = document.createElement('button');
++  removeBtn.type = 'button';
++  removeBtn.className = 'attendee-remove';
++  removeBtn.textContent = 'Quitar';
++  removeBtn.addEventListener('click',()=>row.remove());
++  row.appendChild(removeBtn);
++
++  return row;
+ }
+ 
+-function formatDateString(year,monthIndex,day){
+-  const m = String(monthIndex+1).padStart(2,'0');
+-  const d = String(day).padStart(2,'0');
+-  return `${year}-${m}-${d}`;
++function addAttendee(containerId, withEmail){
++  const container = document.getElementById(containerId);
++  if(!container) return;
++  const row = createAttendeeRow({withEmail});
++  container.appendChild(row);
+ }
+ 
+-function isDayAvailable(dateStr){
+-  if(isWeekend(dateStr)) return false;
+-  const info = availabilityByDate[dateStr];
+-  if(!info) return true;
+-  return info.hasAvailableSlots;
++function getAttendeeData(containerId, withEmail){
++  const container = document.getElementById(containerId);
++  if(!container) return [];
++  const rows = Array.from(container.querySelectorAll('.attendee-row'));
++  return rows.map(row=>{
++    const inputs = row.querySelectorAll('input');
++    const name = inputs[0]?.value?.trim() || '';
++    const role = inputs[1]?.value?.trim() || '';
++    const email = withEmail ? (inputs[2]?.value?.trim() || '') : '';
++    return {name, role, email};
++  }).filter(item=>item.name || item.role || item.email);
+ }
+ 
+-  function isWeekend(dateStr){
+- // Parse as local date to avoid timezone shifts that could misclassify weekends
+-  const [y,m,d] = dateStr.split('-').map(Number);
+-  const date = new Date(y, (m||1)-1, d||1);
+-  const day = date.getDay();
+-  return day === 0 || day === 6; // domingo (0) o sábado (6)
++function getFormData(){
++  return {
++    visitType: document.getElementById('visitType')?.value || '',
++    visitDate: document.getElementById('visitDate')?.value || '',
++    visitTime: document.getElementById('visitTime')?.value || '',
++    presentationLanguage: document.getElementById('presentationLanguage')?.value || '',
++    coffeeBreak: document.getElementById('coffeeBreak')?.value || '',
++    costCenter: document.getElementById('costCenter')?.value || '',
++    companyName: document.getElementById('companyName')?.value || '',
++    sector: document.getElementById('sector')?.value || '',
++    subsector: document.getElementById('subsector')?.value || '',
++    sitesCount: document.getElementById('sitesCount')?.value || '',
++    annualRevenue: document.getElementById('annualRevenue')?.value || '',
++    salesManager: document.getElementById('salesManager')?.value || '',
++    accountExecutive: document.getElementById('accountExecutive')?.value || '',
++    corporateCuc: document.getElementById('corporateCuc')?.value || '',
++    opportunityStatus: document.getElementById('opportunityStatus')?.value || '',
++    opportunityProject: document.getElementById('opportunityProject')?.value || '',
++    topNumber: document.getElementById('topNumber')?.value || '',
++    clientAttendees: getAttendeeData('clientAttendeesList', true),
++    internalAttendees: getAttendeeData('internalAttendeesList', false),
++    visitObjective: document.getElementById('visitObjective')?.value || '',
++    customerDescription: document.getElementById('customerDescription')?.value || '',
++    mainProblem: document.getElementById('mainProblem')?.value || '',
++    maturityLevel: document.getElementById('maturityLevel')?.value || ''
++  };
+ }
+-  
+-function renderCalendar(monthDate = currentMonthDate){
+-  currentMonthDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+-  const monthLabel = document.getElementById('calendarMonthLabel');
+-  const grid = document.getElementById('calendarGrid');
+-  if(!monthLabel || !grid) return;
+ 
+-  monthLabel.textContent = currentMonthDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+-  grid.innerHTML = '';
++function renderSummarySection(title, items){
++  const listItems = items.map(item=>{
++    return `<li><strong>${item.label}:</strong> ${item.value}</li>`;
++  }).join('');
++  return `
++    <div class="summary-section">
++      <h3>${title}</h3>
++      <ul class="summary-list">${listItems}</ul>
++    </div>
++  `;
++}
+ 
+-  const startOfMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth(),1);
+-  const startDay = (startOfMonth.getDay()+6)%7; // Empezar en lunes
+-  for(let i=0;i<startDay;i++){
+-    const empty = document.createElement('div');
+-    grid.appendChild(empty);
++function formatAttendees(attendees, withEmail){
++  if(!attendees.length){
++    return `<li>${EMPTY_VALUE}</li>`;
+   }
+-
+-  const daysInMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+1,0).getDate();
+-  for(let day=1; day<=daysInMonth; day++){
+-    const dateStr = formatDateString(currentMonthDate.getFullYear(), currentMonthDate.getMonth(), day);
+-    const btn = document.createElement('button');
+-    btn.type = 'button';
+-    btn.classList.add('calendar-day');
+-    btn.textContent = day;
+-
+-    if(isDayAvailable(dateStr)){
+-      btn.classList.add('available-day');
+-      btn.addEventListener('click',()=>onDayClick(dateStr));
+-    }else{
+-      btn.classList.add('unavailable-day');
+-      btn.disabled = true;
+-    }
+-
+-    if(selectedDate === dateStr){
+-      btn.classList.add('selected-day');
++  return attendees.map((attendee, index)=>{
++    const name = formatValue(attendee.name);
++    const role = formatValue(attendee.role);
++    if(withEmail){
++      const email = formatValue(attendee.email);
++      return `<li>${index+1}. ${name} — ${role} — ${email}</li>`;
+     }
+-    grid.appendChild(btn);
+-  }
++    return `<li>${index+1}. ${name} — ${role}</li>`;
++  }).join('');
+ }
+ 
+-function onDayClick(dateString){
+-  if(!isDayAvailable(dateString)) return;
+-  selectedDate = dateString;
+-  renderCalendar(currentMonthDate);
+-  renderTimeOptionsForSelectedDay();
+-}
+-
+-function renderTimeOptionsForSelectedDay(){
+-  const select = document.getElementById('requestedTime');
+-  if(!select) return;
+-  select.innerHTML = '';
++function populateSummary(){
++  const data = getFormData();
++  const solutions = getSelectedSolutions();
++  const summary = document.getElementById('confirmationSummary');
++  if(!summary) return;
++
++  const sectionsHtml = [
++    renderSummarySection('A) Visit logistics', [
++      {label:'Visit type', value: formatValue(data.visitType)},
++      {label:'Visit date', value: formatValue(data.visitDate)},
++      {label:'Visit time', value: formatValue(data.visitTime)},
++      {label:'Presentation language', value: formatValue(data.presentationLanguage)},
++      {label:'Coffee break', value: formatValue(data.coffeeBreak)},
++      {label:'Cost center', value: formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}
++    ]),
++    renderSummarySection('B) Customer data', [
++      {label:'Customer company name', value: formatValue(data.companyName)},
++      {label:'Sector/Industry', value: formatValue(data.sector)},
++      {label:'Subsector', value: formatValue(data.subsector)},
++      {label:'Number of sites/plants', value: formatValue(data.sitesCount)},
++      {label:'Annual revenue (MXN)', value: formatValue(data.annualRevenue)}
++    ]),
++    renderSummarySection('C) Commercial internal data', [
++      {label:'Sales manager', value: formatValue(data.salesManager)},
++      {label:'Account executive', value: formatValue(data.accountExecutive)},
++      {label:'Corporate CUC', value: formatValue(data.corporateCuc)},
++      {label:'Opportunity status', value: formatValue(data.opportunityStatus)},
++      {label:'Opportunity/Project name or ID', value: formatValue(data.opportunityProject)},
++      {label:'TOP number', value: formatValue(data.topNumber)}
++    ]),
++    `
++      <div class="summary-section">
++        <h3>D) Attendees (client + Scitum/Telmex)</h3>
++        <strong>Client attendees</strong>
++        <ul class="summary-list">${formatAttendees(data.clientAttendees, true)}</ul>
++        <strong>Scitum/Telmex attendees</strong>
++        <ul class="summary-list">${formatAttendees(data.internalAttendees, false)}</ul>
++      </div>
++    `,
++    renderSummarySection('E) Strategic context', [
++      {label:'Visit objective', value: formatValue(data.visitObjective)},
++      {label:'Customer description, critical processes, and operation', value: formatValue(data.customerDescription)},
++      {label:'Main problem to solve', value: formatValue(data.mainProblem)},
++      {label:'Cybersecurity maturity level', value: formatValue(data.maturityLevel)}
++    ]),
++    `
++      <div class="summary-section">
++        <h3>F) Diagram / Selected solutions</h3>
++        <ul class="summary-list">
++          ${solutions.length ? solutions.map((s, idx)=>`<li>${idx+1}. ${s.name} — ${formatValue(s.brand)}</li>`).join('') : `<li>${EMPTY_VALUE}</li>`}
++        </ul>
++      </div>
++    `
++  ];
+ 
+-  const placeholder = document.createElement('option');
+-  placeholder.value = '';
+-  placeholder.disabled = true;
+-  placeholder.selected = true;
+-  placeholder.textContent = selectedDate ? 'Selecciona un horario' : 'Selecciona una fecha primero';
+-  select.appendChild(placeholder);
++  summary.innerHTML = sectionsHtml.join('');
++}
+ 
+-  const blocked = (selectedDate && availabilityByDate[selectedDate]?.blockedTimes) ? availabilityByDate[selectedDate].blockedTimes : new Set();
++function buildMailto(){
++  if(!validateStep1()){
++    showStep('step-1');
++    alert('Por favor completa los campos obligatorios.');
++    return null;
++  }
+ 
+-  DISPLAY_HOURS.forEach(time=>{
+-    const option = document.createElement('option');
+-    option.value = time;
+-    option.textContent = time;
+-    const isReservable = RESERVABLE_HOURS.includes(time);
+-    const isBlocked = blocked.has(time);
+-    const isAvailable = selectedDate && isReservable && !isBlocked;
++  const data = getFormData();
++  const solutions = getSelectedSolutions();
++  const subjectCompany = formatValue(data.companyName);
++  const subjectDate = formatValue(data.visitDate);
++  const subjectTime = formatValue(data.visitTime);
++
++  const subject = `Showroom Visit Request - ${subjectCompany} - ${subjectDate} ${subjectTime}`;
++
++  let body = `A) Visit logistics\n`;
++  body += `- Visit type: ${formatValue(data.visitType)}\n`;
++  body += `- Visit date: ${formatValue(data.visitDate)}\n`;
++  body += `- Visit time: ${formatValue(data.visitTime)}\n`;
++  body += `- Presentation language: ${formatValue(data.presentationLanguage)}\n`;
++  body += `- Coffee break: ${formatValue(data.coffeeBreak)}\n`;
++  body += `- Cost center: ${formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}\n\n`;
++
++  body += `B) Customer data\n`;
++  body += `- Customer company name: ${formatValue(data.companyName)}\n`;
++  body += `- Sector/Industry: ${formatValue(data.sector)}\n`;
++  body += `- Subsector: ${formatValue(data.subsector)}\n`;
++  body += `- Number of sites/plants: ${formatValue(data.sitesCount)}\n`;
++  body += `- Annual revenue (MXN): ${formatValue(data.annualRevenue)}\n\n`;
++
++  body += `C) Commercial internal data\n`;
++  body += `- Sales manager: ${formatValue(data.salesManager)}\n`;
++  body += `- Account executive: ${formatValue(data.accountExecutive)}\n`;
++  body += `- Corporate CUC: ${formatValue(data.corporateCuc)}\n`;
++  body += `- Opportunity status: ${formatValue(data.opportunityStatus)}\n`;
++  body += `- Opportunity/Project name or ID: ${formatValue(data.opportunityProject)}\n`;
++  body += `- TOP number: ${formatValue(data.topNumber)}\n\n`;
++
++  body += `D) Attendees (client + Scitum/Telmex)\n`;
++  body += `Client attendees:\n`;
++  if(data.clientAttendees.length){
++    data.clientAttendees.forEach((attendee, idx)=>{
++      body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)} / ${formatValue(attendee.email)}\n`;
++    });
++  }else{
++    body += `- ${EMPTY_VALUE}\n`;
++  }
++  body += `Scitum/Telmex attendees:\n`;
++  if(data.internalAttendees.length){
++    data.internalAttendees.forEach((attendee, idx)=>{
++      body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)}\n`;
++    });
++  }else{
++    body += `- ${EMPTY_VALUE}\n`;
++  }
++  body += `\n`;
+ 
+-    if(isAvailable){
+-      option.classList.add('time-available');
+-      option.style.color = '#2ecc71';
+-    }else{
+-      option.classList.add('time-disabled');
+-      option.disabled = true;
+-      option.style.color = '#e63946';
+-    }
+-    select.appendChild(option);
+-  });
++  body += `E) Strategic context\n`;
++  body += `- Visit objective: ${formatValue(data.visitObjective)}\n`;
++  body += `- Customer description, critical processes, and operation: ${formatValue(data.customerDescription)}\n`;
++  body += `- Main problem to solve: ${formatValue(data.mainProblem)}\n`;
++  body += `- Cybersecurity maturity level: ${formatValue(data.maturityLevel)}\n\n`;
+ 
+-  if(selectedDate){
+-    const firstAvailable = RESERVABLE_HOURS.find(h=>!blocked.has(h));
+-    if(firstAvailable){
+-      const valueToSelect = (selectedTime && !blocked.has(selectedTime)) ? selectedTime : firstAvailable;
+-      select.value = valueToSelect;
+-      selectedTime = valueToSelect;
+-    }else{
+-      select.value = '';
+-      selectedTime = null;
+-    }
++  body += `F) Diagram / Selected solutions\n`;
++  if(solutions.length){
++    solutions.forEach((solution, idx)=>{
++      body += `- ${idx+1}. ${solution.name} — ${formatValue(solution.brand)}\n`;
++    });
+   }else{
+-    selectedTime = null;
++    body += `- ${EMPTY_VALUE}\n`;
+   }
++
++  return {to: mailtoRecipient, subject, body};
+ }
+ 
+-function changeMonth(delta){
+-  currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+delta, 1);
+-  renderCalendar(currentMonthDate);
++function sendEmail(){
++  const mailData = buildMailto();
++  if(!mailData) return;
++  const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
++  if(mailtoLink.length>1900){
++    document.getElementById('fallback-to').textContent = mailData.to;
++    document.getElementById('fallback-subject').textContent = mailData.subject;
++    document.getElementById('fallback-body').value = mailData.body;
++    document.getElementById('fallback').style.display='block';
++  }else{
++    document.getElementById('fallback').style.display='none';
++    window.location.href = mailtoLink;
++  }
+ }
+ 
+ const LAYER_HEIGHT = 130;
+ const purdueLayers = [
+   {level:5, label:'', height:Math.round(LAYER_HEIGHT*1.3)},
+   {level:4, label:'Nivel 4 – Enterprise Network', height:LAYER_HEIGHT},
+   {level:3.5, label:'Nivel 3.5 – IT/OT DMZ', height:LAYER_HEIGHT},
+   {level:3, label:'Nivel 3 – Site Operations', height:LAYER_HEIGHT},
+   {level:2, label:'Nivel 2 – Area Supervisory Control', height:LAYER_HEIGHT},
+   {level:1, label:'Nivel 1 – Basic Control', height:LAYER_HEIGHT},
+   {level:0, label:'Nivel 0 – Physical Process', height:LAYER_HEIGHT}
+ ];
+ let currentY = 0;
+ purdueLayers.forEach(l=>{
+   l.height = l.height || LAYER_HEIGHT;
+   l.y = currentY;
+   currentY += l.height;
+ });
+ 
+ let currentNodes = {};
+ let currentLinks = [];
+ let adjacency = {};
+ let currentSvg = null;
+ let dragState = null;
+-let guests = [];
+ 
+ const brandLogos = {
+   fortinet: {
+     color: { primary: '#EE3124', secondary: '#C41E3A', stroke: '#8B1A1A' },
+     logo: `<g transform="translate(-30, -30)">
+       <rect x="5" y="5" width="15" height="15" fill="#EE3124" rx="2"/>
+       <rect x="22" y="5" width="15" height="15" fill="#EE3124" rx="2"/>
+       <rect x="39" y="5" width="15" height="15" fill="#EE3124" rx="2"/>
+       <rect x="5" y="22" width="15" height="15" fill="#EE3124" rx="2"/>
+       <rect x="39" y="22" width="15" height="15" fill="#EE3124" rx="2"/>
+       <rect x="5" y="39" width="15" height="15" fill="#EE3124" rx="2"/>
+       <rect x="22" y="39" width="15" height="15" fill="#EE3124" rx="2"/>
+       <rect x="39" y="39" width="15" height="15" fill="#EE3124" rx="2"/>
+     </g>`
+   },
+   checkpoint: {
+     color: { primary: '#E6007E', secondary: '#C4006A', stroke: '#8B004D' },
+     logo: `<g transform="translate(-25, -25)">
+       <circle cx="25" cy="35" r="20" fill="none" stroke="#E6007E" stroke-width="6"/>
+       <circle cx="25" cy="35" r="6" fill="#E6007E"/>
+       <rect x="22" y="20" width="6" height="10" fill="#E6007E"/>
+       <rect x="30" y="23" width="8" height="4" fill="#E6007E"/>
+       <circle cx="38" cy="10" r="8" fill="#000"/>
+     </g>`
+   },
+@@ -1181,393 +1360,72 @@ function getSelectedBrand(groupName) {
+   const value = radio.value.trim().toLowerCase();
+ 
+   const map = {
+     fortinet: 'fortinet',
+     'check point': 'checkpoint',
+     check: 'checkpoint',
+     point: 'checkpoint',
+     txone: 'txone',
+     'palo alto': 'paloalto',
+     palo: 'paloalto',
+     alto: 'paloalto',
+     nozomi: 'nozomi',
+     tenable: 'tenable',
+     claroty: 'claroty',
+     cyolo: 'cyolo',
+     zscaler: 'zscaler',
+     splunk: 'splunk'
+   };
+ 
+   for (const key in map) {
+     if (value.includes(key)) return map[key];
+   }
+   return null;
+ }
+ 
+-/* Invitados */
+-function addGuest(){
+-  const nameInput = document.getElementById('guestNameInput');
+-  const roleInput = document.getElementById('guestRoleInput');
+-  if(!nameInput || !roleInput) return;
+-  const name = nameInput.value.trim();
+-  const role = roleInput.value.trim();
+-  if(!name && !role) return;
+-  guests.push({name, role});
+-  nameInput.value = '';
+-  roleInput.value = '';
+-  renderGuestList();
+-}
+-function editGuest(idx){
+-  if(idx<0 || idx>=guests.length) return;
+-  const g = guests[idx];
+-  const newName = prompt('Nombre del invitado:', g.name || '');
+-  if(newName === null) return;
+-  const newRole = prompt('Puesto del invitado:', g.role || '');
+-  if(newRole === null) return;
+-  guests[idx] = {name:newName.trim(), role:newRole.trim()};
+-  renderGuestList();
+-}
+-function removeGuest(idx){
+-  if(idx<0 || idx>=guests.length) return;
+-  guests.splice(idx,1);
+-  renderGuestList();
+-}
+-function renderGuestList(){
+-  const container = document.getElementById('guestList');
+-  if(!container) return;
+-  if(guests.length === 0){
+-    container.innerHTML = '<span style="font-size:0.8em;color:#718096;">Sin invitados capturados aún.</span>';
+-    return;
+-  }
+-  let html = '<ul style="padding-left:0;margin:0;list-style:none;">';
+-  guests.forEach((g,idx)=>{
+-    const safeName = g.name || 'Sin nombre';
+-    const safeRole = g.role || 'Sin puesto';
+-    html += `
+-      <li class="guest-list-item">
+-        <span class="guest-text">${idx+1}. ${safeName} – ${safeRole}</span>
+-        <span class="guest-actions">
+-          <button type="button" class="guest-btn edit" onclick="editGuest(${idx})">Editar</button>
+-          <button type="button" class="guest-btn delete" onclick="removeGuest(${idx})">Eliminar</button>
+-        </span>
+-      </li>`;
+-  });
+-  html += '</ul>';
+-  container.innerHTML = html;
+-}
+-
+-/* Validación y armado de correo */
+-function validateForm(){
+-  const hasDate = !!selectedDate;
+-  const hasTime = !!selectedTime;
+-
+-  const solIds = [
+-    {chk:'sol-fw-ot', brandGroup:'fw-ot-brand', label:'FW OT'},
+-    {chk:'sol-visibility', brandGroup:'visibility-brand', label:'Visibilidad de Red OT'},
+-    {chk:'sol-vuln', brandGroup:'vuln-brand', label:'Gestión de vulnerabilidades OT'},
+-    {chk:'sol-ips', brandGroup:'ips-brand', label:'IPS'},
+-    {chk:'sol-access', brandGroup:'access-brand', label:'Acceso Seguro / ZTNA'},
+-    {chk:'sol-deception', brandGroup:'deception-brand', label:'Deception OT'},
+-    {chk:'sol-soc', brandGroup:'soc-brand', label:'SOC'}
+-  ];
+-
+-  const anySolutionChecked = solIds.some(s => document.getElementById(s.chk).checked);
+-
+-  if(!(hasDate && hasTime && anySolutionChecked)){
+-    return false;
+-}
+-
+-
+-  const missingBrands = [];
+-  solIds.forEach(s=>{
+-    const chk = document.getElementById(s.chk);
+-    if(chk && chk.checked){
+-      const brand = getSelectedBrand(s.brandGroup);
+-      if(!brand){
+-        missingBrands.push(s.label);
+-      }
+-    }
+-  });
+-
+-  if(missingBrands.length > 0){
+-    alert('Debe seleccionar una marca para: ' + missingBrands.join(', '));
+-    return false;
+-  }
+-
+-  return true;
+-}
+-
+ function getSelectedSolutions(){
+   const solutions = [];
    function pick(id,name,group){
      if(document.getElementById(id).checked){
        let brandText = null;
@@ -303,216 +1217,234 @@ index 8aa67def8279a7038e616eddbe153326efd6b1f6..ffeca984df55e874683a9c2908c62fad
    return solutions;
  }
  
- function buildMailto(){
-   if(!validateForm()){
-     alert('Por favor complete todos los campos obligatorios, seleccione al menos una solución y una marca para cada solución seleccionada.');
-     return null;
-   }
--  const date = document.getElementById('requestedDate').value;
-   const comments = document.getElementById('comments').value.trim();
-   const companyName = document.getElementById('companyName').value.trim();
-   const guestCount = document.getElementById('guestCount').value.trim();
-   const sector = document.getElementById('sector').value.trim();
-   const requiresLabTeam = document.getElementById('labTeamPresent').checked;
-   const solutions = getSelectedSolutions();
-   const dateStrIso = (selectedDate && selectedTime) ? `${selectedDate}T${selectedTime}:00` : null;
-   const dateObj = dateStrIso ? new Date(dateStrIso) : null;
-   const dateStr = dateObj ? dateObj.toLocaleString('es-ES',{
-     year:'numeric',month:'2-digit',day:'2-digit',
-     hour:'2-digit',minute:'2-digit'
-   }) : '';
- 
-  const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${companyName || "Empresa no indicada"}`;
-  let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
-   body += `Solicito la reserva del showroom con los siguientes detalles:\n\n`;
-   
-   body += `DATOS DEL CLIENTE\n`;
-   body += `-----------------\n`;
-     if(companyName) body += `Empresa: ${companyName}\n`;
-   if(sector) body += `Sector: ${sector}\n`;
-   if(guestCount) body += `Número de invitados: ${guestCount}\n`;
-   body += `Fecha solicitada: ${dateStr}\n\n`;
- 
-   if(guests.length>0){
-@@ -1305,80 +1374,197 @@ function buildMailto(){
-     body += `\nREQUERIMIENTOS ADICIONALES\n`;
-     body += `------------------------\n`;
-     body += `• El cliente solicita que la presentación sea impartida por el equipo de laboratorio.\n`;
-   }
- 
-   body += `\nSaludos cordiales`;
- 
-   return {to:mailtoRecipient,subject,body};
- }
- 
- function openOutlook(){
-   const mailData = buildMailto();
-   if(!mailData) return;
-   const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
-   if(mailtoLink.length>1900){
-     document.getElementById('fallback-to').textContent = mailData.to;
-     document.getElementById('fallback-subject').textContent = mailData.subject;
-     document.getElementById('fallback-body').value = mailData.body;
-     document.getElementById('fallback').style.display='block';
-   }else{
-     document.getElementById('fallback').style.display='none';
-     window.location.href = mailtoLink;
-   }
- }
- 
-+function addOneHour(timeStr){
-+  if(!timeStr) return '';
-+  const [hourStr, minuteStr='00'] = timeStr.split(':');
-+  const hourNum = Number(hourStr);
-+  if(Number.isNaN(hourNum)) return '';
-+  const nextHour = Math.min(hourNum + 1, 23);
-+  return `${String(nextHour).padStart(2,'0')}:${minuteStr.padStart(2,'0')}`;
-+}
-+
- function buildReservationRecord(){
-   const companyName = document.getElementById('companyName').value.trim();
-   const sector = document.getElementById('sector').value.trim();
-   const guestCount = document.getElementById('guestCount').value.trim();
-   const comments = document.getElementById('comments').value.trim();
-   const requiresLabTeam = document.getElementById('labTeamPresent').checked;
-   const solutions = getSelectedSolutions();
-+  const horaInicio = selectedTime;
-+  const horaFin = addOneHour(selectedTime);
- 
-   return {
-     fecha: selectedDate,
--    hora: selectedTime,
-+    hora: horaInicio,
-+    horaInicio,
-+    horaFin,
-+    estado: 'pendiente',
-     empresa: companyName,
-     sector,
-     numeroInvitados: guestCount,
-     comentarios: comments,
-     requiereEquipoLab: requiresLabTeam,
-     invitados: [...guests],
-     tecnologias: solutions.map(s=>`${s.name} (${s.brand})`)
-   };
- }
- 
-- async function handleSubmit(){
-+function escapeCsvField(value){
-+  const str = (value ?? '').toString();
-+  if(/[",\n]/.test(str)){
-+    return '"' + str.replace(/"/g,'""') + '"';
-+  }
-+  return str;
-+}
-+
-+function reservationToCsvRow(record){
-+  const invitadoJson = JSON.stringify(record.invitados || []);
-+  const tecnologiasList = Array.isArray(record.tecnologias) ? record.tecnologias.join(';') : (record.tecnologias || '');
-+  return [
-+    record.fecha || '',
-+    record.horaInicio || record.hora || '',
-+    record.horaFin || '',
-+    record.estado || 'pendiente',
-+    record.empresa || '',
-+    record.sector || '',
-+    record.numeroInvitados || '',
-+    record.comentarios || '',
-+    record.requiereEquipoLab ? '1' : '0',
-+    invitadoJson,
-+    tecnologiasList
-+  ];
-+}
-+
-+function serializeCsv(rows){
-+  return rows.map(r=>r.map(escapeCsvField).join(',')).join('\n');
-+}
-+
-+async function appendReservationToCsv(record){
-+  const csvUrl = '../data/reservas.csv';
-+  let rows = cachedCsvRows && cachedCsvRows.length ? cachedCsvRows.map(r=>[...r]) : null;
-+
-+  if(!rows){
-+    try{
-+      const response = await fetch(csvUrl);
-+      if(response.ok){
-+        const text = await response.text();
-+        const parsed = parseCsv(text);
-+        if(parsed.length>0){
-+          rows = parsed;
-+        }
-+      }
-+    }catch(err){
-+      console.warn('No se pudo leer reservas.csv; se iniciará uno nuevo en memoria.', err);
-+    }
-+  }
-+
-+  if(!rows || rows.length === 0){
-+    rows = [CSV_HEADERS];
-+  }else{
-+    const hasHeader = CSV_HEADERS.every((h,idx)=> (rows[0][idx] || '').trim().toLowerCase() === h.toLowerCase());
-+    if(!hasHeader){
-+      rows = [CSV_HEADERS, ...rows];
-+    }
-+  }
-+
-+  rows.push(reservationToCsvRow(record));
-+  cachedCsvRows = rows;
-+  const csvContent = serializeCsv(rows);
-+  if(typeof localStorage !== 'undefined'){
-+    try{
-+      localStorage.setItem('reservasCsvCache', csvContent);
-+    }catch(err){
-+      console.warn('No se pudo guardar el CSV en localStorage', err);
-+    }
-+  }
-+  console.log('reservas.csv actualizado en memoria:', csvContent);
-+}
-+
-+function addReservationToState(record){
-+  const dateStr = record.fecha;
-+  const timeStr = normalizeTimeSlot(record.hora || record.horaInicio || record.horaFin);
-+  if(!dateStr || !timeStr) return;
-+  if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
-+  reservationsByDate[dateStr].push(timeStr);
-+  buildAvailabilityMap();
-+  renderCalendar(currentMonthDate);
-+  if(selectedDate === dateStr){
-+    renderTimeOptionsForSelectedDay();
-+  }
-+}
-+
-+function showSuccessModal(){
-+  const modal = document.getElementById('successModal');
-+  if(modal) modal.style.display = 'flex';
-+}
-+
-+function closeSuccessModal(){
-+  const modal = document.getElementById('successModal');
-+  if(modal) modal.style.display = 'none';
-+}
-+
-+async function handleSubmit(){
-   if(!validateForm()){
-     alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
-     return;
-   }
- 
-+  const reservationData = buildReservationRecord();
-   openOutlook();
- 
+-function buildMailto(){
+-  if(!validateForm()){
+-    alert('Por favor complete todos los campos obligatorios, seleccione al menos una solución y una marca para cada solución seleccionada.');
+-    return null;
+-  }
+-  const comments = document.getElementById('comments').value.trim();
+-  const companyName = document.getElementById('companyName').value.trim();
+-  const guestCount = document.getElementById('guestCount').value.trim();
+-  const sector = document.getElementById('sector').value.trim();
+-  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
+-  const solutions = getSelectedSolutions();
+-  const dateStrIso = (selectedDate && selectedTime) ? `${selectedDate}T${selectedTime}:00` : null;
+-  const dateObj = dateStrIso ? new Date(dateStrIso) : null;
+-  const dateStr = dateObj ? dateObj.toLocaleString('es-ES',{
+-    year:'numeric',month:'2-digit',day:'2-digit',
+-    hour:'2-digit',minute:'2-digit'
+-  }) : '';
+-
+- const subject = `Solicitud Showroom IT/OT - ${dateStr} - ${companyName || "Empresa no indicada"}`;
+- let body  = `Estimado equipo de Showroom IT/OT,\n\n`;
+-  body += `Solicito la reserva del showroom con los siguientes detalles:\n\n`;
+-  
+-  body += `DATOS DEL CLIENTE\n`;
+-  body += `-----------------\n`;
+-    if(companyName) body += `Empresa: ${companyName}\n`;
+-  if(sector) body += `Sector: ${sector}\n`;
+-  if(guestCount) body += `Número de invitados: ${guestCount}\n`;
+-  body += `Fecha solicitada: ${dateStr}\n\n`;
+-
+-  if(guests.length>0){
+-    body += `INVITADOS DEL CLIENTE\n`;
+-    body += `--------------------\n`;
+-    guests.forEach((g,i)=>{
+-      const nameInv = g.name || 'Sin nombre';
+-      const roleInv = g.role || 'Sin puesto';
+-      body += `${i+1}. ${nameInv} – ${roleInv}\n`;
+-    });
+-    body += `\n`;
+-  }
+-
+-  body += `SOLUCIONES A DEMOSTRAR\n`;
+-  body += `----------------------\n`;
+-  solutions.forEach((s,i)=>{
+-    body += `${i+1}. ${s.name} - Marca: ${s.brand}\n`;
+-  });
+-
+-  if(comments){
+-    body += `\nCOMENTARIOS ADICIONALES\n`;
+-    body += `-----------------------\n`;
+-    body += comments + '\n';
+-  }
+-
+-  if(requiresLabTeam){
+-    body += `\nREQUERIMIENTOS ADICIONALES\n`;
+-    body += `------------------------\n`;
+-    body += `• El cliente solicita que la presentación sea impartida por el equipo de laboratorio.\n`;
+-  }
+-
+-  body += `\nSaludos cordiales`;
+-
+-  return {to:mailtoRecipient,subject,body};
+-}
+-
+-function openOutlook(){
+-  const mailData = buildMailto();
+-  if(!mailData) return;
+-  const mailtoLink = `mailto:${encodeURIComponent(mailData.to)}?subject=${encodeURIComponent(mailData.subject)}&body=${encodeURIComponent(mailData.body)}`;
+-  if(mailtoLink.length>1900){
+-    document.getElementById('fallback-to').textContent = mailData.to;
+-    document.getElementById('fallback-subject').textContent = mailData.subject;
+-    document.getElementById('fallback-body').value = mailData.body;
+-    document.getElementById('fallback').style.display='block';
+-  }else{
+-    document.getElementById('fallback').style.display='none';
+-    window.location.href = mailtoLink;
+-  }
+-}
+-
+-function addOneHour(timeStr){
+-  if(!timeStr) return '';
+-  const [hourStr, minuteStr='00'] = timeStr.split(':');
+-  const hourNum = Number(hourStr);
+-  if(Number.isNaN(hourNum)) return '';
+-  const nextHour = Math.min(hourNum + 1, 23);
+-  return `${String(nextHour).padStart(2,'0')}:${minuteStr.padStart(2,'0')}`;
+-}
+-
+-function buildReservationRecord(){
+-  const companyName = document.getElementById('companyName').value.trim();
+-  const sector = document.getElementById('sector').value.trim();
+-  const guestCount = document.getElementById('guestCount').value.trim();
+-  const comments = document.getElementById('comments').value.trim();
+-  const requiresLabTeam = document.getElementById('labTeamPresent').checked;
+-  const solutions = getSelectedSolutions();
+-  const horaInicio = selectedTime;
+-  const horaFin = addOneHour(selectedTime);
+-
+-  return {
+-    fecha: selectedDate,
+-    hora: horaInicio,
+-    horaInicio,
+-    horaFin,
+-    estado: 'pendiente',
+-    empresa: companyName,
+-    sector,
+-    numeroInvitados: guestCount,
+-    comentarios: comments,
+-    requiereEquipoLab: requiresLabTeam,
+-    invitados: [...guests],
+-    tecnologias: solutions.map(s=>`${s.name} (${s.brand})`)
+-  };
+-}
+-
+-function escapeCsvField(value){
+-  const str = (value ?? '').toString();
+-  if(/[",\n]/.test(str)){
+-    return '"' + str.replace(/"/g,'""') + '"';
+-  }
+-  return str;
+-}
+-
+-function reservationToCsvRow(record){
+-  const invitadoJson = JSON.stringify(record.invitados || []);
+-  const tecnologiasList = Array.isArray(record.tecnologias) ? record.tecnologias.join(';') : (record.tecnologias || '');
+-  return [
+-    record.fecha || '',
+-    record.horaInicio || record.hora || '',
+-    record.horaFin || '',
+-    record.estado || 'pendiente',
+-    record.empresa || '',
+-    record.sector || '',
+-    record.numeroInvitados || '',
+-    record.comentarios || '',
+-    record.requiereEquipoLab ? '1' : '0',
+-    invitadoJson,
+-    tecnologiasList
+-  ];
+-}
+-
+-function serializeCsv(rows){
+-  return rows.map(r=>r.map(escapeCsvField).join(',')).join('\n');
+-}
+-
+-async function appendReservationToCsv(record){
+-  const csvUrl = '../data/reservas.csv';
+-  let rows = cachedCsvRows && cachedCsvRows.length ? cachedCsvRows.map(r=>[...r]) : null;
+-
+-  if(!rows){
+-    try{
+-      const response = await fetch(csvUrl);
+-      if(response.ok){
+-        const text = await response.text();
+-        const parsed = parseCsv(text);
+-        if(parsed.length>0){
+-          rows = parsed;
+-        }
+-      }
+-    }catch(err){
+-      console.warn('No se pudo leer reservas.csv; se iniciará uno nuevo en memoria.', err);
+-    }
+-  }
+-
+-  if(!rows || rows.length === 0){
+-    rows = [CSV_HEADERS];
+-  }else{
+-    const hasHeader = CSV_HEADERS.every((h,idx)=> (rows[0][idx] || '').trim().toLowerCase() === h.toLowerCase());
+-    if(!hasHeader){
+-      rows = [CSV_HEADERS, ...rows];
+-    }
+-  }
+-
+-  rows.push(reservationToCsvRow(record));
+-  cachedCsvRows = rows;
+-  const csvContent = serializeCsv(rows);
+-  if(typeof localStorage !== 'undefined'){
+-    try{
+-      localStorage.setItem('reservasCsvCache', csvContent);
+-    }catch(err){
+-      console.warn('No se pudo guardar el CSV en localStorage', err);
+-    }
+-  }
+-  console.log('reservas.csv actualizado en memoria:', csvContent);
+-}
+-
+-function addReservationToState(record){
+-  const dateStr = record.fecha;
+-  const timeStr = normalizeTimeSlot(record.hora || record.horaInicio || record.horaFin);
+-  if(!dateStr || !timeStr) return;
+-  if(!reservationsByDate[dateStr]) reservationsByDate[dateStr] = [];
+-  reservationsByDate[dateStr].push(timeStr);
+-  buildAvailabilityMap();
+-  renderCalendar(currentMonthDate);
+-  if(selectedDate === dateStr){
+-    renderTimeOptionsForSelectedDay();
+-  }
+-}
+-
+-function showSuccessModal(){
+-  const modal = document.getElementById('successModal');
+-  if(modal) modal.style.display = 'flex';
+-}
+-
+-function closeSuccessModal(){
+-  const modal = document.getElementById('successModal');
+-  if(modal) modal.style.display = 'none';
+-}
+-
+-async function handleSubmit(){
+-  if(!validateForm()){
+-    alert('Por favor selecciona una fecha, horario y al menos una solución con su marca.');
+-    return;
+-  }
+-
 -  const reservationData = buildReservationRecord();
-+  try{
-+    await appendReservationToCsv(reservationData);
-+    addReservationToState(reservationData);
-+  }catch(err){
-+    console.error('No se pudo actualizar el CSV local', err);
-+    alert('No se pudo actualizar el CSV localmente. Revisa la consola para más detalles.');
-+  }
-+
-+  showSuccessModal();
-   console.log('Datos listos para almacenar en reservasdb:', reservationData);
- }
- 
+-  openOutlook();
+-
+-  try{
+-    await appendReservationToCsv(reservationData);
+-    addReservationToState(reservationData);
+-  }catch(err){
+-    console.error('No se pudo actualizar el CSV local', err);
+-    alert('No se pudo actualizar el CSV localmente. Revisa la consola para más detalles.');
+-  }
+-
+-  showSuccessModal();
+-  console.log('Datos listos para almacenar en reservasdb:', reservationData);
+-}
+-
  function copyToClipboard(){
    const textarea = document.getElementById('fallback-body');
    const to = document.getElementById('fallback-to').textContent;
@@ -536,5 +1468,114 @@ index 8aa67def8279a7038e616eddbe153326efd6b1f6..ffeca984df55e874683a9c2908c62fad
    return layer ? layer.y + layer.height/2 : 0;
  }
  
-EOF
-)
+ /* Arquitectura IT/OT */
+ function buildArchitecture(){
+@@ -2679,61 +2537,100 @@ function placeSaaS(nodes){
+   }
+ }
+ 
+ /* Mostrar/ocultar marcas */
+ function toggleBrands(solutionId){
+   const checkbox = document.getElementById('sol-'+solutionId);
+   const brandsGroup = document.getElementById('brands-'+solutionId);
+   const radios = brandsGroup ? brandsGroup.querySelectorAll('input[type="radio"]') : [];
+   if(checkbox.checked){
+     if(brandsGroup) brandsGroup.classList.add('active');
+     if(radios.length > 0){
+       const anyChecked = Array.from(radios).some(r => r.checked);
+       if(!anyChecked){
+         radios[0].checked = true;
+       }
+     }
+   }else{
+     if(brandsGroup) brandsGroup.classList.remove('active');
+     radios.forEach(r=>r.checked=false);
+   }
+   updateDiagram();
+ }
+ 
+ /* Init */
+ document.addEventListener('DOMContentLoaded',()=>{
+-  renderGuestList();
+   updateDiagram();
+-   renderCalendar(currentMonthDate);
+-  renderTimeOptionsForSelectedDay();
+-  loadReservationsFromCsv();
+-  const timeSelect = document.getElementById('requestedTime');
+-  if(timeSelect){
+-    timeSelect.addEventListener('change',(e)=>{
+-      selectedTime = e.target.value || null;
++  toggleCostCenter();
++  addAttendee('clientAttendeesList', true);
++  addAttendee('internalAttendeesList', false);
++
++  const coffeeBreak = document.getElementById('coffeeBreak');
++  if(coffeeBreak){
++    coffeeBreak.addEventListener('change', toggleCostCenter);
++  }
++
++  const addClient = document.getElementById('addClientAttendee');
++  if(addClient){
++    addClient.addEventListener('click',()=>addAttendee('clientAttendeesList', true));
++  }
++  const addInternal = document.getElementById('addInternalAttendee');
++  if(addInternal){
++    addInternal.addEventListener('click',()=>addAttendee('internalAttendeesList', false));
++  }
++
++  const toStep2 = document.getElementById('toStep2');
++  if(toStep2){
++    toStep2.addEventListener('click',()=>{
++      if(validateStep1()){
++        showStep('step-2');
++      }else{
++        alert('Por favor completa los campos obligatorios.');
++      }
+     });
+   }
++  const backToStep1 = document.getElementById('backToStep1');
++  if(backToStep1){
++    backToStep1.addEventListener('click',()=>showStep('step-1'));
++  }
++  const toStep3 = document.getElementById('toStep3');
++  if(toStep3){
++    toStep3.addEventListener('click',()=>showStep('step-3'));
++  }
++  const backToStep1FromSummary = document.getElementById('backToStep1FromSummary');
++  if(backToStep1FromSummary){
++    backToStep1FromSummary.addEventListener('click',()=>showStep('step-1'));
++  }
++  const backToStep2FromSummary = document.getElementById('backToStep2FromSummary');
++  if(backToStep2FromSummary){
++    backToStep2FromSummary.addEventListener('click',()=>showStep('step-2'));
++  }
++  const sendButton = document.getElementById('sendEmail');
++  if(sendButton){
++    sendButton.addEventListener('click', sendEmail);
++  }
++
+   const form = document.getElementById('reservationForm');
+   if(form){
+     form.addEventListener('change',updateDiagram);
+   }
+ });
+ </script>
+ <script>
+ (() => {
+   const ensureBadge = () => {
+     let badge = document.getElementById('version-badge');
+     if (!badge) {
+       badge = document.createElement('div');
+       badge.id = 'version-badge';
+       document.body.insertBefore(badge, document.body.firstChild);
+     }
+ 
+     Object.assign(badge.style, {
+       position: 'fixed',
+       bottom: '10px',
+       right: '10px',
+       background: 'rgba(0, 0, 0, 0.6)',
+       color: 'white',
+       padding: '6px 12px',
+       borderRadius: '6px',
+       fontSize: '11px',
