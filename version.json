@@ -9,10 +9,10 @@
     "author": "Felipe Tabares"
   },
   "patching": {
-    "patchCounter": 11,
-    "lastPatch": "patch-dev-0011",
+    "patchCounter": 12,
+    "lastPatch": "patch-dev-0012",
     "patchPrefix": "patch",
-    "nextPatchName": "patch-0012"
+    "nextPatchName": "patch-0013"
   },
   "changelog": [
     {
@@ -92,6 +92,12 @@
       "file": "dev/patches/cambios.patch",
       "description": "Se ajusta ventana de tecnologias y opcion de alimentos",
       "date": "2026-01-21 21:21:54"
+    },
+    {
+      "patch": "patch-dev-0012",
+      "file": "dev/patches/cambios.patch",
+      "description": "mejora",
+      "date": "2026-01-21 21:39:49"
     }
   ],
   "metadata": {

@@ -617,29 +617,8 @@ body{
       <span class="error-message" id="error-visitDate"></span>
     </div>
     <div class="form-group">
-      <label for="visitTime">Hora (intervalos de 30 min) *</label>
-      <select id="visitTime" required>
-        <option value="">Selecciona una hora</option>
-        <option value="9:00 AM">9:00 AM</option>
-        <option value="9:30 AM">9:30 AM</option>
-        <option value="10:00 AM">10:00 AM</option>
-        <option value="10:30 AM">10:30 AM</option>
-        <option value="11:00 AM">11:00 AM</option>
-        <option value="11:30 AM">11:30 AM</option>
-        <option value="12:00 PM">12:00 PM</option>
-        <option value="12:30 PM">12:30 PM</option>
-        <option value="1:00 PM">1:00 PM</option>
-        <option value="1:30 PM">1:30 PM</option>
-        <option value="2:00 PM">2:00 PM</option>
-        <option value="2:30 PM">2:30 PM</option>
-        <option value="3:00 PM">3:00 PM</option>
-        <option value="3:30 PM">3:30 PM</option>
-        <option value="4:00 PM">4:00 PM</option>
-        <option value="4:30 PM">4:30 PM</option>
-        <option value="5:00 PM">5:00 PM</option>
-        <option value="5:30 PM">5:30 PM</option>
-        <option value="6:00 PM">6:00 PM</option>
-      </select>
+      <label for="visitTime">Hora de visita *</label>
+      <input type="time" id="visitTime" required>
       <span class="error-message" id="error-visitTime"></span>
     </div>
     <div class="form-group">
@@ -655,7 +634,7 @@ body{
       <select id="foodOption" required>
         <option value="">Selecciona una opción</option>
         <option value="Coffee break">Coffee break</option>
-        <option value="Comida en caja">Comida en caja</option>
+        <option value="Box lunch">Box lunch</option>
         <option value="Nada">Nada</option>
         <option value="Personalizada">Personalizada</option>
       </select>
@@ -1051,10 +1030,6 @@ function validateStep1(){
     }
   });
 
-  if(!validateVisitDate({resetIfInvalid:true})){
-    isValid = false;
-  }
-
   const foodOption = document.getElementById('foodOption');
   const foodDetail = document.getElementById('foodDetail');
   const costCenter = document.getElementById('costCenter');
@@ -1072,26 +1047,6 @@ function validateStep1(){
   }
 
   return isValid;
-}
-
-function isWeekend(dateString){
-  const date = new Date(`${dateString}T00:00:00`);
-  if(Number.isNaN(date.getTime())) return false;
-  const day = date.getDay();
-  return day === 0 || day === 6;
-}
-
-function validateVisitDate({resetIfInvalid = false} = {}){
-  const visitDate = document.getElementById('visitDate');
-  if(!visitDate || !visitDate.value) return true;
-  if(isWeekend(visitDate.value)){
-    setError('visitDate','Selecciona un día hábil (lunes a viernes).');
-    if(resetIfInvalid){
-      visitDate.value = '';
-    }
-    return false;
-  }
-  return true;
 }
 
 function createAttendeeRow({withEmail = false} = {}){
@@ -1337,14 +1292,6 @@ function buildMailto(){
     });
   }else{
     body += `- ${EMPTY_VALUE}\n`;
-  }
-
-  body += `\nNotas operativas\n`;
-  body += `- Aforo máximo: 12 personas.\n`;
-  body += `- Alimentos: Considerar 4 personas por parte del showroom.\n`;
-  body += `- Horario operativo: Reservar 2 horas adicionales previas al evento para la preparación de la maqueta y 30 minutos posteriores para limpieza y restablecer la maqueta.\n`;
-  if(data.foodOption && data.foodOption !== 'Nada'){
-    body += `- Nota de alimentos: Considerar comida en caja / Coffee break / opción personalizada para el equipo del showroom, según corresponda.\n`;
   }
 
   return {to: mailtoRecipient, subject, body};
@@ -2697,19 +2644,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   const foodOption = document.getElementById('foodOption');
   if(foodOption){
     foodOption.addEventListener('change', toggleCostCenter);
-  }
-
-  const visitDate = document.getElementById('visitDate');
-  if(visitDate){
-    visitDate.addEventListener('change',()=>{
-      if(!visitDate.value){
-        setError('visitDate','');
-        return;
-      }
-      if(validateVisitDate({resetIfInvalid:true})){
-        setError('visitDate','');
-      }
-    });
   }
 
   const addClient = document.getElementById('addClientAttendee');
