@@ -1,8 +1,39 @@
 diff --git a/dev/dev.html b/dev/dev.html
-index a739ca484b677be01306b3eea6af244c4156e611..4883bc3fb529a7cd5ff7414e4641e82b2e8771fe 100644
+index 4883bc3fb529a7cd5ff7414e4641e82b2e8771fe..17538a42eb1e9b1d2d88766a80e05b88a9478105 100644
 --- a/dev/dev.html
 +++ b/dev/dev.html
-@@ -29,62 +29,65 @@ body{
+@@ -1,126 +1,138 @@
+ <!DOCTYPE html>
+ <html lang="es">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Showroom IT/OT - SHOTv18</title>
+ <style>
+ *{margin:0;padding:0;box-sizing:border-box}
+ body{
+   font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+   background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+   color:#e0e0e0;
+   min-height:100vh;
+   padding:20px;
+ }
++:root{
++  --step2-panel-height: calc(100vh - 260px);
++}
+ 
+ /* Nuevo layout general */
+ .page-container{
+   max-width:1800px;
+   margin:0 auto;
+   display:flex;
+   flex-direction:column;
+   gap:25px;
+ }
+ 
+ .header{
+   text-align:center;
+   padding:20px;
    background:linear-gradient(135deg,#0f3460 0%,#16213e 100%);
    border-radius:10px;
    box-shadow:0 4px 15px rgba(0,0,0,.3);
@@ -28,11 +59,10 @@ index a739ca484b677be01306b3eea6af244c4156e611..4883bc3fb529a7cd5ff7414e4641e82b
  /* Dos columnas: tecnologías (30%) + diagrama (70%) */
  .content-two-columns{
    display:grid;
--  grid-template-columns:0.3fr 0.7fr;
--  gap:25px;
-+  grid-template-columns:minmax(320px, 380px) 1fr;
-+  gap:16px;
-   align-items:start;
+   grid-template-columns:minmax(320px, 380px) 1fr;
+   gap:16px;
+-  align-items:start;
++  align-items:stretch;
  }
  
  /* Panel de opciones de tecnología */
@@ -42,10 +72,16 @@ index a739ca484b677be01306b3eea6af244c4156e611..4883bc3fb529a7cd5ff7414e4641e82b
    border-radius:12px;
    box-shadow:0 8px 25px rgba(0,0,0,.4);
    border:1px solid #2d3e50;
-+  max-height:calc(100vh - 260px);
-+  overflow:auto;
-+  min-height:0;
+-  max-height:calc(100vh - 260px);
+-  overflow:auto;
+   min-height:0;
  }
++.tech-options-panel{
++  height:var(--step2-panel-height);
++  overflow:auto;
++  min-height:520px;
++  max-height:980px;
++}
  
  .form-group{margin-bottom:20px}
  .form-group label{
@@ -70,35 +106,52 @@ index a739ca484b677be01306b3eea6af244c4156e611..4883bc3fb529a7cd5ff7414e4641e82b
  .form-group input:focus,
  .form-group textarea:focus,
  .form-group select:focus{
-@@ -404,75 +407,77 @@ body{
-   border:2px solid #ff6b35;
+   outline:none;
+   border-color:#ff6b35;
+   box-shadow:0 0 10px rgba(255,107,53,.3);
  }
- .fallback-section h3{
-   color:#ff6b35;
-   margin-bottom:15px;
+ .form-group textarea{
+   resize:vertical;
+   min-height:80px;
  }
- .fallback-section textarea{
-   width:100%;
-   min-height:200px;
-   padding:12px;
-   background:#0f1923;
-   color:#e0e0e0;
-   border:1px solid #2d3e50;
++.form-note{
++  margin-top:8px;
++  font-size:.85em;
++  color:#cfd8dc;
++}
+ .step-panel{display:none;}
+ .step-panel.active{display:block;}
+ .error-message{
+   color:#e63946;
+   font-size:.8em;
+   margin-top:6px;
+   display:block;
+ }
+ .attendee-row{
+   display:flex;
+   gap:10px;
+   flex-wrap:wrap;
+   margin-bottom:10px;
+ }
+ .attendee-row input{
+   flex:1;
+   min-width:160px;
+ }
+ .attendee-remove{
+   padding:10px 12px;
+   border:none;
    border-radius:6px;
-   font-family:monospace;
-   font-size:.9em;
- }
- 
- /* Panel diagrama */
- .diagram-panel{
+   background:#e63946;
+   color:#fff;
+   font-size:.8em;
+@@ -427,51 +439,51 @@ body{
    background:linear-gradient(135deg,#1e2a3a 0%,#243447 100%);
    padding:25px;
    border-radius:12px;
    box-shadow:0 8px 25px rgba(0,0,0,.4);
    border:1px solid #2d3e50;
--  min-height:600px;
    position:relative;
-+  min-height:0;
+   min-height:0;
  }
  .diagram-panel h2{
    color:#ff6b35;
@@ -117,15 +170,14 @@ index a739ca484b677be01306b3eea6af244c4156e611..4883bc3fb529a7cd5ff7414e4641e82b
  }
  #diagram-container{
    width:100%;
--  height:980px;
-+  height:calc(100vh - 260px);
-+  min-height:520px;
-+  max-height:980px;
+-  height:calc(100vh - 260px);
++  height:var(--step2-panel-height);
+   min-height:520px;
+   max-height:980px;
    position:relative;
    background:#0f1923;
    border-radius:8px;
--  overflow:hidden;
-+  overflow:auto;
+   overflow:auto;
  }
  
  /* Tooltip y estilos de nodos/enlaces */
@@ -145,68 +197,577 @@ index a739ca484b677be01306b3eea6af244c4156e611..4883bc3fb529a7cd5ff7414e4641e82b
  }
  .tooltip.active{display:block}
  .tooltip strong{
-   color:#ff6b35;
-   display:block;
-   margin-bottom:4px;
-   font-size:1em;
- }
- .tooltip .layer{
-@@ -541,57 +546,54 @@ body{
- .link-api{stroke:#e63946;stroke-dasharray:4 4;}
- .dim-node{opacity:.18;}
- .dim-link{opacity:.18;}
- .highlight-node{
-   opacity:1;
-   filter:drop-shadow(0 0 6px rgba(255,255,255,.5));
- }
- .highlight-link{
-   opacity:1;
-   stroke-width:3;
- }
- .layer-rect{
-   stroke:#2d3e50;
-   stroke-width:1;
- }
- .layer-label{
-   font-size:11px;
-   fill:#a8dadc;
-   font-weight:600;
- }
- .cloud-label{
-   font-size:10px;
-   fill:#e0e0e0;
- }
- 
--@media(max-width:1400px){
-+@media(max-width:1000px){
-   .content-two-columns{
-     grid-template-columns:1fr;
-   }
--  #diagram-container{
--    height:700px;
--  }
- }
- </style>
- </head>
- <body>
- 
- <div id="version-badge" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.6);color:white;padding:6px 12px;border-radius:6px;font-size:11px;z-index:9999;">DEV | versión no disponible</div>
- 
- <div class="page-container">
- 
-   <!-- ENCABEZADO -->
-   <div class="header">
-     <h1>🏭 Showroom IT/OT</h1>
-   </div>
- 
-   <!-- STEP 1: FORMULARIO -->
-   <div class="form-panel step-panel active" id="step-1">
-     <h2>Paso 1 de 3 · Formulario de visita</h2>
- 
-     <h3 style="margin-bottom:12px;color:#ff6b35;">A) Logística de la visita</h3>
-     <div class="form-group">
-       <label for="visitType">Tipo de visita (Presencial / Virtual)</label>
+@@ -596,57 +608,65 @@ body{
        <select id="visitType">
          <option value="">Selecciona una opción</option>
          <option value="Physical">Presencial</option>
          <option value="Virtual">Virtual</option>
+       </select>
+     </div>
+     <div class="form-group">
+       <label for="visitDate">Fecha de visita *</label>
+       <input type="date" id="visitDate" required>
+       <span class="error-message" id="error-visitDate"></span>
+     </div>
+     <div class="form-group">
+       <label for="visitTime">Hora de visita *</label>
+       <input type="time" id="visitTime" required>
+       <span class="error-message" id="error-visitTime"></span>
+     </div>
+     <div class="form-group">
+       <label for="presentationLanguage">Idioma de presentación (Español / Inglés)</label>
+       <select id="presentationLanguage">
+         <option value="">Selecciona una opción</option>
+         <option value="Spanish">Español</option>
+         <option value="English">Inglés</option>
+       </select>
+     </div>
+     <div class="form-group">
+-      <label for="coffeeBreak">Receso de café *</label>
+-      <select id="coffeeBreak" required>
++      <label for="foodOption">Alimentos *</label>
++      <select id="foodOption" required>
+         <option value="">Selecciona una opción</option>
+-        <option value="Yes">Sí</option>
+-        <option value="No">No</option>
++        <option value="Coffee break">Coffee break</option>
++        <option value="Box lunch">Box lunch</option>
++        <option value="Nada">Nada</option>
++        <option value="Personalizada">Personalizada</option>
+       </select>
+-      <span class="error-message" id="error-coffeeBreak"></span>
++      <span class="error-message" id="error-foodOption"></span>
++      <p class="form-note">Nota: Considerar 4 personas por parte del showroom.</p>
++    </div>
++    <div class="form-group" id="foodDetailGroup" style="display:none;">
++      <label for="foodDetail">Detalle (opción personalizada) *</label>
++      <input type="text" id="foodDetail" placeholder="Especifica la opción de alimentos…" disabled>
++      <span class="error-message" id="error-foodDetail"></span>
+     </div>
+     <div class="form-group" id="costCenterGroup">
+       <label for="costCenter">Centro de costos *</label>
+       <input type="text" id="costCenter" placeholder="Centro de costos" disabled>
+       <span class="error-message" id="error-costCenter"></span>
+     </div>
+ 
+     <h3 style="margin:20px 0 12px;color:#ff6b35;">B) Datos del cliente</h3>
+     <div class="form-group">
+       <label for="companyName">Empresa (cliente) *</label>
+       <input type="text" id="companyName" placeholder="Ej: ACME Manufacturing" required>
+       <span class="error-message" id="error-companyName"></span>
+     </div>
+     <div class="form-group">
+       <label for="sector">Sector / Industria</label>
+       <input type="text" id="sector" placeholder="Ej: Automotriz, Manufactura, Energía...">
+     </div>
+     <div class="form-group">
+       <label for="subsector">Subsector</label>
+       <input type="text" id="subsector" placeholder="Ej: Componentes, Alimentos, Retail">
+     </div>
+     <div class="form-group">
+       <label for="sitesCount">Número de sitios / plantas</label>
+       <input type="text" id="sitesCount" placeholder="Ej: 3 plantas, 12 sitios">
+     </div>
+@@ -661,101 +681,102 @@ body{
+       <input type="text" id="salesManager" required>
+       <span class="error-message" id="error-salesManager"></span>
+     </div>
+     <div class="form-group">
+       <label for="accountExecutive">Ejecutivo comercial *</label>
+       <input type="text" id="accountExecutive" required>
+       <span class="error-message" id="error-accountExecutive"></span>
+     </div>
+     <div class="form-group">
+       <label for="corporateCuc">CUC corporativo</label>
+       <input type="text" id="corporateCuc">
+     </div>
+     <div class="form-group">
+       <label for="opportunityStatus">Estatus de la oportunidad</label>
+       <input type="text" id="opportunityStatus">
+     </div>
+     <div class="form-group">
+       <label for="opportunityProject">Nombre o ID de oportunidad / proyecto</label>
+       <input type="text" id="opportunityProject">
+     </div>
+     <div class="form-group">
+       <label for="topNumber">Número TOP</label>
+       <input type="text" id="topNumber">
+     </div>
+ 
+-    <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Asistentes (cliente + Scitum/Telmex)</h3>
++    <h3 style="margin:20px 0 12px;color:#ff6b35;">D) Asistentes</h3>
++    <p class="form-note" style="margin-bottom:12px;">Aforo máximo: 12 personas.</p>
+     <div class="form-group">
+       <label>Asistentes del cliente</label>
+       <div id="clientAttendeesList"></div>
+       <button type="button" class="btn-guest-add" id="addClientAttendee">Agregar invitado</button>
+     </div>
+     <div class="form-group">
+       <label>Asistentes de Scitum/Telmex</label>
+       <div id="internalAttendeesList"></div>
+       <button type="button" class="btn-guest-add" id="addInternalAttendee">Agregar invitado</button>
+     </div>
+ 
+     <h3 style="margin:20px 0 12px;color:#ff6b35;">E) Contexto estratégico</h3>
+     <div class="form-group">
+       <label for="visitObjective">Objetivo de la visita</label>
+       <textarea id="visitObjective"></textarea>
+     </div>
+     <div class="form-group">
+       <label for="customerDescription">Descripción del cliente, procesos críticos y operación</label>
+       <textarea id="customerDescription"></textarea>
+     </div>
+     <div class="form-group">
+       <label for="mainProblem">Problema principal a resolver</label>
+       <textarea id="mainProblem"></textarea>
+     </div>
+     <div class="form-group">
+       <label for="maturityLevel">Nivel de madurez en ciberseguridad</label>
+       <select id="maturityLevel">
+         <option value="">Selecciona una opción</option>
+         <option value="Low">Bajo</option>
+         <option value="Medium">Medio</option>
+         <option value="High">Alto</option>
+         <option value="Unknown">Desconocido</option>
+       </select>
+     </div>
+ 
+     <div class="footer-actions">
+       <div class="footer-actions-inner">
+         <button type="button" class="btn btn-primary" id="toStep2">Siguiente: Diagrama</button>
+       </div>
+     </div>
+   </div>
+ 
+   <!-- STEP 2: DIAGRAMA + SOLUCIONES -->
+   <div class="step-panel" id="step-2">
+     <h2 style="margin-bottom:20px;">Paso 2 de 3 · Diagrama y selección de soluciones</h2>
+     <!-- DOS COLUMNAS: TECNOLOGÍAS + DIAGRAMA -->
+     <div class="content-two-columns">
+ 
+     <!-- OPCIONES DE TECNOLOGÍA -->
+-    <div class="tech-options">
++    <div class="tech-options tech-options-panel">
+       <form id="reservationForm">
+         <div class="solutions-section">
+           <h3 style="color:#a8dadc;margin-bottom:15px;">Soluciones a demostrar *</h3>
+ 
+           <div class="solution-item">
+             <div class="solution-checkbox">
+               <input type="checkbox" id="sol-fw-ot" onchange="toggleBrands('fw-ot')">
+               <label for="sol-fw-ot">FW OT (Firewall OT)</label>
+             </div>
+             <div class="brands-group" id="brands-fw-ot">
+               <div class="brand-option">
+                 <input type="radio" id="fw-fortinet" name="fw-ot-brand" value="Fortinet">
+                 <label for="fw-fortinet">Fortinet</label>
+               </div>
+               <div class="brand-option disabled-option" aria-disabled="true">
+                 <input type="radio" id="fw-checkpoint" name="fw-ot-brand" value="Check Point" disabled>
+                 <label for="fw-checkpoint">Check Point</label>
+               </div>
+               <div class="brand-option disabled-option" aria-disabled="true">
+                 <input type="radio" id="fw-txone" name="fw-ot-brand" value="TXOne Networks" disabled>
+                 <label for="fw-txone">TXOne Networks</label>
+               </div>
+               <div class="brand-option disabled-option" aria-disabled="true">
+                 <input type="radio" id="fw-paloalto" name="fw-ot-brand" value="Palo Alto Networks" disabled>
+                 <label for="fw-paloalto">Palo Alto Networks</label>
+@@ -900,130 +921,149 @@ body{
+         <button type="button" class="btn" id="backToStep1FromSummary">Volver a editar el formulario</button>
+         <button type="button" class="btn" id="backToStep2FromSummary">Volver al diagrama</button>
+         <button type="button" class="btn btn-primary" id="sendEmail">Enviar solicitud</button>
+       </div>
+     </div>
+ 
+     <div id="fallback" style="display:none" class="fallback-section">
+       <h3>El enlace mailto es muy largo. Copia el contenido:</h3>
+       <p style="margin-bottom:10px;color:#a8dadc;"><strong>Para:</strong> <span id="fallback-to"></span></p>
+       <p style="margin-bottom:10px;color:#a8dadc;"><strong>Asunto:</strong> <span id="fallback-subject"></span></p>
+       <textarea id="fallback-body" readonly></textarea>
+       <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+     </div>
+   </div>
+ 
+ </div>
+ 
+ <div id="tooltip" class="tooltip"></div>
+ <script>
+ const mailtoRecipient = 'Visitas_Showroom_OT@scitum.com.mx';
+ const STEP_IDS = ['step-1','step-2','step-3'];
+ const REQUIRED_FIELDS = [
+   {id:'visitDate', label:'Fecha de visita'},
+   {id:'visitTime', label:'Hora de visita'},
+   {id:'companyName', label:'Empresa (cliente)'},
+-  {id:'coffeeBreak', label:'Receso de café'},
++  {id:'foodOption', label:'Alimentos'},
+   {id:'salesManager', label:'Gerente comercial'},
+   {id:'accountExecutive', label:'Ejecutivo comercial'}
+ ];
+ 
+ const EMPTY_VALUE = '—';
+ const DISPLAY_MAPS = {
+   visitType: {Physical:'Presencial', Virtual:'Virtual'},
+   presentationLanguage: {Spanish:'Español', English:'Inglés'},
+-  coffeeBreak: {Yes:'Sí', No:'No'},
+   maturityLevel: {Low:'Bajo', Medium:'Medio', High:'Alto', Unknown:'Desconocido'}
+ };
+ 
+ function formatValue(value){
+   const trimmed = value ? value.toString().trim() : '';
+   return trimmed.length ? trimmed : EMPTY_VALUE;
+ }
+ 
+ function formatChoice(value, map){
+   if(!value) return '';
+   return map && map[value] ? map[value] : value;
+ }
+ 
+ function showStep(stepId){
+   STEP_IDS.forEach(id=>{
+     const step = document.getElementById(id);
+     if(step) step.classList.toggle('active', id === stepId);
+   });
+   if(stepId === 'step-3'){
+     populateSummary();
+   }
+   window.scrollTo({top:0, behavior:'smooth'});
+ }
+ 
+ function toggleCostCenter(){
+-  const coffeeBreak = document.getElementById('coffeeBreak');
++  const foodOption = document.getElementById('foodOption');
+   const costCenterGroup = document.getElementById('costCenterGroup');
+   const costCenter = document.getElementById('costCenter');
+-  const needsCostCenter = coffeeBreak && coffeeBreak.value === 'Yes';
++  const foodDetailGroup = document.getElementById('foodDetailGroup');
++  const foodDetail = document.getElementById('foodDetail');
++  const needsCostCenter = foodOption && foodOption.value && foodOption.value !== 'Nada';
++  const needsFoodDetail = foodOption && foodOption.value === 'Personalizada';
+   if(costCenterGroup){
+     costCenterGroup.style.display = needsCostCenter ? 'block' : 'none';
+   }
+   if(costCenter){
+     costCenter.disabled = !needsCostCenter;
+     costCenter.required = needsCostCenter;
+     if(!needsCostCenter){
+       costCenter.value = '';
+     }
+   }
++  if(foodDetailGroup){
++    foodDetailGroup.style.display = needsFoodDetail ? 'block' : 'none';
++  }
++  if(foodDetail){
++    foodDetail.disabled = !needsFoodDetail;
++    foodDetail.required = needsFoodDetail;
++    if(!needsFoodDetail){
++      foodDetail.value = '';
++    }
++  }
+ }
+ 
+ function setError(fieldId, message){
+   const error = document.getElementById(`error-${fieldId}`);
+   if(error){
+     error.textContent = message;
+   }
+ }
+ 
+ function clearErrors(){
+   document.querySelectorAll('.error-message').forEach(el=>{el.textContent='';});
+ }
+ 
+ function validateStep1(){
+   clearErrors();
+   let isValid = true;
+ 
+   REQUIRED_FIELDS.forEach(field=>{
+     const input = document.getElementById(field.id);
+     if(!input) return;
+     if(!input.value || !input.value.toString().trim()){
+       setError(field.id, 'Este campo es obligatorio.');
+       isValid = false;
+     }
+   });
+ 
+-  const coffeeBreak = document.getElementById('coffeeBreak');
++  const foodOption = document.getElementById('foodOption');
++  const foodDetail = document.getElementById('foodDetail');
+   const costCenter = document.getElementById('costCenter');
+-  if(coffeeBreak && coffeeBreak.value === 'Yes'){
++  if(foodOption && foodOption.value === 'Personalizada'){
++    if(!foodDetail || !foodDetail.value.trim()){
++      setError('foodDetail', 'Este campo es obligatorio.');
++      isValid = false;
++    }
++  }
++  if(foodOption && foodOption.value && foodOption.value !== 'Nada'){
+     if(!costCenter || !costCenter.value.trim()){
+-      setError('costCenter', 'El centro de costos es obligatorio cuando hay coffee break.');
++      setError('costCenter', 'El centro de costos es obligatorio cuando hay alimentos.');
+       isValid = false;
+     }
+   }
+ 
+   return isValid;
+ }
+ 
+ function createAttendeeRow({withEmail = false} = {}){
+   const row = document.createElement('div');
+   row.className = 'attendee-row';
+ 
+   const nameInput = document.createElement('input');
+   nameInput.type = 'text';
+   nameInput.placeholder = 'Nombre';
+ 
+   const roleInput = document.createElement('input');
+   roleInput.type = 'text';
+   roleInput.placeholder = 'Rol / Puesto';
+ 
+   row.appendChild(nameInput);
+   row.appendChild(roleInput);
+ 
+   let emailInput = null;
+   if(withEmail){
+     emailInput = document.createElement('input');
+@@ -1046,51 +1086,52 @@ function addAttendee(containerId, withEmail){
+   const container = document.getElementById(containerId);
+   if(!container) return;
+   const row = createAttendeeRow({withEmail});
+   container.appendChild(row);
+ }
+ 
+ function getAttendeeData(containerId, withEmail){
+   const container = document.getElementById(containerId);
+   if(!container) return [];
+   const rows = Array.from(container.querySelectorAll('.attendee-row'));
+   return rows.map(row=>{
+     const inputs = row.querySelectorAll('input');
+     const name = inputs[0]?.value?.trim() || '';
+     const role = inputs[1]?.value?.trim() || '';
+     const email = withEmail ? (inputs[2]?.value?.trim() || '') : '';
+     return {name, role, email};
+   }).filter(item=>item.name || item.role || item.email);
+ }
+ 
+ function getFormData(){
+   return {
+     visitType: document.getElementById('visitType')?.value || '',
+     visitDate: document.getElementById('visitDate')?.value || '',
+     visitTime: document.getElementById('visitTime')?.value || '',
+     presentationLanguage: document.getElementById('presentationLanguage')?.value || '',
+-    coffeeBreak: document.getElementById('coffeeBreak')?.value || '',
++    foodOption: document.getElementById('foodOption')?.value || '',
++    foodDetail: document.getElementById('foodDetail')?.value || '',
+     costCenter: document.getElementById('costCenter')?.value || '',
+     companyName: document.getElementById('companyName')?.value || '',
+     sector: document.getElementById('sector')?.value || '',
+     subsector: document.getElementById('subsector')?.value || '',
+     sitesCount: document.getElementById('sitesCount')?.value || '',
+     annualRevenue: document.getElementById('annualRevenue')?.value || '',
+     salesManager: document.getElementById('salesManager')?.value || '',
+     accountExecutive: document.getElementById('accountExecutive')?.value || '',
+     corporateCuc: document.getElementById('corporateCuc')?.value || '',
+     opportunityStatus: document.getElementById('opportunityStatus')?.value || '',
+     opportunityProject: document.getElementById('opportunityProject')?.value || '',
+     topNumber: document.getElementById('topNumber')?.value || '',
+     clientAttendees: getAttendeeData('clientAttendeesList', true),
+     internalAttendees: getAttendeeData('internalAttendeesList', false),
+     visitObjective: document.getElementById('visitObjective')?.value || '',
+     customerDescription: document.getElementById('customerDescription')?.value || '',
+     mainProblem: document.getElementById('mainProblem')?.value || '',
+     maturityLevel: document.getElementById('maturityLevel')?.value || ''
+   };
+ }
+ 
+ function renderSummarySection(title, items){
+   const listItems = items.map(item=>{
+     return `<li><strong>${item.label}:</strong> ${item.value}</li>`;
+   }).join('');
+@@ -1107,118 +1148,124 @@ function formatAttendees(attendees, withEmail){
+     return `<li>${EMPTY_VALUE}</li>`;
+   }
+   return attendees.map((attendee, index)=>{
+     const name = formatValue(attendee.name);
+     const role = formatValue(attendee.role);
+     if(withEmail){
+       const email = formatValue(attendee.email);
+       return `<li>${index+1}. ${name} — ${role} — ${email}</li>`;
+     }
+     return `<li>${index+1}. ${name} — ${role}</li>`;
+   }).join('');
+ }
+ 
+ function populateSummary(){
+   const data = getFormData();
+   const solutions = getSelectedSolutions();
+   const summary = document.getElementById('confirmationSummary');
+   if(!summary) return;
+ 
+   const sectionsHtml = [
+     renderSummarySection('A) Logística de la visita', [
+       {label:'Tipo de visita', value: formatValue(formatChoice(data.visitType, DISPLAY_MAPS.visitType))},
+       {label:'Fecha de visita', value: formatValue(data.visitDate)},
+       {label:'Hora de visita', value: formatValue(data.visitTime)},
+       {label:'Idioma de presentación', value: formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))},
+-      {label:'Receso de café', value: formatValue(formatChoice(data.coffeeBreak, DISPLAY_MAPS.coffeeBreak))},
+-      {label:'Centro de costos', value: formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}
++      {label:'Alimentos', value: formatValue(data.foodOption)},
++      ...(data.foodOption === 'Personalizada'
++        ? [{label:'Detalle', value: formatValue(data.foodDetail)}]
++        : []),
++      {label:'Centro de costos', value: formatValue(data.foodOption && data.foodOption !== 'Nada' ? data.costCenter : '')}
+     ]),
+     renderSummarySection('B) Datos del cliente', [
+       {label:'Empresa (cliente)', value: formatValue(data.companyName)},
+       {label:'Sector / Industria', value: formatValue(data.sector)},
+       {label:'Subsector', value: formatValue(data.subsector)},
+       {label:'Número de sitios / plantas', value: formatValue(data.sitesCount)},
+       {label:'Facturación anual (MXN)', value: formatValue(data.annualRevenue)}
+     ]),
+     renderSummarySection('C) Datos comerciales internos', [
+       {label:'Gerente comercial', value: formatValue(data.salesManager)},
+       {label:'Ejecutivo comercial', value: formatValue(data.accountExecutive)},
+       {label:'CUC corporativo', value: formatValue(data.corporateCuc)},
+       {label:'Estatus de la oportunidad', value: formatValue(data.opportunityStatus)},
+       {label:'Nombre o ID de oportunidad / proyecto', value: formatValue(data.opportunityProject)},
+       {label:'Número TOP', value: formatValue(data.topNumber)}
+     ]),
+     `
+       <div class="summary-section">
+-        <h3>D) Asistentes (cliente + Scitum/Telmex)</h3>
++        <h3>D) Asistentes</h3>
+         <strong>Asistentes del cliente</strong>
+         <ul class="summary-list">${formatAttendees(data.clientAttendees, true)}</ul>
+         <strong>Asistentes de Scitum/Telmex</strong>
+         <ul class="summary-list">${formatAttendees(data.internalAttendees, false)}</ul>
+       </div>
+     `,
+     renderSummarySection('E) Contexto estratégico', [
+       {label:'Objetivo de la visita', value: formatValue(data.visitObjective)},
+       {label:'Descripción del cliente, procesos críticos y operación', value: formatValue(data.customerDescription)},
+       {label:'Problema principal a resolver', value: formatValue(data.mainProblem)},
+       {label:'Nivel de madurez en ciberseguridad', value: formatValue(formatChoice(data.maturityLevel, DISPLAY_MAPS.maturityLevel))}
+     ]),
+     `
+       <div class="summary-section">
+         <h3>F) Diagrama / Soluciones seleccionadas</h3>
+         <ul class="summary-list">
+           ${solutions.length ? solutions.map((s, idx)=>`<li>${idx+1}. ${s.name} — ${formatValue(s.brand)}</li>`).join('') : `<li>${EMPTY_VALUE}</li>`}
+         </ul>
+       </div>
+     `
+   ];
+ 
+   summary.innerHTML = sectionsHtml.join('');
+ }
+ 
+ function buildMailto(){
+   if(!validateStep1()){
+     showStep('step-1');
+     alert('Por favor completa los campos obligatorios.');
+     return null;
+   }
+ 
+   const data = getFormData();
+   const solutions = getSelectedSolutions();
+   const subjectCompany = formatValue(data.companyName);
+   const subjectDate = formatValue(data.visitDate);
+   const subjectTime = formatValue(data.visitTime);
+ 
+   const subject = `Solicitud de Visita Showroom OT – ${subjectCompany} – ${subjectDate} ${subjectTime}`;
+ 
+   let body = `A) Logística de la visita\n`;
+   body += `- Tipo de visita: ${formatValue(formatChoice(data.visitType, DISPLAY_MAPS.visitType))}\n`;
+   body += `- Fecha de visita: ${formatValue(data.visitDate)}\n`;
+   body += `- Hora de visita: ${formatValue(data.visitTime)}\n`;
+   body += `- Idioma de presentación: ${formatValue(formatChoice(data.presentationLanguage, DISPLAY_MAPS.presentationLanguage))}\n`;
+-  body += `- Receso de café: ${formatValue(formatChoice(data.coffeeBreak, DISPLAY_MAPS.coffeeBreak))}\n`;
+-  body += `- Centro de costos: ${formatValue(data.coffeeBreak === 'Yes' ? data.costCenter : '')}\n\n`;
++  body += `- Alimentos: ${formatValue(data.foodOption)}\n`;
++  if(data.foodOption === 'Personalizada'){
++    body += `- Detalle: ${formatValue(data.foodDetail)}\n`;
++  }
++  body += `- Centro de costos: ${formatValue(data.foodOption && data.foodOption !== 'Nada' ? data.costCenter : '')}\n\n`;
+ 
+   body += `B) Datos del cliente\n`;
+   body += `- Empresa (cliente): ${formatValue(data.companyName)}\n`;
+   body += `- Sector / Industria: ${formatValue(data.sector)}\n`;
+   body += `- Subsector: ${formatValue(data.subsector)}\n`;
+   body += `- Número de sitios / plantas: ${formatValue(data.sitesCount)}\n`;
+   body += `- Facturación anual (MXN): ${formatValue(data.annualRevenue)}\n\n`;
+ 
+   body += `C) Datos comerciales internos\n`;
+   body += `- Gerente comercial: ${formatValue(data.salesManager)}\n`;
+   body += `- Ejecutivo comercial: ${formatValue(data.accountExecutive)}\n`;
+   body += `- CUC corporativo: ${formatValue(data.corporateCuc)}\n`;
+   body += `- Estatus de la oportunidad: ${formatValue(data.opportunityStatus)}\n`;
+   body += `- Nombre o ID de oportunidad / proyecto: ${formatValue(data.opportunityProject)}\n`;
+   body += `- Número TOP: ${formatValue(data.topNumber)}\n\n`;
+ 
+   body += `D) Asistentes (cliente + Scitum/Telmex)\n`;
+   body += `Asistentes del cliente:\n`;
+   if(data.clientAttendees.length){
+     data.clientAttendees.forEach((attendee, idx)=>{
+       body += `- ${idx+1}. ${formatValue(attendee.name)} / ${formatValue(attendee.role)} / ${formatValue(attendee.email)}\n`;
+     });
+   }else{
+     body += `- ${EMPTY_VALUE}\n`;
+   }
+@@ -2572,53 +2619,53 @@ function toggleBrands(solutionId){
+   const checkbox = document.getElementById('sol-'+solutionId);
+   const brandsGroup = document.getElementById('brands-'+solutionId);
+   const radios = brandsGroup ? brandsGroup.querySelectorAll('input[type="radio"]') : [];
+   if(checkbox.checked){
+     if(brandsGroup) brandsGroup.classList.add('active');
+     if(radios.length > 0){
+       const anyChecked = Array.from(radios).some(r => r.checked);
+       if(!anyChecked){
+         radios[0].checked = true;
+       }
+     }
+   }else{
+     if(brandsGroup) brandsGroup.classList.remove('active');
+     radios.forEach(r=>r.checked=false);
+   }
+   updateDiagram();
+ }
+ 
+ /* Init */
+ document.addEventListener('DOMContentLoaded',()=>{
+   updateDiagram();
+   toggleCostCenter();
+   addAttendee('clientAttendeesList', true);
+   addAttendee('internalAttendeesList', false);
+ 
+-  const coffeeBreak = document.getElementById('coffeeBreak');
+-  if(coffeeBreak){
+-    coffeeBreak.addEventListener('change', toggleCostCenter);
++  const foodOption = document.getElementById('foodOption');
++  if(foodOption){
++    foodOption.addEventListener('change', toggleCostCenter);
+   }
+ 
+   const addClient = document.getElementById('addClientAttendee');
+   if(addClient){
+     addClient.addEventListener('click',()=>addAttendee('clientAttendeesList', true));
+   }
+   const addInternal = document.getElementById('addInternalAttendee');
+   if(addInternal){
+     addInternal.addEventListener('click',()=>addAttendee('internalAttendeesList', false));
+   }
+ 
+   const toStep2 = document.getElementById('toStep2');
+   if(toStep2){
+     toStep2.addEventListener('click',()=>{
+       if(validateStep1()){
+         showStep('step-2');
+       }else{
+         alert('Por favor completa los campos obligatorios.');
+       }
+     });
+   }
+   const backToStep1 = document.getElementById('backToStep1');
+   if(backToStep1){
+     backToStep1.addEventListener('click',()=>showStep('step-1'));
+   }
